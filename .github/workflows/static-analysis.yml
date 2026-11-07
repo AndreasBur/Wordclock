@@ -66,49 +66,12 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev clang-tidy
 
-      # Configured, not built: clang-tidy compiles each translation unit itself and needs
-      # nothing from the build but compile_commands.json, which every preset writes.
-      - name: Configure
-        run: cmake --preset simulator
-
-      # The one exception to "not built". WebPage.h holds the two pages as arrays and is
-      # generated rather than checked in, so a translation unit that includes it does not
-      # compile until the rule has run - and clang-tidy reports that as the file being
-      # missing, which reads like a bad include path rather than a build step that was
-      # skipped. It is the python script and nothing else, so it costs no build time.
-      - name: Generate the embedded pages
-        run: cmake --build --preset simulator --target WordclockWebPage
-
-      # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
-      # there, so a finding fails this job.
+      # Each step that checks something is a target of the Makefile, the same a developer runs,
+      # and the reasons for what it runs are written beside it there. This one: clang-tidy over
+      # the core and the simulator, every header on its own, and the names in the tests, the
+      # window and both backends' host tests.
       - name: Analyse
-        run: run-clang-tidy -p build -quiet -j "$(nproc)" 'firmware/|platform/simulator/src'
-
-      # Every header compiled as the only include of an empty file, by the compiler and with
-      # the flags the database records. A header that leans on what its includers happen to
-      # include first builds everywhere until one of them stops - tools/self-contained-headers.py
-      # says why that is not a finding any analyser above can make. Each backend's job runs it
-      # again with its own compiler, because the #if branches a header takes are the target's.
-      - name: Headers on their own
-        run: python3 tools/self-contained-headers.py build firmware/inc platform/simulator/include
-
-      # The names are the same everywhere, the tests and the window included, which the run
-      # above leaves out: what the other checks would say about test scaffolding is not worth
-      # answering, but a test written in the old names reads as the old code. Seconds, not
-      # minutes - one check.
-      - name: Names in the tests and the window
-        run: run-clang-tidy -p build -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
-
-      # The backends' host tests are compiled by their own run.sh and by nothing CMake or
-      # PlatformIO sees, so their names are read through the compile database run.sh writes.
-      # That takes python3, for the database and the generated page, and nothing else: no
-      # PlatformIO and no cross compiler, the stubs stand in for both.
-      - name: Names in the host tests
-        run: |
-          for backend in esp32 rp2350; do
-            "platform/$backend/test/run.sh" compiledb
-            run-clang-tidy -p "platform/$backend/.pio/host-tests" -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/'
-          done
+        run: make tidy
 
   clang-tidy-avr:
     name: clang-tidy (AVR Dx)
@@ -124,17 +87,8 @@ jobs:
         with:
           packages: cmake ninja-build gcc-avr avr-libc clang-tidy python3
 
-      # Configured, not built, as above. The preset names the toolchain file, which matters
-      # here: the database records whichever compiler project() found.
-      - name: Configure
-        run: cmake --preset avr
-
       - name: Analyse
-        run: python3 tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
-
-      # As in the clang-tidy job, by avr-g++, which this job installs for the tool above anyway.
-      - name: Headers on their own
-        run: python3 tools/self-contained-headers.py build-avr firmware/inc platform/avr-dx/include
+        run: make tidy-avr
 
   clang-tidy-platformio:
     name: clang-tidy (${{ matrix.backend }})
@@ -169,17 +123,8 @@ jobs:
       # PlatformIO at the version uv.lock pins, the one the firmware jobs build with.
       - uses: ./.github/actions/uv-sync
 
-      # compiledb rather than a build: it fetches the platform, runs the pre-scripts - which
-      # is what writes WebPage.h - and writes the database, and compiles nothing.
-      - name: Write the compile database
-        run: pio run -d platform/${{ matrix.backend }} -t compiledb
-
       - name: Analyse
-        run: python3 tools/cross-clang-tidy.py platform/${{ matrix.backend }} 'firmware/|platform/${{ matrix.backend }}/src|platform/arduino/src'
-
-      # As in the clang-tidy job, by the board's own compiler out of the PlatformIO packages.
-      - name: Headers on their own
-        run: python3 tools/self-contained-headers.py platform/${{ matrix.backend }} firmware/inc platform/${{ matrix.backend }}/include platform/arduino/include
+        run: make tidy-${{ matrix.backend }}
 
   cppcheck:
     name: cppcheck
@@ -188,46 +133,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # No cmake, no wxWidgets, no compile database: cppcheck is given the include
-      # directories and works out the configurations itself, which for the firmware core is
-      # enough - it reports the same findings with and without compile_commands.json, and
-      # this way the job still answers when the simulator does not build.
       - name: Install cppcheck
         uses: ./.github/actions/apt-install
         with:
           packages: cppcheck
 
-      # firmware/ only, unlike the clang-tidy job above. Without wxWidgets' own headers
-      # cppcheck stops at DECLARE_EVENT_TABLE in the simulator's window class and asks to be
-      # told what the macro is; the backend is the half clang-tidy covers through the
-      # compile database, and this is the half that needs no toolchain to read.
-      #
-      # --enable: warning and portability, not style or performance. Those two are where
-      # "could be static", "could be const&" and "could return a reference" live - 270 of
-      # them, about how the code is written rather than what it does, and the same argument
-      # .clang-tidy makes for leaving the style checks out.
-      # --check-level=exhaustive costs nothing measurable at this size (~4 s either way).
-      # --inline-suppr so a one-off can be answered next to the code, with the reason there,
-      # rather than by widening .cppcheck-suppressions to a whole file.
-      #
       # Both analysers use Ubuntu 26.04 packages, as in the dev container. Package
       # updates can still introduce new findings between image rebuilds.
       - name: Analyse
-        run: |
-          # An array, so each directory is one argument - a name with a blank in it included.
-          mapfile -t INCLUDES < <(find firmware/inc -type d | sed 's/^/-I/')
-          cppcheck \
-            --enable=warning,portability \
-            --check-level=exhaustive \
-            --std=c++17 \
-            --inline-suppr \
-            --suppressions-list=.cppcheck-suppressions \
-            --error-exitcode=1 \
-            --quiet \
-            "${INCLUDES[@]}" \
-            -Iplatform/simulator/include/sim \
-            -Iplatform/simulator/include \
-            firmware/src firmware/inc
+        run: make cppcheck
 
   # Which lines of firmware/ the tests run, as a table in the job's summary - the least covered
   # files first, because the gaps are what it is for. Read rather than enforced: there is no
@@ -251,21 +165,9 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
-      - name: Build the core tests with --coverage
-        run: |
-          cmake --preset coverage
-          cmake --build --preset coverage
-
-      - name: Run the three suites
-        run: |
-          ctest --preset coverage
-          HOST_TESTS_CXXFLAGS="--coverage -O0" platform/esp32/test/run.sh
-          HOST_TESTS_CXXFLAGS="--coverage -O0" platform/rp2350/test/run.sh
-
-      - name: Report
-        run: |
-          python3 tools/coverage.py --summary "$GITHUB_STEP_SUMMARY" \
-              build-cov platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
+      # Into the job's summary, which the target writes to whenever GITHUB_STEP_SUMMARY is set.
+      - name: Run the three suites and report
+        run: make coverage
 
   # The same three suites, built with AddressSanitizer and UndefinedBehaviorSanitizer. A test
   # whose code reads an uninitialised variable, runs past an array or shifts by more than the
@@ -280,9 +182,6 @@ jobs:
     name: Sanitizers
     runs-on: ubuntu-26.04
     timeout-minutes: 20
-    env:
-      SANITIZE: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
-      UBSAN_OPTIONS: print_stacktrace=1
     steps:
       - uses: actions/checkout@v7
 
@@ -291,16 +190,8 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
-      - name: Build the core tests
-        run: |
-          cmake --preset sanitizers
-          cmake --build --preset sanitizers
-
       - name: Run the three suites
-        run: |
-          ctest --preset sanitizers
-          HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh
-          HOST_TESTS_CXXFLAGS="$SANITIZE" platform/rp2350/test/run.sh
+        run: make sanitizers
 
   # The tests run what somebody thought of; this runs what nobody did. libFuzzer makes up
   # inputs for the two ways data from outside reaches the firmware - a command line as a
@@ -330,22 +221,14 @@ jobs:
       - name: Restore the corpus
         uses: actions/cache@v6
         with:
-          path: fuzz-work/*/corpus
+          path: build-fuzz/work/*/corpus
           key: fuzz-corpus-${{ github.run_id }}
           restore-keys: fuzz-corpus-
 
-      - name: Build the fuzzers
-        run: |
-          cmake --preset fuzz
-          cmake --build --preset fuzz
-
-      # The fuzzers are in no build the clang-tidy job reads, so their names are read here,
-      # through this build's own database.
-      - name: Names in the fuzzers
-        run: run-clang-tidy -p build-fuzz -quiet -j "$(nproc)" -checks='-*,readability-identifier-naming' 'platform/simulator/tests/fuzz'
-
+      # Built, their names read - they are in no build the clang-tidy job reads - and run for
+      # the Makefile's FUZZ_SECONDS each.
       - name: Fuzz
-        run: platform/simulator/tests/fuzz/run.sh build-fuzz 180 fuzz-work
+        run: make fuzz
 
       # The input that failed, so it can be replayed: build-fuzz/bin/<fuzzer> crash-<hash>.
       - name: Keep what was found
@@ -354,8 +237,8 @@ jobs:
         with:
           name: fuzz-findings
           path: |
-            fuzz-work/*/crash-*
-            fuzz-work/*/log.txt
+            build-fuzz/work/*/crash-*
+            build-fuzz/work/*/log.txt
           if-no-files-found: ignore
 
   # The shell scripts, the Python ones and the workflows, which build, test and check everything
@@ -376,16 +259,8 @@ jobs:
 
       - uses: ./.github/actions/uv-sync
 
-      - name: shellcheck
-        run: git ls-files -z '*.sh' | xargs -0 shellcheck
-
-      - name: ruff
-        run: ruff check
-
-      # actionlint runs shellcheck over every run: script as well, which is why it comes after
-      # shellcheck is installed.
-      - name: actionlint
-        run: actionlint
+      - name: shellcheck, ruff and actionlint
+        run: make scripts
 
   docs:
     name: Doxygen blocks
@@ -399,13 +274,6 @@ jobs:
         with:
           packages: doxygen
 
-      # Once per backend, over firmware/ and that backend: a \param that names no parameter, a
-      # command Doxygen does not know, an entity without a block or a block that leaves
-      # something out. docs/documentation.md says what a block holds. The runner's python3 is
-      # enough.
+      # The runner's python3 is enough.
       - name: Check
-        run: python3 tools/docs.py
-
-      # A line that continues a command of a block is indented under the command's text.
-      - name: Indented
-        run: python3 tools/doc-indent.py
+        run: make docs

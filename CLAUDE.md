@@ -128,8 +128,14 @@ cmake --workflow --preset simulator  # configure, build and run the tests in one
 ```
 
 `cmake --list-presets=all` names the others - `avr`, `clang`, `sanitizers`, `coverage`, `fuzz`
-and the `ci-` variants, which are the same with warnings as errors. CI calls the same presets,
-so a flag belongs in `CMakePresets.json` and not in a workflow.
+and the `ci-` variants, which are the same with warnings as errors.
+
+Everything else - the analysers, the host suites, the PlatformIO builds, the web smoke test -
+is a target of the `Makefile`, and so is each preset: `make` lists them. Every workflow step
+that builds or checks something is `make <target>` and nothing else, so a flag belongs in
+`CMakePresets.json` and a command in the `Makefile`, never in a workflow; the reason for a
+command is written beside it there. Before pushing, run the targets of what changed - `make
+lint` takes seconds, `make check` is all of CI and takes minutes, most of them PlatformIO.
 
 ## Delivering a change
 
@@ -241,9 +247,9 @@ overflows its card, and a page that scrolls sideways at 390 px is a bug however 
 looks. And **behaviour that needs input** — `set_input_files` on the update panel's picker
 plus a click on Install exercises the whole upload, both answers included.
 
-The first of them runs on every pull request: `tools/web-smoke.py build/bin/Wordclock` starts
-the simulator under `xvfb-run` — no window on anybody's desktop, no sandbox to disable — and
-checks both pages at 390 and 1280 px for console errors, sideways scrolling and a command
+The first of them runs on every pull request: `make web`, which is `tools/web-smoke.py
+build/bin/Wordclock`, starts the simulator under `xvfb-run` — no window on anybody's desktop, no
+sandbox to disable — and checks both pages at 390 and 1280 px for console errors, sideways scrolling and a command
 answered. Run it before reaching for a script of your own; write one for what it does not
 check.
 

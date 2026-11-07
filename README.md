@@ -102,6 +102,10 @@ cmake --workflow --preset simulator    # configure, build, test - into build/
 cmake --list-presets=all               # avr, clang, sanitizers, coverage, fuzz, ci-*
 ```
 
+Or through the [Makefile](Makefile), which is the index over the presets and everything that
+is not CMake: `make` lists every target, `make simulator` is the line above, `make run` starts
+the window, and `make check` is everything CI runs.
+
 That way requires CMake ≥ 3.25 for the presets, Ninja, a C++17 compiler and wxWidgets 3.x
 (GTK on Linux). Without the presets the platform is the `PLATFORM` switch,
 `-DPLATFORM=simulator` by default. See the [simulator README](platform/simulator/README.md) for details.
@@ -159,16 +163,16 @@ whether the code builds and whether it reads clean.
 repository can be built, each of which breaks on its own, and the host builds once more
 with clang:
 
-| Job | What it does |
-|-----|--------------|
-| Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
-| Host builds with clang | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
-| Web pages in a browser | [`tools/web-smoke.py`](tools/web-smoke.py): the panel and the console in Chromium against the simulator, at 390 and 1280 px — no console error, nothing wider than the window, a command typed in the console answered |
-| ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
-| RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
-| ESP32 firmware | `pio run` for the board it actually runs on |
-| RP2350 firmware | `pio run` for the Pico 2 W |
-| AVR Dx firmware | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and [`tools/avr-stack.py`](tools/avr-stack.py): the deepest stack against the RAM the image leaves free |
+| Job | `make` | What it does |
+|-----|--------|--------------|
+| Simulator and core tests | `simulator` | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
+| Host builds with clang | `clang` | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
+| Web pages in a browser | `web` | [`tools/web-smoke.py`](tools/web-smoke.py): the panel and the console in Chromium against the simulator, at 390 and 1280 px — no console error, nothing wider than the window, a command typed in the console answered |
+| ESP32 backend on the host | `host-esp32` | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
+| RP2350 backend on the host | `host-rp2350` | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
+| ESP32 firmware | `esp32` | `pio run` for the board it actually runs on, and the sizes its README states against the image |
+| RP2350 firmware | `rp2350` | `pio run` for the Pico 2 W, and the sizes its notes state |
+| AVR Dx firmware | `avr` | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and [`tools/avr-stack.py`](tools/avr-stack.py): the deepest stack against the RAM the image leaves free |
 
 A firmware job looks redundant next to its host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
@@ -182,53 +186,32 @@ is what reads the code rather than building it — two analysers, because they a
 good at different things, a report of what the tests reach, the tests run again
 under the sanitizers, and a fuzzer for what no test thought of:
 
-| Job | What it does |
-|-----|--------------|
-| clang-tidy | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
-| coverage | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
-| sanitizers | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
-| fuzz | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
-| cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
-| Scripts | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
+| Job | `make` | What it does |
+|-----|--------|--------------|
+| clang-tidy | `tidy` | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
+| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
+| sanitizers | `sanitizers` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
+| fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
+| cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
+| Scripts | `scripts` | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
 clang-tidy already covers through the compile database.
 
-The same commands are what to run before pushing; nothing in them needs a display,
-a board, or anything the dev container does not carry. The analysers are the ones
-that need a configured build directory rather than a built one:
+Each job is one target of the [Makefile](Makefile), and the workflows run nothing else, so
+the column above is also what to type before pushing. Nothing in them needs a display, a board,
+or anything the dev container does not carry. The clang-tidy job of each cross-compiled backend
+is `tidy-avr`, `tidy-esp32` and `tidy-rp2350`, the Doxygen blocks are `docs`:
 
 ```bash
-cmake --preset simulator                # every preset writes compile_commands.json
-run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
-tools/self-contained-headers.py build firmware/inc platform/simulator/include
-run-clang-tidy -p build -quiet -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
-platform/esp32/test/run.sh compiledb    # and the same for rp2350
-run-clang-tidy -p platform/esp32/.pio/host-tests -quiet -checks='-*,readability-identifier-naming' 'platform/'
-cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
-    --suppressions-list=.cppcheck-suppressions \
-    $(find firmware/inc -type d | sed 's/^/-I/') \
-    -Iplatform/simulator/include/sim -Iplatform/simulator/include \
-    firmware/src firmware/inc
+make lint                     # scripts, docs and cppcheck: seconds, no build
+make tidy                     # clang-tidy over the core and the simulator
+make check                    # every job of both workflows, warnings as errors
+make fuzz FUZZ_SECONDS=300    # longer than the three minutes a pull request gets
 ```
 
-The sanitizers need a build of their own, because every object is instrumented. The host
-suites are not CMake builds and take the flags themselves:
-
-```bash
-cmake --workflow --preset sanitizers   # into build-san/
-SANITIZE="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh    # and the same for rp2350
-```
-
-And the fuzzers, which need clang and a build of their own as well. The last number is how
-many seconds each runs; a second run goes on from the corpus the first left in `build-fuzz/work`:
-
-```bash
-cmake --workflow --preset fuzz         # into build-fuzz/
-platform/simulator/tests/fuzz/run.sh build-fuzz 300 build-fuzz/work
-```
+The fuzzers go on from the corpus the run before left in `build-fuzz/work`.
 
 ## License
 

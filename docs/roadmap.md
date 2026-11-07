@@ -88,27 +88,13 @@ whose clock is unreachable has nothing to show.
 Nothing here changes what the clock does, which is why it stands apart from the list above:
 what it buys is that a change is checked the same way on every machine, today and next year.
 
-### One way in: CMake presets and a Makefile
-
-The commands that build and check this repository were written out three times — in the
-workflows, in the [README](../README.md) and in the agent notes. The tools they call are pinned
-in `uv.lock`, and the CMake builds are one place now: [CMakePresets.json](../CMakePresets.json),
-which the workflows call as well, and whose `cmake --workflow --preset avr` configures, builds
-and checks the image in one call. What is still written out is everything that is not CMake -
-the analysers, the host suites, the PlatformIO builds, the web smoke test.
-
-The rest of the shape: a `Makefile` that is nothing but the index over the presets and over
-`uv run`, `make help` listing every action. `make` is on every machine already, and the logic stays in versioned files rather than
-in it. CI then calls the same targets a developer does, and the command lines exist once.
-
-Settled when `make check` runs locally what CI runs, and the workflows call nothing else.
-
 ### Lint the two web pages
 
 `web/app.html` and `web/index.html` are HTML with their scripts inline, and only a browser has
 ever read them. html-validate and eslint, its HTML plugin reading the inline scripts, would —
-but both are npm packages, which brings an npm lockfile next to `uv.lock`. Worth it once the
-item above has settled how a tool is called, so that these arrive the same way.
+but both are npm packages, which brings an npm lockfile next to `uv.lock`. They would arrive
+the way every other tool has: pinned in a lockfile, called by a target of the
+[Makefile](../Makefile), and that target is what CI runs.
 
 ### Let the pins update themselves
 
@@ -175,3 +161,4 @@ it happened in.
 | **The host builds again with clang**, the backends' host suites included | the clang job in [ci.yml](../.github/workflows/ci.yml) |
 | **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **One pinned environment for the Python tools** — PlatformIO, Playwright, ruff, actionlint — the same in the dev container and in CI | [pyproject.toml](../pyproject.toml) and `uv.lock`, the [uv-sync action](../.github/actions/uv-sync/action.yml) |
+| **One way in** — a preset for every CMake build, and a Makefile over them and everything else: `make check` is what CI runs, and the workflows call nothing but its targets | [Makefile](../Makefile), [CMakePresets.json](../CMakePresets.json) |
