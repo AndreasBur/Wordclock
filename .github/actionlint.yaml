@@ -1,0 +1,7 @@
+# What actionlint is told beyond what it knows. Every job runs on ubuntu-26.04, a GitHub-hosted
+# label newer than the list the pinned actionlint carries, which would otherwise be reported as an
+# unknown runner on every job. Declared here rather than switched off, so that a misspelt label is
+# still found.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04

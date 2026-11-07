@@ -33,7 +33,8 @@ FROM ${BASE_IMAGE}
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
 # doxygen is what tools/docs.py reads the Doxygen blocks with, a job of that workflow as well.
-# shellcheck and flake8 read the shell and Python scripts, the "Scripts" job of that workflow.
+# shellcheck reads the shell scripts, in the "Scripts" job of that workflow; ruff and actionlint,
+# the job's other two, come with the tool environment below.
 # clang, libclang-rt-dev and llvm build and read the fuzzers of that workflow's fuzz job. clang
 # alone is not enough, and fails late: it compiles a fuzzer and then cannot link it, because
 # libFuzzer and the sanitizers' runtimes are libclang-rt-dev. llvm brings llvm-symbolizer,
@@ -54,7 +55,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         llvm \
         cppcheck \
         doxygen \
-        flake8 \
         shellcheck \
         gcc-avr \
         avr-libc \
@@ -92,10 +92,9 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     dpkg -i /tmp/gh.deb && \
     rm /tmp/gh.deb
 
-# PlatformIO for the ESP32 backend, plus what test/run.sh needs: python3 for the page
-# embedding, node for the local web console. In a virtual environment because Ubuntu 24.04
-# refuses to let pip write into the system one, and under /opt so it belongs to the image
-# rather than to a home directory a volume may replace.
+# python3 for the tool environment below and for what the scripts in tools/ and test/run.sh
+# need - the page embedding among them - and python3-venv for the pip that installs uv where
+# the base image has none. node for the local web console.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         python3 \
@@ -103,42 +102,47 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m venv /opt/platformio && \
-    /opt/platformio/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/platformio/bin/pip install --no-cache-dir platformio
+# uv, which makes the environment below from pyproject.toml and uv.lock. This ARG is the one
+# place its version is written: .github/actions/uv-sync reads it for CI. The Vector base image
+# brings a uv already, under /opt/uv; the others get it from PyPI, into an environment of its own
+# as pip will not write into the system's.
+ARG UV_VERSION=0.12.0
+RUN if ! command -v uv >/dev/null; then \
+        python3 -m venv /opt/uv-pip && \
+        /opt/uv-pip/bin/pip install --no-cache-dir "uv==${UV_VERSION}" && \
+        ln -s /opt/uv-pip/bin/uv /opt/uv-pip/bin/uvx /usr/local/bin/; \
+    fi
 
-ENV PATH="/opt/platformio/bin:${PATH}"
-
-# PlatformIO downloads with requests and hands it its own certifi bundle, so it ignores
-# REQUESTS_CA_BUNDLE and fails behind a TLS-intercepting proxy with
-# CERTIFICATE_VERIFY_FAILED on URLs that curl and git fetch without complaint. Appending
-# the image's own trust store keeps verification on rather than turning it off. The
-# platform packages build a second environment under ~/.platformio at first use, which
-# needs the same and gets it from the shared feature's postStartCommand.
-RUN cat /etc/ssl/certs/ca-certificates.crt \
-        >> "$(/opt/platformio/bin/python -c 'import certifi; print(certifi.where())')"
-
-# Playwright with its own Chromium, which is what looks at web/index.html - the one part of
-# this project the simulator cannot show, and the only front end whose layout has to be
-# checked by looking. Its own, because apt on this base offers `chromium-browser` as a snap
-# stub and snap does not run in a container: the browser Playwright brings is a plain
-# tarball under the path below.
+# The repository's Python tools - PlatformIO, Playwright, ruff, actionlint - in one environment,
+# at the versions uv.lock pins, which are CI's as well. Under /opt so it belongs to the image
+# rather than to a home directory a volume may replace, and on PATH, so `pio` and the rest work as
+# they did when each had an environment of its own. UV_PROJECT_ENVIRONMENT makes `uv run` in the
+# workspace use this one rather than make a .venv; it belongs to the remote user, because a
+# changed uv.lock is synced into it by the next `uv run`.
 #
-# PLAYWRIGHT_BROWSERS_PATH is what keeps it out of ~/.cache, which a volume replaces - the
-# same reason the venv above lives under /opt. --with-deps pulls the ~30 libraries a
-# headless Chromium links against, so this layer is the expensive one in the image: about
-# 650 MB of browser and libraries. It runs headless, so it needs no X server and none of
-# the display plumbing "Screenshotting the simulator" in CLAUDE.md has to work around.
+# PlatformIO downloads with requests and hands it certifi's bundle, so it ignores
+# REQUESTS_CA_BUNDLE and fails behind a TLS-intercepting proxy with CERTIFICATE_VERIFY_FAILED on
+# URLs that curl and git fetch without complaint. Appending the image's own trust store keeps
+# verification on rather than turning it off. The platform packages build a second environment
+# under ~/.platformio at first use, and a sync can replace certifi here; the shared feature's
+# postStartCommand appends to both.
 #
-# Pinned, and to the version the web job of ci.yml installs: a Playwright release brings its own
-# Chromium, so two versions are two browsers, and the job's cached one would never match.
-ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
-ARG PLAYWRIGHT_VERSION=1.64.1
-RUN python3 -m venv /opt/playwright && \
-    /opt/playwright/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/playwright/bin/pip install --no-cache-dir "playwright==${PLAYWRIGHT_VERSION}" && \
-    /opt/playwright/bin/playwright install --with-deps chromium && \
+# Playwright's Chromium is what looks at the two pages - its own, because apt on this base offers
+# `chromium-browser` as a snap stub and snap does not run in a container. PLAYWRIGHT_BROWSERS_PATH
+# keeps it out of ~/.cache, which a volume replaces. --with-deps pulls the ~30 libraries a headless
+# Chromium links against, so this layer is the expensive one in the image: about 650 MB.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
+    UV_PROJECT_ENVIRONMENT=/opt/wordclock-env \
+    UV_LINK_MODE=copy \
+    PATH="/opt/wordclock-env/bin:${PATH}"
+COPY pyproject.toml uv.lock /opt/wordclock-tools/
+RUN cd /opt/wordclock-tools && \
+    UV_NO_CACHE=1 uv sync --frozen && \
+    cat /etc/ssl/certs/ca-certificates.crt \
+        >> "$(/opt/wordclock-env/bin/python -c 'import certifi; print(certifi.where())')" && \
+    /opt/wordclock-env/bin/playwright install --with-deps chromium && \
     chmod -R a+rX /opt/ms-playwright && \
+    chown -R vscode:vscode /opt/wordclock-env && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # The package cache is a named volume, and an empty one takes its ownership from the path

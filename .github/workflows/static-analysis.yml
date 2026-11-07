@@ -155,18 +155,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-
       # The same keys as the firmware jobs in ci.yml, so whichever of the two runs first
       # fills the cache for the other - the toolchains are the slow part of this job too.
       - name: Cache the PlatformIO packages
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.platformio
-            ~/.cache/pip
+          path: ~/.platformio
           key: ${{ matrix.cache }}-${{ runner.os }}-${{ hashFiles(format('platform/{0}/platformio.ini', matrix.backend)) }}
           restore-keys: ${{ matrix.cache }}-${{ runner.os }}-
 
@@ -175,8 +169,8 @@ jobs:
         with:
           packages: clang-tidy
 
-      - name: Install PlatformIO
-        run: pip install --upgrade platformio
+      # PlatformIO at the version uv.lock pins, the one the firmware jobs build with.
+      - uses: ./.github/actions/uv-sync
 
       # compiledb rather than a build: it fetches the platform, runs the pre-scripts - which
       # is what writes WebPage.h - and writes the database, and compiles nothing.
@@ -223,7 +217,8 @@ jobs:
       # updates can still introduce new findings between image rebuilds.
       - name: Analyse
         run: |
-          INCLUDES=$(find firmware/inc -type d | sed 's/^/-I/')
+          # An array, so each directory is one argument - a name with a blank in it included.
+          mapfile -t INCLUDES < <(find firmware/inc -type d | sed 's/^/-I/')
           cppcheck \
             --enable=warning,portability \
             --check-level=exhaustive \
@@ -232,7 +227,7 @@ jobs:
             --suppressions-list=.cppcheck-suppressions \
             --error-exitcode=1 \
             --quiet \
-            $INCLUDES \
+            "${INCLUDES[@]}" \
             -Iplatform/simulator/include/sim \
             -Iplatform/simulator/include \
             firmware/src firmware/inc
@@ -370,9 +365,10 @@ jobs:
             fuzz-work/*/log.txt
           if-no-files-found: ignore
 
-  # The shell scripts and the Python ones, which build, test and check everything else and were
-  # read by nothing: shellcheck over every .sh, flake8 over every .py, with the checks .flake8
-  # names. Both from the archive, as in the dev container. Seconds, not minutes.
+  # The shell scripts, the Python ones and the workflows, which build, test and check everything
+  # else: shellcheck over every .sh, ruff over every .py with the checks pyproject.toml selects,
+  # and actionlint over .github/workflows with what .github/actionlint.yaml adds. shellcheck from
+  # the archive, the other two at the versions uv.lock pins. Seconds, not minutes.
   scripts:
     name: Scripts
     runs-on: ubuntu-26.04
@@ -380,16 +376,23 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install the linters
+      - name: Install shellcheck
         uses: ./.github/actions/apt-install
         with:
-          packages: shellcheck flake8
+          packages: shellcheck
+
+      - uses: ./.github/actions/uv-sync
 
       - name: shellcheck
         run: git ls-files -z '*.sh' | xargs -0 shellcheck
 
-      - name: flake8
-        run: git ls-files -z '*.py' | xargs -0 flake8
+      - name: ruff
+        run: ruff check
+
+      # actionlint runs shellcheck over every run: script as well, which is why it comes after
+      # shellcheck is installed.
+      - name: actionlint
+        run: actionlint
 
   docs:
     name: Doxygen blocks

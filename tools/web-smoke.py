@@ -19,9 +19,9 @@ through xvfb-run, so that its window opens nowhere a person would see it, and in
 its own, because it keeps its settings in a file in the working directory. It is stopped again
 whatever the outcome.
 
-Run with a Python that has Playwright and its Chromium - the dev container's /opt/playwright:
+Run with the tool environment, which has Playwright at the version uv.lock pins:
 
-    /opt/playwright/bin/python tools/web-smoke.py build/bin/Wordclock
+    uv run tools/web-smoke.py build/bin/Wordclock
 """
 
 import argparse

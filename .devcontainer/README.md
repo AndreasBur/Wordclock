@@ -176,8 +176,8 @@ way are silently ignored.
 
 ## PlatformIO for the ESP32 backend
 
-The image carries PlatformIO in a virtual environment under `/opt/platformio`, on the
-`PATH`, plus `python3` and `nodejs` — which is what
+The image carries PlatformIO in the tool environment under `/opt/wordclock-env`, on the
+`PATH` and at the version [`uv.lock`](../uv.lock) pins, plus `python3` and `nodejs` — which is what
 [`platform/esp32/test/run.sh`](../platform/esp32/test/run.sh) needs for the page embedding
 and for the local server that puts both pages in front of it. So `pio run -d platform/esp32` works with nothing to install.
 

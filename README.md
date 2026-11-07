@@ -189,7 +189,7 @@ under the sanitizers, and a fuzzer for what no test thought of:
 | sanitizers | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
 | fuzz | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
 | cppcheck | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
-| Scripts | shellcheck over every shell script and flake8 over every Python one - the scripts that build, test and check everything else. flake8 runs pyflakes only, for the reason [`.flake8`](.flake8) gives |
+| Scripts | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
 
 cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
