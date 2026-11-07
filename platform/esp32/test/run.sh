@@ -115,7 +115,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/I2cBus.cpp"
     "$PLATFORM_DIR/src/Pixels.cpp"
     "$PLATFORM_DIR/src/PowerSwitch.cpp"
-    "$PLATFORM_DIR/src/RealTimeClock.cpp"
+    "$ROOT/platform/arduino/src/RealTimeClock.cpp"
     "$PLATFORM_DIR/src/Storage.cpp"
     "$PLATFORM_DIR/src/System.cpp"
     "$PLATFORM_DIR/src/WordclockMain.cpp"

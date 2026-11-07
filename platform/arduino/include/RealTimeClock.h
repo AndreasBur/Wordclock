@@ -3,12 +3,12 @@
 
 /*!
  * \file
- * \brief RP2350 real-time clock, backed by the system clock.
+ * \brief The real-time clock of both Arduino backends, backed by the system clock.
  *
  * Mirrors the public API of the simulator's real-time clock, so the shared firmware core reads the
  * time the same way on both.
  *
- * The RP2350's system clock *is* the clock, kept right by SNTP in the background and converted to
+ * The system clock *is* the clock, kept right by SNTP in the background and converted to
  * local time by the zone rule the application installs - which is also what makes daylight saving
  * somebody else's problem. Task() therefore reads rather than counts, and no seconds are counted
  * here.
@@ -32,11 +32,11 @@
  * The core reads the time and the date wherever it shows or compares them, and sets them from the
  * time and the date commands. The application calls Task() on every tick, outside the scheduler.
  *
- * On the RP2350 the system clock is the source, which SNTP sets once the application has applied
- * the zone rule WORDCLOCK_TIMEZONE at start and started the time servers once the link is up; see
- * TimeSync.h. The date and time here are local time, by that rule. The DS3231 fills in while the
- * system clock holds no valid year, and is written from the system clock once an hour and after
- * every setting. The chip keeps UTC.
+ * The system clock is the source, which SNTP sets once the backend has applied the zone rule
+ * WORDCLOCK_TIMEZONE and started the time servers - the ESP32 with configTzTime(), the RP2350
+ * through TimeSync.h. The date and time here are local time, by that rule. The DS3231 fills in
+ * while the system clock holds no valid year, and is written from the system clock once an hour
+ * and after every setting. The chip keeps UTC.
  */
 class RealTimeClock
 {
@@ -127,11 +127,11 @@ class RealTimeClock
     /*!
      * \brief Sets the date and time.
      *
-     * On the RP2350 it keeps them at once and writes them to the system clock as local time,
-     * through the zone rule, ignoring whether the system clock took them; the next Task() that
-     * finds the system clock set writes the chip as well. Written through rather than just
-     * stored: Task() reads the system clock back on the very next tick, so a value kept only here
-     * would be overwritten within 10 ms and the time command would look like it did nothing.
+     * It keeps them at once and writes them to the system clock as local time, through the zone
+     * rule, ignoring whether the system clock took them; the next Task() that finds the system clock
+     * set writes the chip as well. Written through rather than just stored: Task() reads the system
+     * clock back on the very next tick, so a value kept only here would be overwritten within 10 ms
+     * and the time command would look like it did nothing.
      *
      * \param[in] date_time The date and time.
      */
@@ -140,7 +140,7 @@ class RealTimeClock
     /*!
      * \brief Sets the time of day, and keeps the date.
      *
-     * On the RP2350 it writes the date it holds and the new time to the system clock, as
+     * It writes the date it holds and the new time to the system clock, as
      * SetDateTime() does, and has the next Task() write the chip.
      *
      * \param[in] time The time of day.
@@ -150,7 +150,7 @@ class RealTimeClock
     /*!
      * \brief Sets the date, and keeps the time of day.
      *
-     * On the RP2350 it writes the new date and the time it holds to the system clock, as
+     * It writes the new date and the time it holds to the system clock, as
      * SetDateTime() does, and has the next Task() write the chip.
      *
      * \param[in] date The date.
@@ -160,18 +160,18 @@ class RealTimeClock
     /*!
      * \brief Brings the date and time up to date.
      *
-     * On the RP2350 it takes them from the system clock, as local time, while the system clock
-     * holds a valid year, and then writes the chip in UTC when the hour differs from the one it
-     * last wrote, or after a setting. Nothing is counted forward here, unlike on the simulator:
-     * SNTP keeps the system clock right on its own, so counting would only add a second source of
-     * truth that drifts away from it.
+     * It takes them from the system clock, as local time, while the system clock holds a valid
+     * year, and then writes the chip in UTC when the hour differs from the one it last wrote, or
+     * after a setting. Nothing is counted forward here, unlike on the simulator: SNTP
+     * keeps the system clock right on its own, so counting would only add a second source of truth
+     * that drifts away from it.
      *
-     * While the system clock holds no valid year it leaves the date and time as they were and
-     * tries the chip instead, on its first such call and then about once a second. A chip that
-     * answers sets the system clock, which the next call then reads. The clock chip is the source
-     * of last resort rather than a second one: it is read only while the system clock holds
-     * nothing. Which way round matters - the chip drifts a few seconds a month and SNTP does not,
-     * so a chip that could overwrite a synchronised clock would make the clock worse.
+     * While the system clock holds no valid year it leaves the date and time as they were and tries
+     * the chip instead, on its first such call and then about once a second. A chip that answers
+     * sets the system clock, which the next call then reads. The clock chip is the source of last
+     * resort rather than a second one: it is read only while the system clock holds nothing. Which
+     * way round matters - the chip drifts a few seconds a month and SNTP does not, so a chip that
+     * could overwrite a synchronised clock would make the clock worse.
      */
     void Task();
 };

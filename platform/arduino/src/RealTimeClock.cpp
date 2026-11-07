@@ -3,10 +3,12 @@
 
 /*!
  * \file
- * \brief RP2350 real-time clock, backed by the system clock.
+ * \brief The real-time clock of both Arduino backends, backed by the system clock.
  *
- * All conversions go through the C library's local time, so the zone and the daylight-saving rule
- * that the application installed with wordclock_time::ApplyTimeZone() apply in both directions.
+ * The system clock's conversions go through the C library's local time, so the zone and the
+ * daylight-saving rule the backend installed - configTzTime() on the ESP32,
+ * wordclock_time::ApplyTimeZone() on the RP2350 - apply in both directions. The chip's go through
+ * UTC and leave the rule out.
  */
 
 #include "RealTimeClock.h"

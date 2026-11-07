@@ -173,7 +173,7 @@ it happened in.
 | **WiFi provisioning** — credentials in NVS, command 13, an access point when there are none | [web/README.md](../web/README.md) |
 | **The panel and the console** — six task pages at `/`, the generated command groups at `/console` | [web/README.md](../web/README.md) |
 | **OTA update** on both networked backends, `POST /update`, and command 16's password in front of every route | the two backends' READMEs |
-| **An RTC with a battery**, keeping UTC and never overwriting a clock SNTP has set | [RealTimeClock.cpp](../platform/esp32/src/RealTimeClock.cpp) |
+| **An RTC with a battery**, keeping UTC and never overwriting a clock SNTP has set | [RealTimeClock.cpp](../platform/arduino/src/RealTimeClock.cpp) |
 | **Colour animations** — a hue cycle that is a level of its own rather than a write to the colour | [ColorCycle.h](../firmware/inc/ColorCycle/ColorCycle.h) |
 | **The overlay configuration is stored**, all three slots, the text as a fixed field | [Persistence.h](../firmware/inc/Persistence/Persistence.h) |
 | **An installable console**, with the limit above as the more interesting half of the answer | [manifest.webmanifest](../web/manifest.webmanifest), [web/README.md](../web/README.md) |
