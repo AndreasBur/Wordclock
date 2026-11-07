@@ -236,6 +236,12 @@ overflows its card, and a page that scrolls sideways at 390 px is a bug however 
 looks. And **behaviour that needs input** — `set_input_files` on the update panel's picker
 plus a click on Install exercises the whole upload, both answers included.
 
+The first of them runs on every pull request: `tools/web-smoke.py build/bin/Wordclock` starts
+the simulator under `xvfb-run` — no window on anybody's desktop, no sandbox to disable — and
+checks both pages at 390 and 1280 px for console errors, sideways scrolling and a command
+answered. Run it before reaching for a script of your own; write one for what it does not
+check.
+
 What none of them shows is **the colour that went to the strip**. Both pages take only
 *whether* a pixel is lit from the frame — the bytes arrive already dimmed, and a word at low
 brightness would be a dark grey on a dark ground — and the wx window renders brightness as a

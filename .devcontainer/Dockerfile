@@ -19,6 +19,8 @@ FROM ${BASE_IMAGE}
 # PlatformIO block below, which installs them for the same two jobs. wx-common is not
 # listed either, but for a different reason — libwxgtk3.2-dev depends on it, and it
 # is what puts the wx-config that find_package needs on the PATH.
+# xvfb gives the simulator an X server nobody sees, for tools/web-smoke.py: the pages need the
+# simulator behind them, and the simulator opens a window wherever it runs.
 # imagemagick, xdotool and x11-utils are not needed to build or run the simulator.
 # They let an agent screenshot the running window to check a layout change instead of
 # having to ask; see "Screenshotting the simulator" in CLAUDE.md.
@@ -61,6 +63,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         imagemagick \
         librsvg2-bin \
         xdotool \
+        xvfb \
         x11-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -126,10 +129,14 @@ RUN cat /etc/ssl/certs/ca-certificates.crt \
 # headless Chromium links against, so this layer is the expensive one in the image: about
 # 650 MB of browser and libraries. It runs headless, so it needs no X server and none of
 # the display plumbing "Screenshotting the simulator" in CLAUDE.md has to work around.
+#
+# Pinned, and to the version the web job of ci.yml installs: a Playwright release brings its own
+# Chromium, so two versions are two browsers, and the job's cached one would never match.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+ARG PLAYWRIGHT_VERSION=1.64.1
 RUN python3 -m venv /opt/playwright && \
     /opt/playwright/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/playwright/bin/pip install --no-cache-dir playwright && \
+    /opt/playwright/bin/pip install --no-cache-dir "playwright==${PLAYWRIGHT_VERSION}" && \
     /opt/playwright/bin/playwright install --with-deps chromium && \
     chmod -R a+rX /opt/ms-playwright && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
