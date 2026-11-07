@@ -1,0 +1,12 @@
+{
+  "name": "wordclock-web-lint",
+  "private": true,
+  "description": "The linters for web/app.html and web/index.html. Nothing here is shipped: the pages are embedded into the firmware as they are.",
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "eslint-plugin-html": "8.2.1",
+    "globals": "17.13.0",
+    "html-validate": "11.17.0"
+  }
+}

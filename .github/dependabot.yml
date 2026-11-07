@@ -41,3 +41,16 @@ updates:
     groups:
       linters:
         patterns: ["ruff", "actionlint-py"]
+
+  # package.json and package-lock.json: the web pages' linters. One pull request for all of them,
+  # since eslint, its plugin, @eslint/js and globals move together, and html-validate's new
+  # findings are answered the same way as eslint's.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      web-linters:
+        patterns: ["*"]

@@ -57,3 +57,6 @@ __pycache__/
 # is not there. So the directory is ignored and that one file is excepted back in.
 /.idea/*
 !/.idea/editor.xml
+
+# The web pages linters, installed by `make web-lint` from package-lock.json
+node_modules/

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
   The clock's own page: what somebody opens when they type the clock's address. Six task
   pages beside the letter plate, for the handful of things a word clock is actually set to -
@@ -457,7 +458,7 @@
         <!-- Everything this page does not cover, which is most of the command set. -->
         <span class="tools">
             <a href="console" id="console-link">Console</a>
-            <button type="button" id="theme" title="Follow the system, or choose light or dark"></button>
+            <button type="button" id="theme" title="Follow the system, or choose light or dark">system</button>
         </span>
     </div>
 </header>
@@ -1485,7 +1486,7 @@
             try {
                 const answer = JSON.parse(request.responseText);
                 if (answer.error) { reason = answer.error; }
-            } catch (ignored) {
+            } catch {
                 reason = "the answer was not from the clock (HTTP " + request.status + ")";
             }
             say(reason, "failed");
@@ -1514,7 +1515,7 @@
         if (name === "system") { document.documentElement.removeAttribute("data-theme"); }
         else { document.documentElement.dataset.theme = name; }
         themeButton.textContent = name;
-        try { localStorage.setItem("wordclock-theme", name); } catch (ignored) { /* private window */ }
+        try { localStorage.setItem("wordclock-theme", name); } catch { /* private window */ }
     }
 
     themeButton.addEventListener("click", () => {
@@ -1522,7 +1523,7 @@
     });
 
     let stored = null;
-    try { stored = localStorage.getItem("wordclock-theme"); } catch (ignored) { /* private window */ }
+    try { stored = localStorage.getItem("wordclock-theme"); } catch { /* private window */ }
     showTheme(THEMES.includes(stored) ? stored : "system");
 
     /* ---- and the connection that all of it hangs on -------------------------------- */

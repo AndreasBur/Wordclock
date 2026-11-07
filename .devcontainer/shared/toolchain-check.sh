@@ -26,7 +26,7 @@ TOOLS='cmake ninja wx-config
        clang-tidy run-clang-tidy cppcheck doxygen shellcheck
        uv ruff actionlint playwright
        clang++ llvm-symbolizer
-       python3 gh
+       python3 gh node npm
        xdotool xwininfo import rsvg-convert xvfb-run'
 
 missing=''

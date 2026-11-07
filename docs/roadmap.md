@@ -83,19 +83,6 @@ the install can be tried. That also settles what not to add: a service worker ne
 same secure context, and offline is not what this page wants anyway, since a console
 whose clock is unreachable has nothing to show.
 
-## The repository's own tooling
-
-Nothing here changes what the clock does, which is why it stands apart from the list above:
-what it buys is that a change is checked the same way on every machine, today and next year.
-
-### Lint the two web pages
-
-`web/app.html` and `web/index.html` are HTML with their scripts inline, and only a browser has
-ever read them. html-validate and eslint, its HTML plugin reading the inline scripts, would —
-but both are npm packages, which brings an npm lockfile next to `uv.lock`. They would arrive
-the way every other tool has: pinned in a lockfile, called by a target of the
-[Makefile](../Makefile), and that target is what CI runs.
-
 ## An idea, not a plan
 
 **A second language in the word tables.** The mechanism is half here already: four
@@ -155,4 +142,5 @@ it happened in.
 | **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **One pinned environment for the Python tools** — PlatformIO, Playwright, ruff, actionlint — the same in the dev container and in CI | [pyproject.toml](../pyproject.toml) and `uv.lock`, the [uv-sync action](../.github/actions/uv-sync/action.yml) |
 | **One way in** — a preset for every CMake build, and a Makefile over them and everything else: `make check` is what CI runs, and the workflows call nothing but its targets | [Makefile](../Makefile), [CMakePresets.json](../CMakePresets.json) |
-| **The pins update themselves** — Dependabot for the actions and for `uv.lock`, weekly, a week after a release; what it cannot read is named there | [dependabot.yml](../.github/dependabot.yml) |
+| **The pins update themselves** — Dependabot for the actions, `uv.lock` and `package-lock.json`, weekly, a week after a release; what it cannot read is named there | [dependabot.yml](../.github/dependabot.yml) |
+| **The two web pages are linted** — html-validate and eslint; the first run found both pages without a doctype, in quirks mode in every browser | [.htmlvalidate.mjs](../.htmlvalidate.mjs), [eslint.config.mjs](../eslint.config.mjs) |
