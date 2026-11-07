@@ -122,9 +122,14 @@ with the copyright, an SPDX line and a `\file` block. What a block holds, and ho
 ## Build
 
 ```bash
-cmake -S . -B build -G Ninja -DPLATFORM=simulator
-cmake --build build          # -> build/bin/Wordclock
+cmake --preset simulator
+cmake --build --preset simulator     # -> build/bin/Wordclock
+cmake --workflow --preset simulator  # configure, build and run the tests in one
 ```
+
+`cmake --list-presets=all` names the others - `avr`, `clang`, `sanitizers`, `coverage`, `fuzz`
+and the `ci-` variants, which are the same with warnings as errors. CI calls the same presets,
+so a flag belongs in `CMakePresets.json` and not in a workflow.
 
 ## Delivering a change
 

@@ -205,8 +205,7 @@ if(WORDCLOCK_BUILD_FUZZERS)
     if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         message(FATAL_ERROR
             "WORDCLOCK_BUILD_FUZZERS needs clang, which brings libFuzzer:\n"
-            "  cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator "
-            "-DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON")
+            "  cmake --preset fuzz")
     endif()
     set(FUZZ_SANITIZERS -fsanitize=address,undefined -fno-sanitize-recover=all)
     target_compile_options(WordclockBuildSettings INTERFACE -fsanitize=fuzzer-no-link ${FUZZ_SANITIZERS})

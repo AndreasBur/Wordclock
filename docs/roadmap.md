@@ -90,14 +90,15 @@ what it buys is that a change is checked the same way on every machine, today an
 
 ### One way in: CMake presets and a Makefile
 
-The commands that build and check this repository are written out three times — in the
+The commands that build and check this repository were written out three times — in the
 workflows, in the [README](../README.md) and in the agent notes. The tools they call are pinned
-now, in `uv.lock`; the command lines are not one place yet.
+in `uv.lock`, and the CMake builds are one place now: [CMakePresets.json](../CMakePresets.json),
+which the workflows call as well, and whose `cmake --workflow --preset avr` configures, builds
+and checks the image in one call. What is still written out is everything that is not CMake -
+the analysers, the host suites, the PlatformIO builds, the web smoke test.
 
-The shape that fixes it: `CMakePresets.json` with workflow presets for the CMake builds, so
-that `cmake --workflow --preset avr` configures, builds and checks in one call; and a
-`Makefile` that is nothing but the index over them and over `uv run`, `make help` listing every
-action. `make` is on every machine already, and the logic stays in versioned files rather than
+The rest of the shape: a `Makefile` that is nothing but the index over the presets and over
+`uv run`, `make help` listing every action. `make` is on every machine already, and the logic stays in versioned files rather than
 in it. CI then calls the same targets a developer does, and the command lines exist once.
 
 Settled when `make check` runs locally what CI runs, and the workflows call nothing else.

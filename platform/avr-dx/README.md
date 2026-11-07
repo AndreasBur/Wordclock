@@ -75,13 +75,13 @@ The same CMake as the simulator, with one difference: this backend cross-compile
 so its toolchain has to be named when the build directory is created. A compiler
 cannot be swapped afterwards, which is why `-DPLATFORM=avr-dx` on its own is not
 enough — and says so rather than failing later on a host compiler that does not
-know `-mmcu`.
+know `-mmcu`. The `avr` preset names both:
 
 ```bash
-cmake -B build-avr -S . -DPLATFORM=avr-dx \
-      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
-cmake --build build-avr
-cmake --build build-avr --target flash     # over UPDI, via pymcuprog
+cmake --preset avr                          # PLATFORM and the toolchain file, into build-avr/
+cmake --build --preset avr
+ctest --preset avr                          # the documented sizes and the stack, see below
+cmake --build --preset avr --target flash   # over UPDI, via pymcuprog
 ```
 
 **This needs `avr-gcc` 12 or newer.** Not a preference — an older one fails twice,
@@ -111,9 +111,7 @@ from the environment, so a container or a CI job can carry one without every com
 naming it:
 
 ```bash
-cmake -B build-avr -S . -DPLATFORM=avr-dx \
-      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
-      -DAVR_MCU=avr64dd32 -DAVR_DFP=/path/to/Microchip.AVR-Dx_DFP
+cmake --preset avr -DAVR_MCU=avr64dd32 -DAVR_DFP=/path/to/Microchip.AVR-Dx_DFP
 ```
 
 `AVR_F_CPU` and `AVR_PROGRAMMER` are cache variables too. `AVR_F_CPU` is also what

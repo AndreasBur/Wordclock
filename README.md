@@ -92,18 +92,19 @@ X server. See [.devcontainer/README.md](.devcontainer/README.md) for what the
 configurations share, how to add a site-specific one on an internal base image,
 and why changing the shared settings needs a container rebuild.
 
-Without a container, pick a platform with the `PLATFORM` switch (default
-`simulator`):
+Without a container the same works, through the presets of
+[CMakePresets.json](CMakePresets.json) - one per platform and kind of build, and what CI
+calls as well:
 
 ```bash
-cmake -B build -S . -DPLATFORM=simulator
-cmake --build build
-ctest --test-dir build --output-on-failure
+cmake --workflow --preset simulator    # configure, build, test - into build/
 ./build/bin/Wordclock
+cmake --list-presets=all               # avr, clang, sanitizers, coverage, fuzz, ci-*
 ```
 
-That way requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK on
-Linux). See the [simulator README](platform/simulator/README.md) for details.
+That way requires CMake ≥ 3.25 for the presets, Ninja, a C++17 compiler and wxWidgets 3.x
+(GTK on Linux). Without the presets the platform is the `PLATFORM` switch,
+`-DPLATFORM=simulator` by default. See the [simulator README](platform/simulator/README.md) for details.
 
 The on-device platforms are not built with CMake. The `esp32` and `rp2350` platforms use
 PlatformIO:
@@ -117,13 +118,12 @@ pio run -t upload -d platform/rp2350     # hold BOOTSEL on the first upload
 
 The `avr-dx` platform uses the same CMake, but cross-compiles — so its toolchain
 has to be named when the build directory is created, because a compiler cannot be
-swapped afterwards:
+swapped afterwards. Its preset does that, and its tests are the documented sizes and the
+stack, checked against the image just built:
 
 ```bash
-cmake -B build-avr -S . -DPLATFORM=avr-dx \
-      -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake
-cmake --build build-avr
-cmake --build build-avr --target flash
+cmake --workflow --preset avr          # into build-avr/
+cmake --build --preset avr --target flash
 ```
 
 ### The two web pages
@@ -132,7 +132,7 @@ The pages in [web/](web/) need a clock behind them to show anything, and **the s
 one**: it serves them itself, on localhost, from the binary that draws the window.
 
 ```bash
-cmake --build build && ./build/bin/Wordclock     # http://localhost:8080/
+cmake --build --preset simulator && ./build/bin/Wordclock     # http://localhost:8080/
 ```
 
 The panel is at `/` and the console at `/console`, answered out of the same
@@ -200,7 +200,7 @@ a board, or anything the dev container does not carry. The analysers are the one
 that need a configured build directory rather than a built one:
 
 ```bash
-cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --preset simulator                # every preset writes compile_commands.json
 run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
 tools/self-contained-headers.py build firmware/inc platform/simulator/include
 run-clang-tidy -p build -quiet -checks='-*,readability-identifier-naming' 'platform/simulator/(tests|Wordclock)'
@@ -213,13 +213,12 @@ cppcheck --enable=warning,portability --std=c++17 --inline-suppr \
     firmware/src firmware/inc
 ```
 
-The sanitizers need a build of their own, because every object is instrumented:
+The sanitizers need a build of their own, because every object is instrumented. The host
+suites are not CMake builds and take the flags themselves:
 
 ```bash
+cmake --workflow --preset sanitizers   # into build-san/
 SANITIZE="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-cmake -S . -B build-san -G Ninja -DPLATFORM=simulator \
-      -DCMAKE_CXX_FLAGS="$SANITIZE" -DCMAKE_EXE_LINKER_FLAGS="$SANITIZE"
-cmake --build build-san --target WordclockTests && ctest --test-dir build-san
 HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh    # and the same for rp2350
 ```
 
@@ -227,9 +226,7 @@ And the fuzzers, which need clang and a build of their own as well. The last num
 many seconds each runs; a second run goes on from the corpus the first left in `build-fuzz/work`:
 
 ```bash
-cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator \
-      -DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON
-cmake --build build-fuzz --target FuzzCommand FuzzSettings
+cmake --workflow --preset fuzz         # into build-fuzz/
 platform/simulator/tests/fuzz/run.sh build-fuzz 300 build-fuzz/work
 ```
 

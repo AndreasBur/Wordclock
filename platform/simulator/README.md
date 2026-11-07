@@ -123,15 +123,15 @@ local feature that a rebuild has to pick up — see
 
 ### 2. CMake on the host
 
-Requires CMake ≥ 3.16, a C++17 compiler and wxWidgets 3.x (GTK build on Linux).
+Requires CMake ≥ 3.25 for the presets, a C++17 compiler and wxWidgets 3.x (GTK build on Linux).
 
 ```bash
 # Install wxWidgets (Debian/Ubuntu)
 sudo apt install cmake ninja-build libwxgtk3.2-dev
 
-# From the repository root — the PLATFORM switch selects this backend:
-cmake -B build -S . -DPLATFORM=simulator -G Ninja
-cmake --build build
+# From the repository root — the preset selects this backend, PLATFORM=simulator:
+cmake --preset simulator
+cmake --build --preset simulator
 ./build/bin/Wordclock
 ```
 
@@ -142,7 +142,7 @@ per-platform edits. This is also the build that runs inside the container.
 ### Tests
 
 ```bash
-ctest --test-dir build --output-on-failure
+ctest --preset simulator
 ```
 
 [tests/](tests/) holds regression tests for the firmware core. They build

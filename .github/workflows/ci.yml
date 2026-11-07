@@ -79,18 +79,19 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
-      # -Werror in CI, not in the CMakeLists: a warning should stop a change from
-      # being merged without stopping somebody in the middle of debugging one.
+      # The ci- preset: warnings as errors in CI and not in the simulator preset a developer
+      # uses, because a warning should stop a change from being merged without stopping
+      # somebody in the middle of debugging one. CMakePresets.json holds the rest.
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_CXX_FLAGS=-Werror
+        run: cmake --preset ci-simulator
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build --preset ci-simulator
 
       # No display needed: the tests drive the firmware core and the pixel buffer, and the
       # window that renders it is never constructed.
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --preset ci-simulator
 
   # The simulator, its tests and both backends' host suites once more, compiled by clang instead
   # of GCC. Two compilers disagree about what deserves a warning: clang reported a uint16_t made
@@ -110,10 +111,7 @@ jobs:
 
       - name: Simulator and core tests
         run: |
-          cmake -S . -B build-clang -G Ninja -DPLATFORM=simulator \
-                -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS=-Werror
-          cmake --build build-clang
-          ctest --test-dir build-clang --output-on-failure
+          cmake --workflow --preset ci-clang
 
       - name: Both backends' host tests
         run: |
@@ -157,8 +155,8 @@ jobs:
 
       - name: Build the simulator
         run: |
-          cmake -S . -B build -G Ninja -DPLATFORM=simulator
-          cmake --build build --target Wordclock
+          cmake --preset simulator
+          cmake --build --preset simulator --target Wordclock
 
       - name: Load the pages
         run: python tools/web-smoke.py build/bin/Wordclock
@@ -310,33 +308,33 @@ jobs:
 
       # The toolchain has to be named when the build directory is created: a compiler cannot
       # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
-      # -Werror as in the simulator job, and for more reason: nothing else compiles a line of
-      # platform/avr-dx, so a warning there is seen here or nowhere.
+      # The preset names it. Warnings as errors as in the simulator job, and for more reason:
+      # nothing else compiles a line of platform/avr-dx, so a warning there is seen here or
+      # nowhere.
       - name: Configure
-        run: |
-          cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
-                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
-                -DCMAKE_CXX_FLAGS=-Werror
+        run: cmake --preset ci-avr
 
       # The size is printed by the link rule itself. It is the reason this part was chosen,
       # so a change that stops fitting says so here rather than on somebody's bench.
       - name: Build
-        run: cmake --build build-avr
+        run: cmake --build --preset ci-avr
 
       # And the size written in the documentation is compared against the one just built.
       # Every size in this repository has been wrong at least once, always the same way - the
       # code grew and the sentence did not - and twice a corrected number was made wrong again
       # by the next change within a day. This is the only moment that is cheap to fix: the
-      # pull request that moved it. python3 is installed above for this step alone.
+      # pull request that moved it. python3 is installed above for this step and the next. Both
+      # are tests of the AVR build, so `cmake --workflow --preset avr` runs them locally too.
       - name: Check the documented sizes
-        run: python3 tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf
+        run: ctest --preset ci-avr -R documented-sizes
 
       # And the stack against the RAM those sizes leave: the deepest path from main(), with the
       # two deepest interrupt handlers on top, out of the call graph the link writes beside the
       # image. Nothing on this part notices the stack running into .bss - there is no guard - so
       # the pull request that makes it deeper is again the one moment it is cheap to find out.
+      # --verbose, so the job's log shows the paths the stack is made of even when it fits.
       - name: Check the stack fits
-        run: python3 tools/avr-stack.py build-avr --paths
+        run: ctest --preset ci-avr -R stack --verbose
 
       # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
       # the only one of the two that still knows the symbols, and a report about a clock in

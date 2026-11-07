@@ -67,9 +67,9 @@ jobs:
           packages: cmake ninja-build libwxgtk3.2-dev clang-tidy
 
       # Configured, not built: clang-tidy compiles each translation unit itself and needs
-      # nothing from the build but compile_commands.json.
+      # nothing from the build but compile_commands.json, which every preset writes.
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake --preset simulator
 
       # The one exception to "not built". WebPage.h holds the two pages as arrays and is
       # generated rather than checked in, so a translation unit that includes it does not
@@ -77,7 +77,7 @@ jobs:
       # missing, which reads like a bad include path rather than a build step that was
       # skipped. It is the python script and nothing else, so it costs no build time.
       - name: Generate the embedded pages
-        run: cmake --build build --target WordclockWebPage
+        run: cmake --build --preset simulator --target WordclockWebPage
 
       # Which checks, and why the rest are off, is in .clang-tidy. WarningsAsErrors is set
       # there, so a finding fails this job.
@@ -124,13 +124,10 @@ jobs:
         with:
           packages: cmake ninja-build gcc-avr avr-libc clang-tidy python3
 
-      # Configured, not built, as above. The toolchain file for the same reason ci.yml names
-      # it: the database records whichever compiler project() found.
+      # Configured, not built, as above. The preset names the toolchain file, which matters
+      # here: the database records whichever compiler project() found.
       - name: Configure
-        run: |
-          cmake -B build-avr -S . -G Ninja -DPLATFORM=avr-dx \
-                -DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake --preset avr
 
       - name: Analyse
         run: python3 tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
@@ -256,13 +253,12 @@ jobs:
 
       - name: Build the core tests with --coverage
         run: |
-          cmake -S . -B build-cov -G Ninja -DPLATFORM=simulator \
-                -DCMAKE_CXX_FLAGS="--coverage -O0" -DCMAKE_EXE_LINKER_FLAGS=--coverage
-          cmake --build build-cov --target WordclockTests
+          cmake --preset coverage
+          cmake --build --preset coverage
 
       - name: Run the three suites
         run: |
-          ctest --test-dir build-cov --output-on-failure
+          ctest --preset coverage
           HOST_TESTS_CXXFLAGS="--coverage -O0" platform/esp32/test/run.sh
           HOST_TESTS_CXXFLAGS="--coverage -O0" platform/rp2350/test/run.sh
 
@@ -297,13 +293,12 @@ jobs:
 
       - name: Build the core tests
         run: |
-          cmake -S . -B build-san -G Ninja -DPLATFORM=simulator \
-                -DCMAKE_CXX_FLAGS="$SANITIZE" -DCMAKE_EXE_LINKER_FLAGS="$SANITIZE"
-          cmake --build build-san --target WordclockTests
+          cmake --preset sanitizers
+          cmake --build --preset sanitizers
 
       - name: Run the three suites
         run: |
-          ctest --test-dir build-san --output-on-failure
+          ctest --preset sanitizers
           HOST_TESTS_CXXFLAGS="$SANITIZE" platform/esp32/test/run.sh
           HOST_TESTS_CXXFLAGS="$SANITIZE" platform/rp2350/test/run.sh
 
@@ -341,10 +336,8 @@ jobs:
 
       - name: Build the fuzzers
         run: |
-          cmake -S . -B build-fuzz -G Ninja -DPLATFORM=simulator \
-                -DCMAKE_CXX_COMPILER=clang++ -DWORDCLOCK_BUILD_FUZZERS=ON \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          cmake --build build-fuzz --target FuzzCommand FuzzSettings
+          cmake --preset fuzz
+          cmake --build --preset fuzz
 
       # The fuzzers are in no build the clang-tidy job reads, so their names are read here,
       # through this build's own database.
