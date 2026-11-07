@@ -184,11 +184,11 @@ jobs:
         run: pio run -d platform/${{ matrix.backend }} -t compiledb
 
       - name: Analyse
-        run: python3 tools/cross-clang-tidy.py platform/${{ matrix.backend }} 'firmware/|platform/${{ matrix.backend }}/src'
+        run: python3 tools/cross-clang-tidy.py platform/${{ matrix.backend }} 'firmware/|platform/${{ matrix.backend }}/src|platform/arduino/src'
 
       # As in the clang-tidy job, by the board's own compiler out of the PlatformIO packages.
       - name: Headers on their own
-        run: python3 tools/self-contained-headers.py platform/${{ matrix.backend }} firmware/inc platform/${{ matrix.backend }}/include
+        run: python3 tools/self-contained-headers.py platform/${{ matrix.backend }} firmware/inc platform/${{ matrix.backend }}/include platform/arduino/include
 
   cppcheck:
     name: cppcheck

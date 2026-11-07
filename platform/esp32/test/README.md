@@ -38,6 +38,7 @@ answers on its bus, whether SNTP arrives.
 [`cases/frame_test.cpp`](cases/frame_test.cpp) | the bytes `Pixels::Render()` hands the peripheral — channel order, index to offset, that an unchanged frame is not retransmitted, and that the master brightness blanks without touching the buffer |
 [`../../test/cases/serial_test.cpp`](../../test/cases/serial_test.cpp) | that an injected command takes the same path as one typed on the wire, that the UART is served first, and that a line reaches the sink once per `println()` |
 [`../../test/cases/ds3231_test.cpp`](../../test/cases/ds3231_test.cpp) | the clock chip in both directions: which register a read is aimed at, the temperature the overlay shows, the time block as BCD, and the two states — a stopped oscillator, a chip that was never written — that count as no time rather than as data |
+[`cases/i2c_bus_test.cpp`](cases/i2c_bus_test.cpp) | how this backend opens the bus the two drivers in [`platform/arduino`](../../arduino/) share: the pins and the clock handed to `Wire.begin()`, and a bus it refused counting as not open, so the drivers try again |
 [`cases/web_test.cpp`](cases/web_test.cpp) | the handlers, reached through the same registration call the server makes: a frame in, an answer out, the page as a gzip stream, the catalog as valid JSON, an oversized frame refused |
 
 `run.sh` builds with the warnings of [`platform/warnings.txt`](../../warnings.txt) and `-Werror`,

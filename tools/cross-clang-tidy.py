@@ -27,7 +27,7 @@ The checks are .clang-tidy's, the same ones the simulator is read with.
 
 Usage:
     tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
-    tools/cross-clang-tidy.py platform/esp32 'firmware/|platform/esp32/src'
+    tools/cross-clang-tidy.py platform/esp32 'firmware/|platform/esp32/src|platform/arduino/src'
 """
 
 import argparse

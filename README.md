@@ -65,6 +65,7 @@ spricht deutsch.
 | [platform/simulator/](platform/simulator/) | wxWidgets desktop backend: renders the matrix in a window so the firmware can be developed and debugged on a PC. |
 | [platform/esp32/](platform/esp32/) | On-device backend: WS2812 over the RMT peripheral, time from NTP. Built with PlatformIO — see its [README](platform/esp32/README.md). |
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
+| [platform/arduino/](platform/arduino/) | What the two Arduino backends share: the BH1750 and DS3231 drivers, written once against `Wire`. Each backend opens the bus its core's way in its own `I2cBus.cpp`. |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
 | [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first, and [coverage.py](tools/coverage.py), which reports the lines of `firmware/` that no test runs. |
 

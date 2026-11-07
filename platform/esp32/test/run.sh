@@ -48,7 +48,7 @@ fi
 mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
-INCLUDES=(-I"$PLATFORM_DIR/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
+INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
 while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROOT/firmware/inc" -type d)
 
 # The path this platform's Arduino.h includes the core's own through. On the target the
@@ -110,8 +110,9 @@ while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/firmware/s
 # bring their own so they can see what it sends. A test that has no business with HTTP
 # should not have to stub it.
 BACKEND=(
-    "$PLATFORM_DIR/src/BH1750.cpp"
-    "$PLATFORM_DIR/src/DS3231.cpp"
+    "$ROOT/platform/arduino/src/BH1750.cpp"
+    "$ROOT/platform/arduino/src/DS3231.cpp"
+    "$PLATFORM_DIR/src/I2cBus.cpp"
     "$PLATFORM_DIR/src/Pixels.cpp"
     "$PLATFORM_DIR/src/PowerSwitch.cpp"
     "$PLATFORM_DIR/src/RealTimeClock.cpp"
@@ -212,6 +213,7 @@ PYTHON
 
 SOURCES=("${CORE[@]}" "${BACKEND[@]}" "${SHARED[@]}" "${WEB[@]}"
          "$TEST_DIR/cases/frame_test.cpp" "$SHARED_TEST_DIR/cases/serial_test.cpp" "$SHARED_TEST_DIR/cases/ds3231_test.cpp"
+         "$TEST_DIR/cases/i2c_bus_test.cpp"
          "$TEST_DIR/cases/web_test.cpp" "$TEST_DIR/stubs/rmt_stubs.cpp")
 
 writeCompileCommands "${SOURCES[@]}"
@@ -227,9 +229,10 @@ compileAll "${SOURCES[@]}"
 link frame_test  "$TEST_DIR/cases/frame_test.cpp" "$PLATFORM_DIR/src/Pixels.cpp" "$PLATFORM_DIR/src/WordclockSerial.cpp"
 link serial_test "$SHARED_TEST_DIR/cases/serial_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 link ds3231_test "$SHARED_TEST_DIR/cases/ds3231_test.cpp" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
+link i2c_bus_test "$TEST_DIR/cases/i2c_bus_test.cpp" "$PLATFORM_DIR/src/I2cBus.cpp"
 link web_test    "$TEST_DIR/cases/web_test.cpp" "${WEB[@]}" "${BACKEND[@]}" "${CORE[@]}" "$TEST_DIR/stubs/rmt_stubs.cpp"
 FAILED=0
-for name in frame_test serial_test ds3231_test web_test; do
+for name in frame_test serial_test ds3231_test i2c_bus_test web_test; do
     echo
     echo "--- $name ---"
     "$WORK/$name" || FAILED=1

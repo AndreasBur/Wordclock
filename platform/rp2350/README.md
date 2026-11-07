@@ -2,8 +2,9 @@
 
 The Wordclock on a Raspberry Pi Pico 2 W. The firmware core is not copied here: this
 directory holds only the headers the core reaches for by name — `Pixels.h`,
-`RealTimeClock.h`, `BH1750.h`, `DS3231.h`, `Storage.h`, `System.h` and the `Arduino.h`
-shim — and the sources behind them. See
+`RealTimeClock.h`, `Storage.h`, `System.h` and the `Arduino.h` shim — and the sources
+behind them. The light sensor's and the clock chip's drivers, `BH1750` and `DS3231`, are
+the ESP32's as well and live once in [`../arduino/`](../arduino/). See
 [`../avr-dx/README.md`](../avr-dx/README.md#what-a-backend-must-provide) for the contract
 these fulfil, and [`../esp32/README.md`](../esp32/README.md) for the
 backend this one was derived from.
@@ -74,6 +75,7 @@ The two are the same program above the peripherals. Five things underneath are n
 - **`Wire` takes its pins separately.** `Wire.begin(sda, scl, freq)` is an ESP32 extension;
   here it is `setSDA`, `setSCL`, `begin`, `setClock`. Nothing reports a refusal: a pin the
   setters will not take ends in `panic()`, so the two drivers have to name the same pins.
+  That difference is the whole of `src/I2cBus.cpp`; the drivers above it are shared.
 - **`Storage` is a file, not a key-value pair.** LittleFS rather than the EEPROM emulation,
   because `Read()` has to refuse a blob of the wrong length and a file carries its own.
   `System`'s credentials go the same way, one file per key.
@@ -176,10 +178,12 @@ the peripherals: the frame `Pixels::Render()` hands to DMA, word for word; that 
 command takes the same path through `Communication` as one typed on the wire; and the
 handlers, driven through the same registration call the server makes.
 
-Two of the four case files are not here but in [`../test/`](../test/), shared with the ESP32
+Two of the five case files are not here but in [`../test/`](../test/), shared with the ESP32
 backend. Nothing in `ds3231_test.cpp` or `serial_test.cpp` is about either platform - they
 compile whichever backend is being tested against whichever stubs it brings - so they live
-once.
+once. `i2c_bus_test.cpp` is this backend's own, because opening the bus is the one thing the
+two do differently: it checks that the clock is set after `begin()`, which would otherwise put
+its default back.
 
 There is no `serve` mode here, and none in the ESP32's harness either any more: the pages are
 shared and the simulator serves them itself, which is one binary instead of node in front of a

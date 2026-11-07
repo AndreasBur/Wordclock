@@ -16,11 +16,15 @@ struct TwoWire {
     std::vector<uint8_t> Response;
     std::vector<uint8_t> Written;
     size_t ReadPosition{0u};
+    int Sda{-1};
+    int Scl{-1};
+    uint32_t Clock{0u};
+    bool BeginAnswer{true};
 
     void respondWith(std::vector<uint8_t> Bytes) { Response = Bytes; ReadPosition = 0u; }
     size_t remaining() const { return Response.size() - ReadPosition; }
 
-    bool begin(int, int, uint32_t) { return true; }
+    bool begin(int Pin_Sda, int Pin_Scl, uint32_t Hz) { Sda = Pin_Sda; Scl = Pin_Scl; Clock = Hz; return BeginAnswer; }
     void beginTransmission(uint8_t Address) { Written.push_back(Address); }
     size_t write(uint8_t Value) { Written.push_back(Value); return 1; }
     uint8_t endTransmission() { return 0; }
