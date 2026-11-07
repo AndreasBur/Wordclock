@@ -17,8 +17,8 @@ STORE=/etc/ssl/certs/ca-certificates.crt
 
 [ -r "$STORE" ] || exit 0
 
-for root in "$HOME/.platformio" "${UV_PROJECT_ENVIRONMENT:-}"; do
-    [ -n "$root" ] && [ -d "$root" ] && find "$root" -name cacert.pem -type f 2>/dev/null
+for root in "$HOME/.platformio" /opt/wordclock-env; do
+    [ -d "$root" ] && find "$root" -name cacert.pem -type f 2>/dev/null
 done | while read -r bundle; do
     grep -qF "$MARKER" "$bundle" && continue
 

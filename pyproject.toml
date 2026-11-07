@@ -1,10 +1,10 @@
 # The Python tools this repository builds and checks with, pinned by uv.lock: one environment
 # for all of them, the same in the dev container and in CI.
 #
-# The dev container builds it into /opt/wordclock-env when the image is made, and points
-# UV_PROJECT_ENVIRONMENT there, so `uv run` uses that one rather than a .venv of its own; the
-# tools are on PATH as well. CI makes it with `uv sync --frozen`. Updating a tool is changing its
-# line here and running `uv lock`.
+# The dev container builds it into /opt/wordclock-env when the image is made, puts it on PATH and
+# links the workspace's .venv to it, so `uv run` uses that one rather than making another. CI
+# makes it with `uv sync --frozen`. Updating a tool is changing its line here and running
+# `uv lock`.
 #
 # The repository's own scripts in tools/ use the standard library only and are not a package:
 # nothing here is installed from this directory.

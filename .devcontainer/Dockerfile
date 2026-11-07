@@ -116,9 +116,14 @@ RUN if ! command -v uv >/dev/null; then \
 # The repository's Python tools - PlatformIO, Playwright, ruff, actionlint - in one environment,
 # at the versions uv.lock pins, which are CI's as well. Under /opt so it belongs to the image
 # rather than to a home directory a volume may replace, and on PATH, so `pio` and the rest work as
-# they did when each had an environment of its own. UV_PROJECT_ENVIRONMENT makes `uv run` in the
-# workspace use this one rather than make a .venv; it belongs to the remote user, because a
-# changed uv.lock is synced into it by the next `uv run`.
+# they did when each had an environment of its own. It belongs to the remote user, because a
+# changed uv.lock is synced into it by the next `uv run`; the shared feature links the
+# workspace's .venv to it, which is how `uv run` finds it.
+#
+# UV_PROJECT_ENVIRONMENT is set for this one sync and nowhere else. Set as an ENV it named the
+# environment of every uv project in the image: the features installed after this layer synced
+# their own Python servers into it, each removing what the one before had put there, and the
+# image came out with neither our tools nor all of theirs.
 #
 # PlatformIO downloads with requests and hands it certifi's bundle, so it ignores
 # REQUESTS_CA_BUNDLE and fails behind a TLS-intercepting proxy with CERTIFICATE_VERIFY_FAILED on
@@ -131,13 +136,14 @@ RUN if ! command -v uv >/dev/null; then \
 # `chromium-browser` as a snap stub and snap does not run in a container. PLAYWRIGHT_BROWSERS_PATH
 # keeps it out of ~/.cache, which a volume replaces. --with-deps pulls the ~30 libraries a headless
 # Chromium links against, so this layer is the expensive one in the image: about 650 MB.
+# At the end of PATH, not the front: the tools here are found either way, as nothing else carries
+# them, but at the front anything the environment brings would shadow the system's - a uv a
+# package depends on would stand in front of the one installed above.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
-    UV_PROJECT_ENVIRONMENT=/opt/wordclock-env \
-    UV_LINK_MODE=copy \
-    PATH="/opt/wordclock-env/bin:${PATH}"
+    PATH="${PATH}:/opt/wordclock-env/bin"
 COPY pyproject.toml uv.lock /opt/wordclock-tools/
 RUN cd /opt/wordclock-tools && \
-    UV_NO_CACHE=1 uv sync --frozen && \
+    UV_PROJECT_ENVIRONMENT=/opt/wordclock-env UV_LINK_MODE=copy UV_NO_CACHE=1 uv sync --frozen && \
     cat /etc/ssl/certs/ca-certificates.crt \
         >> "$(/opt/wordclock-env/bin/python -c 'import certifi; print(certifi.where())')" && \
     /opt/wordclock-env/bin/playwright install --with-deps chromium && \

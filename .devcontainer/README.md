@@ -149,6 +149,12 @@ local dev container feature in `shared/`, which every configuration references:
 Feature metadata is merged with the referencing `devcontainer.json`, so a
 variant can add its own extensions on top without repeating the shared list.
 
+`wordclock-tool-env` runs first in the same `postCreateCommand` and links the workspace's
+`.venv` to the image's tool environment, `/opt/wordclock-env`, so that `uv run` uses the
+environment the image built instead of making a second one. A link and not
+`UV_PROJECT_ENVIRONMENT`: that variable names the environment of every uv project in the
+container, and the Python servers other features install synced themselves into it.
+
 `wordclock-toolchain-check` runs once, as the feature's `postCreateCommand`, and names
 every program `Dockerfile` installs that the container does not have. It fails rather
 than warns, because a missing one means the image is older than the line that installs
@@ -197,8 +203,9 @@ bundle, which keeps verification on rather than turning it off.
 That fix has to happen twice, because the platform packages build a *second* virtual
 environment under `~/.platformio` at first use — and that one lives in the volume, not in
 the image. `platformio-trust-store`, installed by the shared feature and run as its
-`postStartCommand`, appends the store to any bundle under `~/.platformio` that does not
-already carry it.
+`postStartCommand`, appends the store to any bundle under `~/.platformio` or in
+`/opt/wordclock-env` that does not already carry it - the second for a `uv run` that synced
+a changed `uv.lock` and replaced `certifi` there.
 
 **Flashing is not covered.** The container can build; getting the USB serial adapter into
 it is another matter, and under WSL2 it needs `usbipd-win` on the Windows side before the

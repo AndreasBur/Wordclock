@@ -42,8 +42,9 @@ devcontainer-lock.json
 # The embed script is imported directly when its comment stripping is being checked, and
 # CPython leaves this behind whenever that happens.
 __pycache__/
-# The tool environment CI's uv sync makes; the dev container keeps its own in /opt/wordclock-env.
-.venv/
+# The tool environment: CI's uv sync makes it here, and in the dev container it is a link to the
+# image's /opt/wordclock-env. No trailing slash, which would match the directory and not the link.
+.venv
 
 # Logs a run leaves in the working tree - the screenshot recipe in CLAUDE.md writes run.log, and
 # a clang-tidy log was once committed by accident.
