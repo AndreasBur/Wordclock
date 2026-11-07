@@ -15,10 +15,6 @@ So the database is rewritten first, into a directory of its own, and only then r
   of clang's guesses for the host;
 - the flags clang does not know are dropped. They are code generation options, none of
   them changes what a header declares;
-- so is -Werror, which a build configured by a ci- preset carries. GCC's warning list has
-  options clang has never heard of, an unknown option is a warning to clang, and -Werror
-  makes every translation unit fail on it. Whether a finding fails is .clang-tidy's
-  WarningsAsErrors to say, not the build's;
 - relative include directories are made absolute. PlatformIO passes -Iinclude, a header
   is then known as include/Pixels.h, and .clang-tidy's HeaderFilterRegex - which looks
   for /platform/ - quietly skipped every header the backend owns;
@@ -43,11 +39,10 @@ import sys
 import tempfile
 from pathlib import Path
 
-DROPPED_FLAGS = {
+GCC_ONLY_FLAGS = {
     '-fno-shrink-wrap',
     '-fno-tree-switch-conversion',
     '-fstrict-volatile-bitfields',
-    '-Werror',
     '-mdisable-hardware-atomics',
     '-mlongcalls',
     '-mtext-section-literals',
@@ -90,7 +85,7 @@ def system_includes(compiler):
 
 
 def is_dropped(argument):
-    if argument in DROPPED_FLAGS:
+    if argument in GCC_ONLY_FLAGS:
         return True
     return argument.startswith('-D') and argument[2:].split('=')[0] in UNREAD_DEFINES
 
