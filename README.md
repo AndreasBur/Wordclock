@@ -162,6 +162,7 @@ with clang:
 |-----|--------------|
 | Simulator and core tests | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
 | Host builds with clang | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
+| Web pages in a browser | [`tools/web-smoke.py`](tools/web-smoke.py): the panel and the console in Chromium against the simulator, at 390 and 1280 px — no console error, nothing wider than the window, a command typed in the console answered |
 | ESP32 backend on the host | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
 | RP2350 backend on the host | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `pio run` for the board it actually runs on |

@@ -26,7 +26,7 @@ TOOLS='cmake ninja wx-config
        clang-tidy run-clang-tidy cppcheck doxygen shellcheck flake8
        clang++ llvm-symbolizer
        python3 gh
-       xdotool xwininfo import rsvg-convert'
+       xdotool xwininfo import rsvg-convert xvfb-run'
 PLAYWRIGHT=/opt/playwright/bin/python
 
 missing=''

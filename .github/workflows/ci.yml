@@ -1,8 +1,10 @@
-# What a pull request is checked with. Seven jobs: the project has six ways of building, each
-# of which can break on its own, and the host builds are made a second time with clang:
+# What a pull request is checked with. Eight jobs: the project has six ways of building, each
+# of which can break on its own; the host builds are made a second time with clang; and the two
+# pages a clock serves are loaded in a browser:
 #
 #   simulator      the firmware core through the wxWidgets backend, plus its regression tests
 #   clang          the simulator and both backends' host tests again, compiled by clang
+#   web            the panel and the console in Chromium, against the simulator
 #   host-tests     the ESP32 backend compiled against the stand-ins in platform/esp32/test
 #   rp2350-host    the same arrangement for the Pico's backend, stubs and all
 #   firmware       the ESP32 backend compiled for the board it actually runs on
@@ -112,6 +114,51 @@ jobs:
         run: |
           CXX=clang++ platform/esp32/test/run.sh
           CXX=clang++ platform/rp2350/test/run.sh
+
+  # The panel and the console in a real browser, with the simulator behind them as the firmware:
+  # each page at a phone's width and a desktop's loads its first frame without a console error,
+  # nothing on it is wider than the window, and a command typed into the console comes back
+  # answered. What tools/web-smoke.py checks, and why those, is in its docstring.
+  #
+  # Playwright at the version the dev container pins, so that the browser cached here is the one
+  # that version wants. xvfb because the simulator is the wx application, and opens its window
+  # on whatever X server it is given.
+  web:
+    name: Web pages in a browser
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    env:
+      PLAYWRIGHT_VERSION: 1.64.1
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build libwxgtk3.2-dev xvfb
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Cache the browser
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install Playwright and its Chromium
+        run: |
+          pip install "playwright==$PLAYWRIGHT_VERSION"
+          python -m playwright install --with-deps chromium
+
+      - name: Build the simulator
+        run: |
+          cmake -S . -B build -G Ninja -DPLATFORM=simulator
+          cmake --build build --target Wordclock
+
+      - name: Load the pages
+        run: python tools/web-smoke.py build/bin/Wordclock
 
   host-tests:
     name: ESP32 backend on the host
