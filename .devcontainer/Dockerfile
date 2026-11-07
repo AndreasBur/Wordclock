@@ -93,8 +93,8 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     rm /tmp/gh.deb
 
 # python3 for the tool environment below and for what the scripts in tools/ and test/run.sh
-# need - the page embedding among them - and python3-venv for the pip that installs uv where
-# the base image has none. node for the local web console.
+# need - the page embedding among them - and python3-venv for the environment uv is installed
+# into. node for the local web console.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         python3 \
@@ -103,15 +103,17 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # uv, which makes the environment below from pyproject.toml and uv.lock. This ARG is the one
-# place its version is written: .github/actions/uv-sync reads it for CI. The Vector base image
-# brings a uv already, under /opt/uv; the others get it from PyPI, into an environment of its own
-# as pip will not write into the system's.
+# place its version is written: .github/actions/uv-sync reads it for CI. From PyPI, into an
+# environment of its own as pip will not write into the system's.
+#
+# Not on PATH, and called by its path below. Features installed after this layer may bring a uv
+# of their own, and install it - with the configuration their own servers depend on - only when
+# they find none: with this one on PATH, the Vector base image's features skipped both, and its
+# ALM server failed to install. The shared feature puts this uv on PATH when the container is
+# created, if nothing has brought one by then.
 ARG UV_VERSION=0.12.0
-RUN if ! command -v uv >/dev/null; then \
-        python3 -m venv /opt/uv-pip && \
-        /opt/uv-pip/bin/pip install --no-cache-dir "uv==${UV_VERSION}" && \
-        ln -s /opt/uv-pip/bin/uv /opt/uv-pip/bin/uvx /usr/local/bin/; \
-    fi
+RUN python3 -m venv /opt/uv-pip && \
+    /opt/uv-pip/bin/pip install --no-cache-dir "uv==${UV_VERSION}"
 
 # The repository's Python tools - PlatformIO, Playwright, ruff, actionlint - in one environment,
 # at the versions uv.lock pins, which are CI's as well. Under /opt so it belongs to the image
@@ -138,12 +140,12 @@ RUN if ! command -v uv >/dev/null; then \
 # Chromium links against, so this layer is the expensive one in the image: about 650 MB.
 # At the end of PATH, not the front: the tools here are found either way, as nothing else carries
 # them, but at the front anything the environment brings would shadow the system's - a uv a
-# package depends on would stand in front of the one installed above.
+# package depends on would stand in front of the container's own.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright \
     PATH="${PATH}:/opt/wordclock-env/bin"
 COPY pyproject.toml uv.lock /opt/wordclock-tools/
 RUN cd /opt/wordclock-tools && \
-    UV_PROJECT_ENVIRONMENT=/opt/wordclock-env UV_LINK_MODE=copy UV_NO_CACHE=1 uv sync --frozen && \
+    UV_PROJECT_ENVIRONMENT=/opt/wordclock-env UV_LINK_MODE=copy UV_NO_CACHE=1 /opt/uv-pip/bin/uv sync --frozen && \
     cat /etc/ssl/certs/ca-certificates.crt \
         >> "$(/opt/wordclock-env/bin/python -c 'import certifi; print(certifi.where())')" && \
     /opt/wordclock-env/bin/playwright install --with-deps chromium && \

@@ -155,6 +155,11 @@ environment the image built instead of making a second one. A link and not
 `UV_PROJECT_ENVIRONMENT`: that variable names the environment of every uv project in the
 container, and the Python servers other features install synced themselves into it.
 
+It also puts the image's uv, `/opt/uv-pip/bin/uv`, on the `PATH` - but only if the container
+has none of its own by then. The image keeps it off the `PATH` on purpose: a feature that
+brings its own uv installs it, together with the configuration its servers need, only when it
+finds none, and with ours on the `PATH` the Vector base image's ALM server failed to install.
+
 `wordclock-toolchain-check` runs once, as the feature's `postCreateCommand`, and names
 every program `Dockerfile` installs that the container does not have. It fails rather
 than warns, because a missing one means the image is older than the line that installs
