@@ -79,19 +79,15 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
-      # The ci- preset: warnings as errors in CI and not in the simulator preset a developer
-      # uses, because a warning should stop a change from being merged without stopping
-      # somebody in the middle of debugging one. CMakePresets.json holds the rest.
-      - name: Configure
-        run: cmake --preset ci-simulator
-
-      - name: Build
-        run: cmake --build --preset ci-simulator
-
+      # Each step from here on is a target of the Makefile, the same a developer runs. Under CI
+      # it takes the ci- presets: warnings as errors here and not in a developer's build, because
+      # a warning should stop a change from being merged without stopping somebody in the middle
+      # of debugging one.
+      #
       # No display needed: the tests drive the firmware core and the pixel buffer, and the
       # window that renders it is never constructed.
-      - name: Test
-        run: ctest --preset ci-simulator
+      - name: Build and test
+        run: make simulator
 
   # The simulator, its tests and both backends' host suites once more, compiled by clang instead
   # of GCC. Two compilers disagree about what deserves a warning: clang reported a uint16_t made
@@ -109,14 +105,8 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev clang
 
-      - name: Simulator and core tests
-        run: |
-          cmake --workflow --preset ci-clang
-
-      - name: Both backends' host tests
-        run: |
-          CXX=clang++ platform/esp32/test/run.sh
-          CXX=clang++ platform/rp2350/test/run.sh
+      - name: Simulator, core tests and both backends' host tests
+        run: make clang
 
   # The panel and the console in a real browser, with the simulator behind them as the firmware:
   # each page at a phone's width and a desktop's loads its first frame without a console error,
@@ -153,13 +143,8 @@ jobs:
       - name: Install Chromium
         run: playwright install --with-deps chromium
 
-      - name: Build the simulator
-        run: |
-          cmake --preset simulator
-          cmake --build --preset simulator --target Wordclock
-
       - name: Load the pages
-        run: python tools/web-smoke.py build/bin/Wordclock
+        run: make web
 
   host-tests:
     name: ESP32 backend on the host
@@ -172,7 +157,7 @@ jobs:
       # the `serve` mode, the pages being the simulator's to serve now. The script compiles
       # into an object cache under .pio/ and links from there.
       - name: Run the host tests
-        run: platform/esp32/test/run.sh
+        run: make host-esp32
 
   firmware:
     name: ESP32 firmware
@@ -197,17 +182,12 @@ jobs:
       # WordclockSecrets.h is not in the repository, so this builds with the defaults in
       # WordclockConfiguration.h - an empty SSID, which is a clock that runs without a
       # network rather than a build that fails.
-      - name: Build the firmware
-        run: pio run -d platform/esp32
-
-      # The sizes this backend's README states, against the image that was just built. Added
-      # after those two numbers sat at half the truth for long enough that the same file
+      #
+      # Then the sizes this backend's README states, against the image that was just built.
+      # Added after those two numbers sat at half the truth for long enough that the same file
       # contradicted itself: the ESP32 was the one target no check covered.
-      - name: Check the documented sizes
-        run: |
-          python3 tools/documented-sizes.py \
-            --esp32-bin platform/esp32/.pio/build/wordclock/firmware.bin \
-            --esp32-elf platform/esp32/.pio/build/wordclock/firmware.elf
+      - name: Build the firmware and check the documented sizes
+        run: make esp32
 
       # Two files because they answer different questions. firmware.bin is the image an
       # over-the-air update takes; firmware.factory.bin is the whole flash including the
@@ -234,7 +214,7 @@ jobs:
       # against the stand-ins in test/stubs rather than the real core. Two of the four case
       # files are the ones under platform/test, shared with that job.
       - name: Run the host tests
-        run: platform/rp2350/test/run.sh
+        run: make host-rp2350
 
   firmware-rp2350:
     name: RP2350 firmware
@@ -260,16 +240,14 @@ jobs:
 
       # As on the ESP32: no WordclockSecrets.h in the repository, so this builds with the
       # empty SSID that leaves a clock running without a network.
-      - name: Build the firmware
-        run: pio run -d platform/rp2350
-
+      #
       # And the two percentages this backend's notes claim are compared against the image that
       # was just built - the same arrangement the AVR job has, and for the same reason: the
       # number in the notes was 11.3 % of 4 MB long after the filesystem took a megabyte of it.
       # python3 comes from the uv-sync action above, and the size tool from the toolchain
       # PlatformIO just fetched.
-      - name: Check the documented sizes
-        run: python3 tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
+      - name: Build the firmware and check the documented sizes
+        run: make rp2350
 
       # The .uf2 first: the Pico mounts as a mass storage device and installing is copying
       # that file onto it, with no tool to install and nothing to go wrong. The .bin is kept
@@ -306,35 +284,23 @@ jobs:
           avr-gcc --version | head -1
           avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
 
-      # The toolchain has to be named when the build directory is created: a compiler cannot
-      # be swapped after project() has run, which is why -DPLATFORM=avr-dx alone refuses.
-      # The preset names it. Warnings as errors as in the simulator job, and for more reason:
-      # nothing else compiles a line of platform/avr-dx, so a warning there is seen here or
-      # nowhere.
-      - name: Configure
-        run: cmake --preset ci-avr
-
-      # The size is printed by the link rule itself. It is the reason this part was chosen,
-      # so a change that stops fitting says so here rather than on somebody's bench.
-      - name: Build
-        run: cmake --build --preset ci-avr
-
-      # And the size written in the documentation is compared against the one just built.
-      # Every size in this repository has been wrong at least once, always the same way - the
-      # code grew and the sentence did not - and twice a corrected number was made wrong again
-      # by the next change within a day. This is the only moment that is cheap to fix: the
-      # pull request that moved it. python3 is installed above for this step and the next. Both
-      # are tests of the AVR build, so `cmake --workflow --preset avr` runs them locally too.
-      - name: Check the documented sizes
-        run: ctest --preset ci-avr -R documented-sizes
-
-      # And the stack against the RAM those sizes leave: the deepest path from main(), with the
-      # two deepest interrupt handlers on top, out of the call graph the link writes beside the
-      # image. Nothing on this part notices the stack running into .bss - there is no guard - so
-      # the pull request that makes it deeper is again the one moment it is cheap to find out.
-      # --verbose, so the job's log shows the paths the stack is made of even when it fits.
-      - name: Check the stack fits
-        run: ctest --preset ci-avr -R stack --verbose
+      # The toolchain is named by the preset, because a compiler cannot be swapped after
+      # project() has run - which is why -DPLATFORM=avr-dx alone refuses. Warnings as errors
+      # as in the simulator job, and for more reason: nothing else compiles a line of
+      # platform/avr-dx, so a warning there is seen here or nowhere. The size is printed by the
+      # link rule itself; it is the reason this part was chosen, so a change that stops fitting
+      # says so here rather than on somebody's bench.
+      #
+      # Then the build's two tests. The size written in the documentation against the one just
+      # built: every size in this repository has been wrong at least once, always the same way
+      # - the code grew and the sentence did not - and twice a corrected number was made wrong
+      # again by the next change within a day. And the stack against the RAM those sizes leave:
+      # the deepest path from main(), with the two deepest interrupt handlers on top, out of the
+      # call graph the link writes beside the image. Nothing on this part notices the stack
+      # running into .bss - there is no guard. For both, the pull request that moved them is
+      # the one moment it is cheap to find out. python3 is installed above for them.
+      - name: Build, and check the documented sizes and the stack
+        run: make avr
 
       # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
       # the only one of the two that still knows the symbols, and a report about a clock in

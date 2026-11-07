@@ -135,9 +135,16 @@ WarningsAsErrors: '*'
 # command without its text, an unknown command. See docs/documentation.md. Checks names
 # clang-diagnostic-documentation*, as the -* it starts with leaves out every diagnostic that is
 # not named.
+#
+# -Wno-error because a database written by a ci- preset carries -Werror, and GCC's warning list
+# names options clang has never heard of: -Wduplicated-cond is an unknown option to clang, which
+# is a warning, and -Werror made every translation unit fail on it. Whether a finding fails is
+# WarningsAsErrors above, not the build's flags. ExtraArgs come after the database's own, so
+# this one wins.
 ExtraArgs:
   - -Wdocumentation
   - -Wdocumentation-unknown-command
+  - -Wno-error
 
 # CHECK OPTIONS
 #

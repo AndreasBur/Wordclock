@@ -27,11 +27,12 @@
         {
             "name": "simulator",
             "displayName": "Simulator",
-            "description": "The wxWidgets window, the web pages behind it and the core tests, into build/ - where clangd and every note look for them.",
+            "description": "The wxWidgets window, the web pages behind it and the core tests, into build/ - where clangd and every note look for them. GCC named, so that a build directory some editor once configured with another compiler does not quietly stay that way: the clang preset is the clang build.",
             "inherits": "base",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "PLATFORM": "simulator"
+                "PLATFORM": "simulator",
+                "CMAKE_CXX_COMPILER": "g++"
             }
         },
         {

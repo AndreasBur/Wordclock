@@ -1,6 +1,7 @@
 #!/bin/bash
 # Runs every fuzzer of this directory side by side for a while, and fails if one of them found
-# something. What static-analysis.yml runs on every pull request, and what to run here:
+# something. What static-analysis.yml runs on every pull request, through `make fuzz`, and what
+# that runs:
 #
 #   cmake --workflow --preset fuzz
 #   platform/simulator/tests/fuzz/run.sh build-fuzz 300 build-fuzz/work
