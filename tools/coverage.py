@@ -9,9 +9,7 @@ check. So the report is of all of them at once. A line counts as run if any suit
 
 Each suite is built with --coverage and run first, which leaves a .gcda beside every object:
 
-    cmake -S . -B build-cov -G Ninja -DPLATFORM=simulator \\
-          -DCMAKE_CXX_FLAGS="--coverage -O0" -DCMAKE_EXE_LINKER_FLAGS=--coverage
-    cmake --build build-cov --target WordclockTests && ctest --test-dir build-cov
+    cmake --workflow --preset coverage
     HOST_TESTS_CXXFLAGS="--coverage -O0" platform/esp32/test/run.sh
     HOST_TESTS_CXXFLAGS="--coverage -O0" platform/rp2350/test/run.sh
     tools/coverage.py build-cov platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests

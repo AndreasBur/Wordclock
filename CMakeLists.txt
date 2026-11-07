@@ -39,8 +39,9 @@ elseif(PLATFORM STREQUAL "avr-dx")
         message(FATAL_ERROR
             "The avr-dx platform cross-compiles, and its toolchain has to be named when "
             "the build directory is created:\n"
-            "  cmake -B build-avr -S . -DPLATFORM=avr-dx "
-            "-DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake\n"
+            "  cmake --preset avr\n"
+            "which is short for -DPLATFORM=avr-dx "
+            "-DCMAKE_TOOLCHAIN_FILE=platform/avr-dx/toolchain-avr.cmake.\n"
             "See platform/avr-dx/README.md.")
     endif()
     add_subdirectory(platform/avr-dx)

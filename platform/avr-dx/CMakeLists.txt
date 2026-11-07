@@ -107,3 +107,15 @@ add_custom_target(flash
     COMMAND pymcuprog write -d ${AVR_MCU} -t ${AVR_PROGRAMMER} -f $<TARGET_FILE_DIR:Wordclock>/Wordclock.hex --erase --verify
     DEPENDS Wordclock
     VERBATIM)
+
+# The two checks CI runs on the image, as tests of this build, so that `ctest` - and the avr
+# workflow preset - runs them wherever the image is built. The sizes only for the part the
+# README documents: an image built for another Dx part is meant to come out at other numbers.
+if(AVR_MCU STREQUAL "avr128da48")
+    add_test(NAME documented-sizes
+        COMMAND python3 tools/documented-sizes.py --elf $<TARGET_FILE:Wordclock>
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+add_test(NAME stack
+    COMMAND python3 tools/avr-stack.py ${CMAKE_BINARY_DIR} --paths
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
