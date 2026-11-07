@@ -1,10 +1,10 @@
 # RP2350 platform
 
 The Wordclock on a Raspberry Pi Pico 2 W. The firmware core is not copied here: this
-directory holds only the headers the core reaches for by name — `Pixels.h`,
-`RealTimeClock.h`, `Storage.h`, `System.h` and the `Arduino.h` shim — and the sources
-behind them. The light sensor's and the clock chip's drivers, `BH1750` and `DS3231`, are
-the ESP32's as well and live once in [`../arduino/`](../arduino/). See
+directory holds only the headers the core reaches for by name — `Pixels.h`, `Storage.h`,
+`System.h` and the `Arduino.h` shim — and the sources behind them. `RealTimeClock` and the
+light sensor's and the clock chip's drivers, `BH1750` and `DS3231`, are the ESP32's as well
+and live once in [`../arduino/`](../arduino/). See
 [`../avr-dx/README.md`](../avr-dx/README.md#what-a-backend-must-provide) for the contract
 these fulfil, and [`../esp32/README.md`](../esp32/README.md) for the
 backend this one was derived from.
