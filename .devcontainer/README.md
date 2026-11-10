@@ -121,10 +121,13 @@ git remote set-url origin ssh://git@ssh.github.com:443/AndreasBur/Wordclock.git
 git remote set-url origin https://github.com/AndreasBur/Wordclock.git
 ```
 
-HTTPS needs no separate login: `gh auth setup-git` installs `gh`'s credential
-helper, so `git` uses the token that is already there. `gh`'s own API calls go
-over HTTPS and honour `HTTPS_PROXY` either way, which is why `gh pr create` can
-work in a container whose `git push` does not.
+HTTPS needs no separate login: the shared feature's `postAttachCommand` runs
+`gh auth setup-git` on every attach, which installs `gh`'s credential helper,
+so `git` uses the token that is already there instead of VS Code's helper, which
+opens a window on the host. On every attach, as VS Code copies the host's
+`.gitconfig` into a new container; without a `gh` login it does nothing. `gh`'s
+own API calls go over HTTPS and honour `HTTPS_PROXY` either way, which is why
+`gh pr create` can work in a container whose `git push` does not.
 
 **The host key is in the image.** `~/.ssh` belongs to the container and is empty
 after every rebuild, so the first SSH operation used to fail with `Host key

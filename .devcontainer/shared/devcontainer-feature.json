@@ -42,6 +42,10 @@
         "GH_HOST": "github.com"
     },
     "postCreateCommand": "wordclock-tool-env && wordclock-toolchain-check",
+    // git signs in to GitHub through gh, whose login is in the volume below, rather than
+    // through VS Code's helper, which opens a window on the host. On every attach, after VS Code
+    // has copied the host's .gitconfig in; nothing without a login.
+    "postAttachCommand": "gh auth status --hostname github.com >/dev/null 2>&1 && gh auth setup-git --hostname github.com || true",
     "mounts": [
         {
             "source": "wordclock-platformio",
