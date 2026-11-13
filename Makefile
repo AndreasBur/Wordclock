@@ -134,29 +134,18 @@ headers: ## Every header compiled on its own, for the host and for each target
 	tools/tidy.sh --database-only >/dev/null
 	python3 tools/self_contained_headers.py build/host @build/tidy/databases
 
-# No cmake, no wxWidgets, no compile database: cppcheck is given the include directories and
-# works out the configurations itself, which for the firmware core is enough - it reports the
-# same findings with and without compile_commands.json, and this way it still answers when the
-# simulator does not build. src/ only, unlike tidy: without wxWidgets' own headers cppcheck
-# stops at DECLARE_EVENT_TABLE in the simulator's window class and asks to be told what the macro
-# is; the backend is the half clang-tidy covers through the compile database, and this is the
-# half that needs no toolchain to read.
+# The template's tools/cppcheck.sh. No cmake, no wxWidgets, no compile database: cppcheck is
+# given the include folders and works out the configurations itself - each module's folder, the
+# simulator's stand-ins for the Arduino core and .cppcheck-suppressions, which cppcheck_flags() of
+# tools/project.sh adds. src/ only, unlike tidy: without wxWidgets' own headers cppcheck stops at
+# DECLARE_EVENT_TABLE in the simulator's window class; the backend is the half clang-tidy covers
+# through the compile database, and this is the half that needs no toolchain to read.
 #
-# --enable: warning and portability, not style or performance. Those two are where "could be
-#   static", "could be const&" and "could return a reference" live - 270 of them, about how the
-#   code is written rather than what it does, and the same argument .clang-tidy makes for leaving
-#   the style checks out.
-# --check-level=exhaustive costs nothing measurable at this size.
-# --inline-suppr so a one-off can be answered next to the code, with the reason there, rather
-#   than by widening .cppcheck-suppressions to a whole file.
-#
-# The include directories as an array, so each is one argument - a name with a blank included.
+# --enable=warning,portability, not style or performance: those two are where "could be static",
+# "could be const&" and "could return a reference" live - 270 of them, about how the code is
+# written rather than what it does. --inline-suppr, so a one-off is answered next to the code.
 cppcheck: ## cppcheck over the firmware core
-	mapfile -t includes < <(find src -type d | sed 's/^/-I/'); \
-	cppcheck --enable=warning,portability --check-level=exhaustive --std=c++17 \
-	    --inline-suppr --suppressions-list=.cppcheck-suppressions --error-exitcode=1 --quiet \
-	    "$${includes[@]}" -Iplatform/simulator/include/sim -Iplatform/simulator/include \
-	    src
+	tools/cppcheck.sh
 
 # The template's tools/lint.sh: clang-format and the indentation of the Doxygen blocks, cpplint
 # with what CPPLINT.cfg filters, shellcheck over tools/, ruff over every .py with the checks
