@@ -18,6 +18,9 @@ declared in a header it did not read is "infinite", branches whose types it neve
   HeaderFilterRegex of .clang-tidy;
 - -Wno-unknown-attributes, as clang does not know avr-gcc's __progmem__ and takes such a table
   as in RAM, which changes nothing clang-tidy checks;
+- -Wno-unknown-warning-option and -Wno-ignored-optimization-argument, as a build may ask GCC for
+  warnings and optimisations clang does not have, as -Wduplicated-cond or ESP-IDF's
+  -freorder-blocks, and clang-tidy reports each as an error of every file;
 - a define no source reads, which only a build system passes on, is dropped;
 - each file is named by its whole path, as a build system may name it relative to its own.
 
@@ -107,7 +110,8 @@ def clang_arguments(arguments, target, includes):
             and not (argument.startswith('-D') and argument[2:].split('=')[0] in UNREAD_DEFINES)]
     flags = [flag for directory in includes for flag in ('-isystem', directory)]
     return ([arguments[0], f'--target={target}', '-nostdlibinc', '-nostdinc++'] + flags + kept
-            + ['-Wno-unknown-attributes'])
+            + ['-Wno-unknown-attributes', '-Wno-unknown-warning-option',
+               '-Wno-ignored-optimization-argument'])
 
 
 def main():

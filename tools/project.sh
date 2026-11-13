@@ -75,6 +75,9 @@ SIMAVR_MCU=""
 # The simulator: the window, the web host and the stand-ins for the hardware that the tests of
 # test/ are built against.
 HOST_CODE=(platform/simulator)
+# The two backends' host tests and the cases they share: each backend's run.sh builds them against
+# stand-ins of its framework, and writes the database the tidy target of tools/project.mk reads.
+TIDY_SKIP=(platform/esp32/test platform/rp2350/test platform/test)
 VARIANTS=(default)
 TIDY_VARIANTS=(default)
 # What the core tests and the two host suites reached together when Wordclock came onto the

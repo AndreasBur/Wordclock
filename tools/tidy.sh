@@ -25,6 +25,12 @@
 # 16 bits on the AVR and 32 on the host, and a check that only saw the host would never meet the
 # code as the board does.
 #
+# A firmware of several targets has a folder of platform/ for each, and a target compiles its own
+# and leaves the others' out. So a source of src/ or examples/ is read with every target, and one
+# of platform/ with those whose database has it; one of platform/ that no target compiles fails,
+# as it would otherwise never be read. The code of HOST_CODE is read with the tests, and that of
+# TIDY_SKIP by a target of the project's own, with a database of its own.
+#
 # The checks of our own, house-*, are a module of clang-tidy's that tools/lib/tidy_module.sh builds
 # from tools/lib/tidy_module/ and clang-tidy loads; the database alone does not need it.
 
@@ -71,6 +77,19 @@ run_tidy() {
   "${RUN_CLANG_TIDY[@]}" "${args[@]}"
 }
 
+# Prints those of the files given that the database in <dir> has an entry for, one per line.
+# Arguments:
+#   dir, then the files, relative to the repository
+in_database() {
+  local dir="$1"
+  shift
+  jq -r --arg root "${ROOT_DIR}" '
+    def path: if (.file | startswith("/")) then .file else .directory + "/" + .file end;
+    map(path) as $paths
+    | $ARGS.positional[] | select(($root + "/" + .) as $wanted | any($paths[]; . == $wanted))' \
+    "${dir}/compile_commands.json" --args "$@"
+}
+
 main() {
   local database_only=0
   if [[ "${1:-}" == "--database-only" ]]; then
@@ -83,7 +102,17 @@ main() {
   cd "${ROOT_DIR}"
   mkdir -p "${TIDY_DIR}"
   local sources
-  list_files sources '\.(cpp|ino)$' 'src/*' 'examples/*' 'platform/*'
+  list_files sources '\.(cpp|ino)$' 'src/*' 'examples/*'
+  local host_code
+  host_code_dirs host_code
+  local platform_paths=('platform/*')
+  local dir
+  for dir in "${host_code[@]}" "${TIDY_SKIP[@]}"; do
+    platform_paths+=(":!${dir%/}/*")
+  done
+  local platform_sources
+  list_files platform_sources '\.cpp$' "${platform_paths[@]}"
+  local -A compiled=()
   MODULE=''
   if ((!database_only)); then
     MODULE="$(tools/lib/tidy_module.sh)"
@@ -95,8 +124,10 @@ main() {
   local target
   local variant
   local compiler_database
-  local dir
   local label
+  local found
+  local own
+  local source
   local databases=()
   for target in "${TARGETS[@]}"; do
     select_target "${target}"
@@ -108,10 +139,28 @@ main() {
         break
       fi
       label="$(target_label "${variant}")"
+      own=()
+      if ((${#platform_sources[@]} > 0)); then
+        found="$(in_database "${dir}" "${platform_sources[@]}")"
+        if [[ -n "${found}" ]]; then
+          mapfile -t own <<< "${found}"
+        fi
+      fi
+      for source in "${own[@]}"; do
+        compiled["${source}"]=1
+      done
       echo "clang-tidy, ${label}:"
-      run_tidy "${dir}" '' "${sources[@]}" || failed=1
+      run_tidy "${dir}" '' "${sources[@]}" "${own[@]}" || failed=1
     done
   done
+  if ((!database_only)); then
+    for source in "${platform_sources[@]}"; do
+      if [[ -z "${compiled[${source}]:-}" ]]; then
+        err "${source} is compiled by no target of tools/project.sh, so clang-tidy never reads it."
+        failed=1
+      fi
+    done
+  fi
   ln -sfn "targets/${TARGETS[0]}/${TIDY_VARIANTS[0]}" "${TIDY_DIR}/clangd"
   if ((database_only)); then
     printf '%s\n' "${databases[@]}" > "${TIDY_DIR}/databases"
@@ -125,14 +174,15 @@ main() {
   # Arduino core and follows it, not the Google style. Nor what lies in test/compile_fail/,
   # which must not compile, and in test/compile_warn/, which warns on purpose: neither is in a
   # database. And the code of HOST_CODE, which CMake builds beside the tests, and its headers.
-  local host_code
-  host_code_dirs host_code
   local paths=('test/*' ':!test/mock/*' ':!test/compile_fail/*' ':!test/compile_warn/*'
     ':!test/fuzz/*')
   local filter='test'
   for dir in "${host_code[@]}"; do
     paths+=("${dir}/*")
     filter+="|${dir}"
+  done
+  for dir in "${TIDY_SKIP[@]}"; do
+    paths+=(":!${dir%/}/*")
   done
   local tests
   list_files tests '\.cpp$' "${paths[@]}"

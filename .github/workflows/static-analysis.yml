@@ -24,14 +24,12 @@
 # AddressSanitizer and UndefinedBehaviorSanitizer.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
-# compiler, so it is read through that build's database - rewritten by
-# tools/cross-clang-tidy.py so that clang can follow what GCC was told. The core is read
+# compiler, so it is read through that build's database - rewritten by the template's
+# tools/lib/clang_database.py so that clang can follow what GCC was told. The core is read
 # again in each of them, which is the point: an int is 16 bit on the AVR, and a check that
 # only ever saw the host would never meet the code the way that target does.
 #
-# timeout-minutes on every job for the reason ci.yml gives, and generous on clang-tidy: it
-# reads every translation unit of the simulator build and takes ten minutes when nothing at
-# all is wrong.
+# timeout-minutes on every job for the reason ci.yml gives.
 name: static-analysis
 
 on:
@@ -52,79 +50,42 @@ concurrency:
 
 jobs:
   clang-tidy:
-    name: clang-tidy
-    runs-on: ubuntu-26.04
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-
-      # wxWidgets is here for the same reason as in the simulator job of ci.yml: the
-      # simulator's compile database is what covers the firmware core, and it does not
-      # exist without the headers the backend includes.
-      - name: Install the toolchain
-        uses: ./.github/actions/apt-install
-        with:
-          packages: cmake ninja-build libwxgtk3.2-dev clang-tidy
-
-      # Each step that checks something is a target of the Makefile, the same a developer runs,
-      # and the reasons for what it runs are written beside it there. This one: clang-tidy over
-      # the core and the simulator, every header on its own, and the names in the tests, the
-      # window and both backends' host tests.
-      - name: Analyse
-        run: make tidy
-
-  clang-tidy-avr:
-    name: clang-tidy (AVR Dx)
-    runs-on: ubuntu-26.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-
-      # The cross compiler is installed although nothing is compiled with it: the tool asks it
-      # where avr-libc's headers are, and clang reads those instead of the host's.
-      - name: Install the toolchain
-        uses: ./.github/actions/apt-install
-        with:
-          packages: cmake ninja-build gcc-avr avr-libc clang-tidy python3
-
-      - name: Analyse
-        run: make tidy-avr
-
-  clang-tidy-platformio:
-    name: clang-tidy (${{ matrix.backend }})
+    name: clang-tidy and headers
     runs-on: ubuntu-26.04
     timeout-minutes: 45
-    strategy:
-      # One backend's findings say nothing about the other's, so both are reported.
-      fail-fast: false
-      matrix:
-        include:
-          - backend: esp32
-            cache: platformio
-          - backend: rp2350
-            cache: platformio-rp2350
     steps:
       - uses: actions/checkout@v7
 
-      # The same keys as the firmware jobs in ci.yml, so whichever of the two runs first
-      # fills the cache for the other - the toolchains are the slow part of this job too.
+      # The same keys as the firmware jobs in ci.yml, so whichever runs first fills the cache for
+      # the others: the toolchains are the slow part, and the ESP32's and the RP2350's databases
+      # are written by PlatformIO, which fetches them first.
       - name: Cache the PlatformIO packages
         uses: actions/cache@v6
         with:
           path: ~/.platformio
-          key: ${{ matrix.cache }}-${{ runner.os }}-${{ hashFiles(format('platform/{0}/platformio.ini', matrix.backend)) }}
-          restore-keys: ${{ matrix.cache }}-${{ runner.os }}-
+          key: platformio-tidy-${{ runner.os }}-${{ hashFiles('platform/*/platformio.ini') }}
+          restore-keys: platformio-tidy-${{ runner.os }}-
 
-      - name: Install clang-tidy
+      # Everything each database is written with: wxWidgets for the simulator's, avr-gcc for the
+      # AVR's - asked where avr-libc's headers are, as clang reads those instead of the host's -
+      # clang for the fuzzers', and jq, which tools/tidy.sh picks the entries with.
+      - name: Install the toolchain
         uses: ./.github/actions/apt-install
         with:
-          packages: clang-tidy
+          packages: cmake ninja-build libwxgtk3.2-dev gcc-avr avr-libc clang libclang-rt-dev jq
 
-      # PlatformIO at the version uv.lock pins, the one the firmware jobs build with.
+      # clang-tidy and PlatformIO at the versions uv.lock pins.
       - uses: ./.github/actions/uv-sync
 
-      - name: Analyse
-        run: make tidy-${{ matrix.backend }}
+      # Each step that checks something is a target of the Makefile, the same a developer runs,
+      # and the reasons for what it runs are written beside it there: clang-tidy over every target
+      # of tools/project.sh, the tests and the fuzzers, and the names in the backends' host tests;
+      # then every header compiled on its own by each target's compiler and the host's.
+      - name: clang-tidy
+        run: make tidy
+
+      - name: Every header on its own
+        run: make headers
 
   cppcheck:
     name: cppcheck

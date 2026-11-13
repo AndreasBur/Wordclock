@@ -43,6 +43,7 @@ readonly BUILD_DIR="${ROOT_DIR}/build"
   CPPCHECK=1
   COVERAGE_MINIMUM=(100 100 100)
   HOST_CODE=()
+  TIDY_SKIP=()
 }
 
 # The hooks, which do nothing unless tools/project.sh defines them again, and

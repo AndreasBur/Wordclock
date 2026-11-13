@@ -1,172 +1,410 @@
-# What static analysis is asked for here, and what it is not.
-#
-# The checks that are on are the ones that answer "is this wrong": the bug patterns, the
-# path-sensitive analyser, the CERT rules and the performance ones. The ones that are off
-# are off because they argue with decisions this project has already made, and a check that
-# is answered by "no, on purpose" a hundred times is a check nobody reads.
-#
-# Style checks identify member functions that can be static or const, and check the names.
-# The names are Google's, as in MaxMatrix and Utl, and the point is that all three read the
-# same - see CHECK OPTIONS at the end. The modernize- family stays off: it would report the
-# configuration macros that every module is configured through.
-#
-# Run over the simulator's compile database, which covers the whole firmware core:
-#
-#   cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-#   run-clang-tidy -p build/host -quiet "^$PWD/src/|platform/simulator/src"
-#
-# and over each hardware backend's, through tools/cross-clang-tidy.py - the same checks, with
-# the database rewritten so that clang can read what a GCC cross compiler was told:
-#
-#   tools/cross-clang-tidy.py build-avr       "^$PWD/src/|platform/avr-dx/src"
-#   tools/cross-clang-tidy.py platform/esp32  "^$PWD/src/|platform/esp32/src|platform/arduino/src"
-#   tools/cross-clang-tidy.py platform/rp2350 "^$PWD/src/|platform/rp2350/src|platform/arduino/src"
-#
+# Broad groups, and out of them what contradicts the Google style, what cannot be had on the
+# AVR, and the aliases of checks that are on already. Each exception says why. This file comes
+# from the template and is brought up to date with `copier update`; a project adds its own
+# exceptions at the end of a list, with its reason, and the update keeps them.
 Checks: >
-  -*,
   bugprone-*,
   cert-*,
   clang-analyzer-*,
-  clang-diagnostic-documentation*,
+  cppcoreguidelines-*,
+  google-*,
+  house-*,
+  misc-*,
+  modernize-*,
   performance-*,
-  readability-convert-member-functions-to-static,
-  readability-identifier-naming,
-  readability-make-member-function-const,
+  portability-*,
+  readability-*,
   -bugprone-dynamic-static-initializers,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -cert-dcl58-cpp,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-c-copy-assignment-signature,
+  -cppcoreguidelines-explicit-constructor,
+  -cppcoreguidelines-explicit-virtual-functions,
+  -cppcoreguidelines-macro-to-enum,
+  -cppcoreguidelines-missing-std-forward,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-noexcept-destructor,
+  -cppcoreguidelines-noexcept-move-operations,
+  -cppcoreguidelines-noexcept-swap,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-rvalue-reference-param-not-moved,
+  -cppcoreguidelines-use-default-member-init,
+  -google-explicit-constructor,
+  -misc-explicit-constructor,
+  -modernize-deprecated-headers,
+  -modernize-return-braced-init-list,
+  -modernize-use-trailing-return-type,
+  -readability-identifier-length,
+  -readability-named-parameter,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
   -bugprone-suspicious-enum-usage,
   -bugprone-too-small-loop-variable,
-  -cert-dcl37-c,
-  -cert-dcl51-cpp,
   -cert-err58-cpp,
   -cert-int09-c,
   -cert-str34-c,
   -clang-analyzer-optin.performance.Padding,
+  -misc-header-include-cycle,
   -performance-enum-size,
-  -performance-unnecessary-value-param
-
-# Why each of those is off:
+  -performance-unnecessary-value-param,
+  -readability-enum-initial-value,
+  -readability-uppercase-literal-suffix,
+  -house-braced-var-init,
+  -misc-include-cleaner,
+  -modernize-macro-to-enum,
+  -modernize-use-nodiscard,
+  -cppcoreguidelines-macro-usage,
+  -readability-static-accessed-through-instance,
+  -modernize-avoid-c-arrays,
+  -modernize-use-designated-initializers,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-special-member-functions,
+  -misc-const-correctness,
+  -house-braced-member-init,
+  -cppcoreguidelines-pro-type-union-access,
+  -clang-diagnostic-unreachable-code-break,
+  -readability-magic-numbers,
+  -readability-function-size,
+  -readability-braces-around-statements,
+  -bugprone-std-namespace-modification,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -modernize-use-equals-default,
+  -modernize-use-auto,
+  -bugprone-signed-bitwise,
+  -readability-else-after-return,
+  -google-readability-braces-around-statements,
+  -cppcoreguidelines-init-variables,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-type-vararg,
+  -readability-math-missing-parentheses,
+  -modernize-loop-convert,
+  -readability-isolate-declaration,
+  -google-runtime-int,
+  -readability-avoid-return-with-void-value,
+  -readability-redundant-member-init,
+  -readability-simplify-boolean-expr,
+  -modernize-type-traits,
+  -modernize-use-default-member-init,
+  -clang-diagnostic-enum-enum-conversion,
+  -readability-implicit-bool-conversion,
+  -readability-redundant-nested-if,
+  -bugprone-throwing-static-initialization,
+  -misc-use-internal-linkage,
+  -readability-function-cognitive-complexity,
+  -cppcoreguidelines-pro-type-member-init,
+  -modernize-use-scoped-lock,
+  -readability-redundant-casting,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-prefer-member-initializer,
+  -cppcoreguidelines-use-enum-class,
+  -modernize-raw-string-literal,
+  -clang-diagnostic-deprecated-copy-with-dtor,
+  -google-runtime-float,
+  -clang-diagnostic-old-style-cast,
+  -misc-use-anonymous-namespace,
+  -readability-use-std-min-max,
+  -bugprone-derived-method-shadowing-base-method,
+  -cert-err33-c,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-virtual-class-destructor,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-use-constraints,
+  -modernize-use-override,
+  -modernize-use-using,
+  -readability-redundant-access-specifiers,
+  -readability-redundant-parentheses,
+  -readability-redundant-typename,
+  -readability-use-anyofallof,
+  -readability-use-concise-preprocessor-directives,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -readability-suspicious-call-argument,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-invalid-enum-default-initialization,
+  -clang-diagnostic-c++98-compat-extra-semi,
+  -clang-diagnostic-comma,
+  -clang-diagnostic-sign-conversion,
+  -clang-diagnostic-undef,
+  -clang-diagnostic-zero-as-null-pointer-constant,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -google-global-names-in-headers,
+  -misc-confusable-identifiers,
+  -misc-multiple-inheritance,
+  -misc-no-recursion,
+  -misc-redundant-expression,
+  -modernize-redundant-void-arg,
+  -modernize-use-nullptr,
+  -readability-avoid-nested-conditional-operator,
+  -readability-redundant-lambda-parameter-list
+# house-*: the checks of our own, in tools/lib/tidy_module/; tools/tidy.sh loads them. Without
+#   the module, as in clangd, the name matches nothing.
+# bugprone-dynamic-static-initializers: it reports the extern declaration of a constant whose
+#   constexpr definition lies in a .cpp it cannot see, as an object identified by its address
+#   has to be.
+# cert-dcl37-c, cert-dcl51-cpp, cert-dcl58-cpp: aliases of bugprone-reserved-identifier and
+#   bugprone-std-namespace-modification, which are on; two names would want two NOLINTs.
+# cppcoreguidelines-avoid-c-arrays, -avoid-magic-numbers, -c-copy-assignment-signature,
+#   -explicit-virtual-functions, -macro-to-enum, -narrowing-conversions, -noexcept-destructor,
+#   -noexcept-move-operations, -noexcept-swap, -non-private-member-variables-in-classes,
+#   -use-default-member-init: aliases of the modernize-, readability-, misc-, bugprone- and
+#   performance- checks that are on, with defaults of their own; the options below are set for
+#   those.
+# cppcoreguidelines-explicit-constructor, google-explicit-constructor,
+#   misc-explicit-constructor: cpplint checks the same rule as runtime/explicit, and the
+#   implicit constructors that are meant carry their NOLINT there; two tools would want two
+#   per line.
+# cppcoreguidelines-missing-std-forward, -rvalue-reference-param-not-moved: they want
+#   std::forward and std::move, which avr-gcc does not have without a standard library; a
+#   static_cast<T&&> is what both are, and the checks do not know it.
+# cppcoreguidelines-pro-bounds-array-to-pointer-decay, -pro-bounds-avoid-unchecked-container-
+#   access, -pro-bounds-constant-array-index: the bounds profile wants gsl::span and gsl::at,
+#   which the AVR does not have; F(), PROGMEM tables and the core take arrays as pointers, and
+#   operator[] is the unchecked access the standard gives. cppcoreguidelines-pro-bounds-
+#   pointer-arithmetic stays on: a project built on pointers, as a container, turns it off
+#   below, with its reason.
+# modernize-deprecated-headers: avr-gcc comes without a C++ standard library, so there is no
+#   <cstdint>, only <stdint.h>.
+# modernize-return-braced-init-list: `return Error();` says what is returned, `return {};`
+#   hides it.
+# modernize-use-trailing-return-type: Google puts the return type in front.
+# readability-identifier-length: Google allows `f` or `a` and `b` where the scope is a few
+#   lines.
+# readability-named-parameter: Google leaves out the name of a parameter that is unused where
+#   the context explains it, as a tag type that only picks an overload.
 #
-# bugprone-dynamic-static-initializers
-#   Only ever reports on the AVR, which builds with -fno-threadsafe-statics, and there it
-#   reports every singleton and every static table - declarations without an initialiser
-#   included. The hazard behind it is a first call from an interrupt racing the first call
-#   from the main loop, and the one singleton an interrupt reaches is the timer, whose
-#   overflow interrupt is enabled by its own init() and so after it has been constructed.
+# Wordclock's own, for good:
+# bugprone-easily-swappable-parameters: it reports every SetPixel(byte column, byte row). The
+#   answer would be a type per coordinate, which is not what this firmware is; the parameters are
+#   named and the call sites are two lines from the definition.
+# bugprone-narrowing-conversions, cert-str34-c: 183 findings, which is byte arithmetic itself:
+#   every b = b + 1 promotes to int and narrows back. The alternative is a cast on every line of
+#   the display and animation code, which would hide the few casts that mean something.
+# bugprone-suspicious-enum-usage: it reports every wxWidgets flag combination - wxLEFT | wxTOP is
+#   two enumerators of two enumerations, which is how that library is written.
+# bugprone-too-small-loop-variable: a byte counting over a table of a hundred entries. The
+#   truncation it warns about needs a container larger than the loop variable can address, and
+#   every table here is fixed and small - the largest is 110 pixels.
+# cert-err58-cpp: it reports the singletons, a static object whose constructor could throw.
+#   Nothing here throws, and the whole design is static objects.
+# cert-int09-c, readability-enum-initial-value: one check under two names. It reports
+#   enumerations whose first values are given and the rest counted, which is how a hardware
+#   command set is written down: BH1750::ModeType carries the chip's opcodes.
+# clang-analyzer-optin.performance.Padding: it reports the message catalog's two structs. Their
+#   field order is the order the tables are written in, and those tables sit in flash.
+# misc-header-include-cycle: the ESP32's and the RP2350's Arduino.h stand in for the core's, to
+#   bind Serial to WordclockSerial, and include it by its path, WORDCLOCK_CORE_ARDUINO_H; the
+#   core's own headers include "Arduino.h" again and find this one, a cycle the include guards
+#   end. Every finding lies in the frameworks' headers, which the filter above does not keep out
+#   of this check.
+# performance-enum-size: it would put ": uint8_t" on some sixty enumerations, several of them
+#   members of structs that PROGMEM tables are memcpy_P'd out of, where the layout is the format
+#   of those tables.
+# performance-unnecessary-value-param: it reports Pixel, ClockDate and ClockTime passed by value.
+#   On a controller with two-byte pointers a three-byte value is cheaper by value than by
+#   reference, the opposite of what the check assumes.
 #
-# bugprone-easily-swappable-parameters
-#   Reports every setPixel(byte Column, byte Row). The answer would be a type per
-#   coordinate, which is not what this firmware is; the parameters are named and the call
-#   sites are two lines from the definition.
-#
-# bugprone-suspicious-enum-usage
-#   Reports every wxWidgets flag combination - wxLEFT | wxTOP is two enumerators of two
-#   enumerations, which is how that library is written. All fifteen findings were in the
-#   simulator's window code.
-#
-# cert-dcl37-c, cert-dcl51-cpp
-#   bugprone-reserved-identifier under two more names, which is on. With them on, a name that
-#   belongs to the toolchain, as avr-libc's __heap_start, would need all three in its NOLINT.
-#
-# cert-err58-cpp
-#   Reports the singletons: a static object whose constructor could throw. Nothing here
-#   throws, and the whole design is static objects.
-#
-# performance-unnecessary-value-param
-#   Reports Pixel, ClockDate and ClockTime being passed by value. On a controller with
-#   two-byte pointers a three-byte value is cheaper by value than by reference, which is
-#   the opposite of what the check assumes.
-#
-# bugprone-narrowing-conversions, cert-str34-c
-#   183 findings, which is byte arithmetic itself: every b = b + 1 promotes to int and
-#   narrows back. The alternative is a cast on every line of the display and animation
-#   code, which would hide the few casts that mean something.
-#
-# bugprone-too-small-loop-variable
-#   A byte counting over a table of a hundred entries. The truncation it warns about needs
-#   a container larger than the loop variable can address, and every table here is fixed
-#   and small - the largest is 110 pixels.
-#
-# performance-enum-size
-#   Would put ": uint8_t" on some sixty enumerations. Several of them are members of
-#   structs that PROGMEM tables are memcpy_P'd out of, where the layout is the file format
-#   of those tables; the saving is not worth changing that by hand.
-#
-# cert-int09-c
-#   Reports enumerations whose first values are given and the rest counted, which is how
-#   a hardware command set is written down: BH1750::ModeType carries the chip's opcodes.
-#
-# clang-analyzer-optin.performance.Padding
-#   Reports the message catalog's two structs. Their field order is the order the tables
-#   are written in, and those tables are read far more often than the four bytes of
-#   padding are paid for - on the target they sit in flash.
-#
-# misc-include-cleaner, which is not in the list above at all
-#   Asks every source to include each header it uses a name from, its own header's
-#   includes not excepted - and a source leaning on its own header is what Google's rule
-#   allows and what this tree does, so almost everything it reports is that. And it asks
-#   for the header that happens to declare a name on the target being read: for PROGMEM
-#   and byte that is the simulator's arduino/Progmem.h and arduino/Types.h, where every
-#   target's sources mean Arduino.h.
-#   What it is there for, a header that compiles only because of what was included
-#   before it, is caught by tools/self-contained-headers.py instead.
-
-# A finding can be reported under several names at once - a bugprone- check and the CERT
-# rules that alias it - and which of them leads depends on the version. A NOLINT therefore
-# names all of them, or it silences nothing on the version that reports the other one. The
-# container carries a newer clang-tidy than the CI runner, so both are met in practice.
-#
-# Only what this repository owns. Header findings are reported through the source that
-# includes them, so the firmware's header-only classes are covered by their callers.
-#
-# The leading slash is load-bearing: without it the Pico SDK's pico_platform/ matched, and
-# its register accessors were reported as this repository's. The libraries PlatformIO
-# fetches sit inside platform/<backend>/.pio, which is why that is excluded by name. The
-# frameworks sit in ~/.platformio, and the SDK's pico/platform/ matches even with the slash:
-# the naming check was the first to report there, on __isr and its neighbours.
-HeaderFilterRegex: '/(src|platform)/'
-ExcludeHeaderFilterRegex: '/\.pio/|/\.platformio/'
+# Wordclock's own, for now: every check after readability-enum-initial-value found
+# something when Wordclock came onto the template, the number given below. Each is answered in a
+# pull request of its own - fixed, or kept off here with its reason - and leaves this list then.
+# The bugprone- and cert- among them were on before; their findings are clang-tidy 23's, which
+# uv.lock pins, where Wordclock was read by 21.
+# misc-include-cleaner, -macro-to-enum, cppcoreguidelines-macro-usage and modernize-avoid-c-arrays
+# meet conventions of Wordclock's own (CLAUDE.md: a source leans on its own header's includes; a
+# module's switches are #define, as #if reads them), decided one by one.
+#    2435 readability-uppercase-literal-suffix
+#    1014 house-braced-var-init
+#     719 misc-include-cleaner
+#     343 modernize-macro-to-enum
+#     323 modernize-use-nodiscard
+#     281 cppcoreguidelines-macro-usage
+#     199 readability-static-accessed-through-instance
+#     161 modernize-avoid-c-arrays
+#     131 modernize-use-designated-initializers
+#     124 cppcoreguidelines-pro-bounds-pointer-arithmetic
+#     116 cppcoreguidelines-special-member-functions
+#      90 misc-const-correctness
+#      89 house-braced-member-init
+#      86 cppcoreguidelines-pro-type-union-access
+#      66 clang-diagnostic-unreachable-code-break
+#      65 readability-magic-numbers
+#      59 readability-function-size
+#      55 readability-braces-around-statements
+#      54 bugprone-std-namespace-modification
+#      54 cppcoreguidelines-pro-type-reinterpret-cast
+#      54 modernize-use-equals-default
+#      48 modernize-use-auto
+#      44 bugprone-signed-bitwise
+#      44 readability-else-after-return
+#      43 google-readability-braces-around-statements
+#      35 cppcoreguidelines-init-variables
+#      34 cppcoreguidelines-owning-memory
+#      19 cppcoreguidelines-pro-type-vararg
+#      19 readability-math-missing-parentheses
+#      17 modernize-loop-convert
+#      17 readability-isolate-declaration
+#      15 google-runtime-int
+#      15 readability-avoid-return-with-void-value
+#      14 readability-redundant-member-init
+#      14 readability-simplify-boolean-expr
+#      13 modernize-type-traits
+#      12 modernize-use-default-member-init
+#      11 clang-diagnostic-enum-enum-conversion
+#      11 readability-implicit-bool-conversion
+#       9 readability-redundant-nested-if
+#       8 bugprone-throwing-static-initialization
+#       8 misc-use-internal-linkage
+#       8 readability-function-cognitive-complexity
+#       7 cppcoreguidelines-pro-type-member-init
+#       7 modernize-use-scoped-lock
+#       7 readability-redundant-casting
+#       6 cppcoreguidelines-avoid-const-or-ref-data-members
+#       6 cppcoreguidelines-avoid-do-while
+#       6 cppcoreguidelines-prefer-member-initializer
+#       6 cppcoreguidelines-use-enum-class
+#       6 modernize-raw-string-literal
+#       5 clang-diagnostic-deprecated-copy-with-dtor
+#       5 google-runtime-float
+#       4 clang-diagnostic-old-style-cast
+#       4 misc-use-anonymous-namespace
+#       4 readability-use-std-min-max
+#       3 bugprone-derived-method-shadowing-base-method
+#       3 cert-err33-c
+#       3 cppcoreguidelines-pro-type-const-cast
+#       3 cppcoreguidelines-virtual-class-destructor
+#       3 misc-non-private-member-variables-in-classes
+#       3 modernize-use-constraints
+#       3 modernize-use-override
+#       3 modernize-use-using
+#       3 readability-redundant-access-specifiers
+#       3 readability-redundant-parentheses
+#       3 readability-redundant-typename
+#       3 readability-use-anyofallof
+#       3 readability-use-concise-preprocessor-directives
+#       2 cppcoreguidelines-pro-type-cstyle-cast
+#       2 readability-suspicious-call-argument
+#       1 bugprone-implicit-widening-of-multiplication-result
+#       1 bugprone-invalid-enum-default-initialization
+#       1 clang-diagnostic-c++98-compat-extra-semi
+#       1 clang-diagnostic-comma
+#       1 clang-diagnostic-sign-conversion
+#       1 clang-diagnostic-undef
+#       1 clang-diagnostic-zero-as-null-pointer-constant
+#       1 cppcoreguidelines-avoid-non-const-global-variables
+#       1 google-global-names-in-headers
+#       1 misc-confusable-identifiers
+#       1 misc-multiple-inheritance
+#       1 misc-no-recursion
+#       1 misc-redundant-expression
+#       1 modernize-redundant-void-arg
+#       1 modernize-use-nullptr
+#       1 readability-avoid-nested-conditional-operator
+#       1 readability-redundant-lambda-parameter-list
 WarningsAsErrors: '*'
-
-# clang reads every Doxygen block as it compiles: a \param whose name is not the parameter's, a
-# command without its text, an unknown command. See docs/documentation.md. Checks names
-# clang-diagnostic-documentation*, as the -* it starts with leaves out every diagnostic that is
-# not named.
+# clang's warnings beyond -Wall -Wextra, which tools/tidy.sh passes: what an IDE such as CLion
+# finds with its own analysis of the code, reported here by clang-tidy as clang-diagnostic-*
+# and failing as any check does. Code that cannot be reached, a macro or a member function
+# that is never used, an #if on a macro that is not defined (a switch spelled wrong is off
+# without a word), a C cast, 0 as a null pointer, a shadowed name, a float promoted to double
+# (which the AVR computes in software). Not -Wdeprecated-redundant-constexpr-static-def: a
+# library for gnu++11 needs the definition of a constexpr static member outside its class, which
+# C++17, as the tests are compiled, calls redundant.
 #
-# -Wno-error because a database written by a ci- preset carries -Werror, and GCC's warning list
-# names options clang has never heard of: -Wduplicated-cond is an unknown option to clang, which
-# is a warning, and -Werror made every translation unit fail on it. Whether a finding fails is
-# WarningsAsErrors above, not the build's flags. ExtraArgs come after the database's own, so
-# this one wins.
+# And the Doxygen blocks, checked against the declaration they stand at: a \param whose name
+# the function does not have, a \return on a function that returns nothing, an unknown
+# command. \stddiff is the alias of the Doxyfile. See docs/Documentation.md.
+#
+# .clangd adds the same, so that the editor shows them.
 ExtraArgs:
+  - -Wcast-qual
+  - -Wcomma
+  - -Wconditional-uninitialized
+  - -Wdeprecated
+  - -Wno-deprecated-redundant-constexpr-static-def
+  - -Wdouble-promotion
+  - -Wextra-semi
+  - -Wformat=2
+  - -Wimplicit-fallthrough
+  - -Wloop-analysis
+  - -Wmissing-noreturn
+  - -Wnon-virtual-dtor
+  - -Wnull-dereference
+  - -Wold-style-cast
+  - -Wshadow-all
+  - -Wundef
+  - -Wunreachable-code-aggressive
+  - -Wunused-exception-parameter
+  - -Wunused-macros
+  - -Wunused-member-function
+  - -Wunused-template
+  - -Wzero-as-null-pointer-constant
   - -Wdocumentation
   - -Wdocumentation-unknown-command
-  - -Wno-error
-
-# CHECK OPTIONS
-#
-# Google's names: types and functions CamelCase, variables and members lower_case, a
-# private or protected member ending in an underscore, constants and enumerators k plus
-# CamelCase, macros UPPER_CASE. The case options are what check the case of a member with
-# the suffix - the suffix alone accepted Count_ in Utl.
-#
-# An include guard begins and ends with an underscore, hence the ignore pattern on macros.
-# A name that belongs to someone else - Arduino's Serial and byte, the standard library's
-# array, the frameworks the host tests stub - carries a NOLINT where it is declared.
-#
-# Not enforced, and worth knowing before trusting a clean run: a name used inside a macro
-# body is neither renamed by the check's fixes nor reported at all. Clock's initial mode,
-# reached only through CLOCK_INITIAL_MODE, kept its old spelling through a clean run.
+  - -fcomment-block-commands=stddiff
+# (^|/), as tools/tidy.sh names the files relative to the repository, and a
+# header beside an example is found as examples/.../font_error.h.
+# Wordclock's own: platform/ as well, whose headers are each backend's, and none of what PlatformIO
+# fetches. The leading slash keeps the Pico SDK's pico_platform/ out; the libraries PlatformIO
+# fetches sit inside platform/<backend>/.pio, and the frameworks in ~/.platformio, whose
+# pico/platform/ matches even with the slash.
+HeaderFilterRegex: '(^|/)(src|platform)/'
+ExcludeHeaderFilterRegex: '/\.pio/|/\.platformio/'
 CheckOptions:
+  # The size of a function, docs/CodingStyle.md FN-2 to FN-5: 40 lines of body,
+  # 4 parameters, 3 levels within the body (the body itself is level 1 to the
+  # check), a cognitive complexity of 15. Without a threshold the check
+  # reports nothing.
+  readability-function-size.LineThreshold: 40
+  readability-function-size.ParameterThreshold: 4
+  readability-function-size.NestingThreshold: 4
+  readability-function-cognitive-complexity.Threshold: 15
+  # A text in PROGMEM is a char array, as F() and a table of texts need one.
+  modernize-avoid-c-arrays.AllowStringArrays: true
+  # A list over several lines ends in a comma, unless it is one value whose
+  # expression wraps, as in Result<...> const end{ReadDigits(...)}: there a
+  # comma would read as the start of a second value.
+  readability-trailing-comma.MultiLineCommaPolicy: Ignore
+  # A struct with only public members is what Google calls a struct, and an
+  # array type has to be one to stay an aggregate.
+  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
+  # The do { ... } while (0) of a macro is how a macro becomes one statement.
+  cppcoreguidelines-avoid-do-while.IgnoreMacros: true
+  # A class that deletes its copy has no move either, as the language has it;
+  # the rule of five does not ask to say so twice.
+  cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: true
+  # Google's "include what you use", with Arduino.h as what provides the
+  # core and the board's pins: F(), __FlashStringHelper and A0 come through it,
+  # from the core's folder and from the variant's. And <avr/io.h> as what
+  # provides a part's registers: avr-libc includes the part's header through
+  # it, at times through a second one, as iom2560.h through iomxx0_1.h, which
+  # include-cleaner does not take back to <avr/io.h>.
+  misc-include-cleaner.IgnoreHeaders: '.*/cores/arduino/.*;.*/variants/.*;.*/avr/io[^/]*\.h'
+  # Google's names, which readability-identifier-naming checks only once it is told them; the
+  # same block in every project, so that every project names alike. Two exceptions Google
+  # makes itself are general: an accessor is named like the variable it gives (group(),
+  # size()), as are the aliases of a type that mimics the standard (value_type); and an include
+  # guard ends in an underscore. The third, an entity that mimics one of the standard library
+  # and takes its names (array, span, make_array), is the project's: it lists them below, as
+  # ClassIgnoredRegexp, StructIgnoredRegexp, FunctionIgnoredRegexp and
+  # ConstexprVariableIgnoredRegexp.
   readability-identifier-naming.NamespaceCase: lower_case
   readability-identifier-naming.ClassCase: CamelCase
   readability-identifier-naming.StructCase: CamelCase
   readability-identifier-naming.EnumCase: CamelCase
   readability-identifier-naming.UnionCase: CamelCase
+  readability-identifier-naming.TypeAliasCase: CamelCase
+  readability-identifier-naming.TypeAliasIgnoredRegexp: '^[a-z][a-z0-9_]*$'
+  readability-identifier-naming.TypedefCase: CamelCase
+  readability-identifier-naming.TypedefIgnoredRegexp: '^[a-z][a-z0-9_]*$'
   readability-identifier-naming.TemplateParameterCase: CamelCase
   readability-identifier-naming.FunctionCase: CamelCase
   readability-identifier-naming.MethodCase: CamelCase
+  readability-identifier-naming.MethodIgnoredRegexp: '^[a-z][a-z0-9_]*$'
   readability-identifier-naming.VariableCase: lower_case
   readability-identifier-naming.ParameterCase: lower_case
   readability-identifier-naming.MemberCase: lower_case
@@ -176,16 +414,14 @@ CheckOptions:
   readability-identifier-naming.ProtectedMemberSuffix: _
   readability-identifier-naming.ConstexprVariableCase: CamelCase
   readability-identifier-naming.ConstexprVariablePrefix: k
-  # Message::npos and StringTools::npos stand for what std::string::npos stands for, and
-  # are read as that - as in MaxMatrix and Utl.
-  readability-identifier-naming.ConstexprVariableIgnoredRegexp: '^npos$'
   readability-identifier-naming.GlobalConstantCase: CamelCase
   readability-identifier-naming.GlobalConstantPrefix: k
   readability-identifier-naming.StaticConstantCase: CamelCase
   readability-identifier-naming.StaticConstantPrefix: k
-  readability-identifier-naming.TypeAliasCase: CamelCase
-  readability-identifier-naming.TypedefCase: CamelCase
   readability-identifier-naming.EnumConstantCase: CamelCase
   readability-identifier-naming.EnumConstantPrefix: k
   readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
-  readability-identifier-naming.MacroDefinitionIgnoredRegexp: '^_?[A-Z][A-Z0-9_]*_$'
+  readability-identifier-naming.MacroDefinitionIgnoredRegexp: '^[A-Z][A-Z0-9_]*_$'
+  # Wordclock's own: Message::npos and StringTools::npos stand for what std::string::npos stands
+  # for, and are spelled as it is.
+  readability-identifier-naming.ConstexprVariableIgnoredRegexp: '^npos$'
