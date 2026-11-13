@@ -1,100 +1,72 @@
-# What a pull request is read with, next to what it is built with in ci.yml. The clang-tidy
-# job was a fourth job there and is the same job here, moved: a badge reports a workflow and
-# not a job, so this is what puts a static-analysis badge in the README beside the CI one.
-# CI is now the three builds and the tests, this is what reads the code, and neither answer
-# hides inside the other's.
+# What a pull request is read with, next to what it is built with in ci.yml: a workflow of its
+# own, as a badge reports a workflow and not a job, so that the README says separately that the
+# builds pass and that the analysers are quiet. Each step is a target of the Makefile.
 #
-# Two analysers, because they are good at different things. clang-tidy sees exactly what the
-# compiler sees - the real include paths and defines out of compile_commands.json - and
-# brings the path-sensitive clang-analyzer checks with it. cppcheck parses the tree by
-# itself, which is how it reaches template instantiations and container bounds that the
-# clang checks do not follow: it is the one that noticed the parameter parser being
-# instantiated with an empty table.
+#   clang-tidy   the library and the examples, or a firmware and its platform/, with each
+#                target's flags, once per variant whose defines differ, the tests on the host and
+#                the fuzzers; which checks, and why the rest are off, is in .clang-tidy; with the
+#                checks of our own, built against LLVM's headers
+#   cppcheck     the library, parsed by cppcheck itself, which reaches what clang does not
+#   headers      every header of src/ compiled on its own, for the host and for each target
+#   fuzz         the fuzzers of test/fuzz/, FUZZ_SECONDS each, going on from the corpus the last
+#                run left
 #
-# Which checks are on, and why the rest are off, is in .clang-tidy and
-# .cppcheck-suppressions, not here.
-#
-# The comments are read as well: clang-tidy reads every Doxygen block with -Wdocumentation, and
-# the docs job has Doxygen read them, which is what notices a block that leaves out a
-# parameter. What a block holds is docs/documentation.md.
-#
-# And every header is compiled on its own, once per build, so that none of them compiles only
-# because of what its includers brought along. The tests are read too: the coverage job reports
-# which lines of src/ none of them runs, and the sanitizers job runs them all again under
-# AddressSanitizer and UndefinedBehaviorSanitizer.
-# clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
-# host compiler sees it; each hardware backend is only ever compiled by its own cross
-# compiler, so it is read through that build's database - rewritten by the template's
-# tools/lib/clang_database.py so that clang can follow what GCC was told. The core is read
-# again in each of them, which is the point: an int is 16 bit on the AVR, and a check that
-# only ever saw the host would never meet the code the way that target does.
-#
-# timeout-minutes on every job for the reason ci.yml gives.
+# Every job carries a timeout-minutes well above what it takes, for one that has stopped making
+# progress. This file comes from the template.
 name: static-analysis
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, master]
+  workflow_call:
 
-# Read the repository and nothing else: no job here writes to it, and a token that could would
-# be handed to every action each job runs. release.yml asks for what publishing needs itself.
+# Read the repository and nothing else.
 permissions:
   contents: read
 
-# A second push to the same branch makes the first answer worthless, so it is cancelled
-# rather than left to occupy a runner.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # The file's own name in the group: called by release.yml, both this and its sibling run as
+  # the workflow "Release", and one would cancel the other.
+  group: ${{ github.workflow }}-analysis-${{ github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   clang-tidy:
-    name: clang-tidy and headers
+    name: clang-tidy
     runs-on: ubuntu-26.04
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 
-      # The same keys as the firmware jobs in ci.yml, so whichever runs first fills the cache for
-      # the others: the toolchains are the slow part, and the ESP32's and the RP2350's databases
-      # are written by PlatformIO, which fetches them first.
-      - name: Cache the PlatformIO packages
-        uses: actions/cache@v6
-        with:
-          path: ~/.platformio
-          key: platformio-tidy-${{ runner.os }}-${{ hashFiles('platform/*/platformio.ini') }}
-          restore-keys: platformio-tidy-${{ runner.os }}-
-
-      # Everything each database is written with: wxWidgets for the simulator's, avr-gcc for the
-      # AVR's - asked where avr-libc's headers are, as clang reads those instead of the host's -
-      # clang for the fuzzers', and jq, which tools/tidy.sh picks the entries with.
+      # CMake and GoogleTest for the database of the tests, clang for that of the fuzzers, jq for
+      # the board's.
       - name: Install the toolchain
         uses: ./.github/actions/apt-install
         with:
-          packages: cmake ninja-build libwxgtk3.2-dev gcc-avr avr-libc clang libclang-rt-dev jq
+          packages: cmake ninja-build libgtest-dev clang jq
+          # And the project's own, as its dev container has them.
+          file: .devcontainer/apt-packages.txt
 
-      # clang-tidy and PlatformIO at the versions uv.lock pins.
       - uses: ./.github/actions/uv-sync
 
-      # The headers of LLVM that the template's checks of its own, house-*, are compiled against,
-      # as the module the clang-tidy of uv.lock loads.
+      # The headers the module of the checks of our own is compiled against.
       - uses: ./.github/actions/llvm-headers
 
-      # Each step that checks something is a target of the Makefile, the same a developer runs,
-      # and the reasons for what it runs are written beside it there: clang-tidy over every target
-      # of tools/project.sh, the tests and the fuzzers, and the names in the backends' host tests;
-      # then every header compiled on its own by each target's compiler and the host's.
-      - name: clang-tidy
-        run: make tidy tidy-host-suites
+      # Each target's flags come from its build system's compilation database.
+      - uses: ./.github/actions/target-setup
 
-      - name: Every header on its own
-        run: make headers
+      - name: Analyse
+        run: make tidy
 
   cppcheck:
     name: cppcheck
     runs-on: ubuntu-26.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
 
@@ -103,104 +75,58 @@ jobs:
         with:
           packages: cppcheck
 
-      # Both analysers use Ubuntu 26.04 packages, as in the dev container. Package
-      # updates can still introduce new findings between image rebuilds.
       - name: Analyse
         run: make cppcheck
 
-  # Which lines, branches and conditions of src/ the tests run, against COVERAGE_MINIMUM of
-  # tools/project.sh: what Wordclock reached when it came onto the template, a floor that only
-  # rises. What none of them runs goes into the job's summary as a table. All three suites at
-  # once, because each alone reads as a gap where another covers it: the core tests never reach
-  # the command line, which the host suites drive through the web socket. Here rather than in
-  # ci.yml because it reads the tests and builds nothing a release would ship, and ci.yml is what
-  # release.yml runs.
-  #
-  # Cheap: the test binaries and the simulator - no PlatformIO, no cross compiler. How
-  # the instrumented builds are made is in tools/coverage.sh, and which suites it counts in
-  # coverage_suites() of tools/project.sh.
-  coverage:
-    name: Coverage report
+  headers:
+    name: Headers on their own
     runs-on: ubuntu-26.04
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
 
       - name: Install the toolchain
         uses: ./.github/actions/apt-install
         with:
-          packages: cmake ninja-build libwxgtk3.2-dev
+          packages: cmake ninja-build libgtest-dev jq
+          # And the project's own, as its dev container has them.
+          file: .devcontainer/apt-packages.txt
 
-      # gcovr, at the version uv.lock pins.
-      - uses: ./.github/actions/uv-sync
+      # The compiler and the core each target's database names.
+      - uses: ./.github/actions/target-setup
 
-      # Into the job's summary, which the target writes to whenever GITHUB_STEP_SUMMARY is set.
-      - name: Run the three suites and check what they reach
-        run: make coverage
+      - name: Compile each header alone
+        run: make headers
 
-  # The same three suites, built with AddressSanitizer and UndefinedBehaviorSanitizer. A test
-  # whose code reads an uninitialised variable, runs past an array or shifts by more than the
-  # width passes as long as the host happens to do what was expected; this is what makes it
-  # fail. It found its first one before it was merged: shifting a row off the grid handed
-  # WritePixel() a bool that GetPixel() had refused to fill.
-  #
-  # -fno-sanitize-recover=all so that a finding ends the run instead of being a line in a log
-  # that passed. Leak checking is on as well, which is AddressSanitizer's default here. Beside
-  # coverage, and not in ci.yml, for the reason that job gives.
-  sanitizers:
-    name: Sanitizers
-    runs-on: ubuntu-26.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Install the toolchain
-        uses: ./.github/actions/apt-install
-        with:
-          packages: cmake ninja-build libwxgtk3.2-dev
-
-      - name: Run the three suites
-        run: make sanitize host-sanitize
-
-  # The tests run what somebody thought of; this runs what nobody did. libFuzzer makes up
-  # inputs for the two ways data from outside reaches the firmware - a command line as a
-  # browser's web socket frame brings it, and a stored blob as Persistence::Load() reads it -
-  # under the same two sanitizers, steered by which branches of the core each input reaches.
-  # What the fuzzers are is test/fuzz/, and how they are run tools/fuzz.sh.
-  #
-  # Three minutes each, side by side, on every pull request. Short for a fuzzer, which is why
-  # the corpus is cached: every run starts from the inputs all earlier runs found, so the
-  # minutes add up across pull requests rather than starting over. The key is new on every
-  # run, so every run saves, and restore-keys takes the newest. A missing line in a parser was
-  # put in on purpose to see the job do its work: it was found in one second.
   fuzz:
-    name: Fuzzing
+    name: Fuzzers
     runs-on: ubuntu-26.04
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 
-      # llvm for llvm-symbolizer, without which a finding is a stack of addresses; clang-tidy
-      # for the names below.
+      # clang with libFuzzer and the sanitizers, which it only recommends, and GoogleTest, as the
+      # preset fuzz builds the tests too.
       - name: Install the toolchain
         uses: ./.github/actions/apt-install
         with:
-          packages: cmake ninja-build libwxgtk3.2-dev clang libclang-rt-dev llvm clang-tidy
+          packages: cmake ninja-build libgtest-dev clang libclang-rt-dev
+          file: .devcontainer/apt-packages.txt
 
+      # What the fuzzers found in earlier runs, so that a run goes on from there rather than from
+      # the seeds: a new key every run, the newest one restored.
       - name: Restore the corpus
         uses: actions/cache@v6
         with:
-          path: build/fuzz/work/*/corpus
-          key: fuzz-corpus-${{ github.run_id }}
-          restore-keys: fuzz-corpus-
+          path: build/fuzz/work
+          key: fuzz-${{ github.run_id }}
+          restore-keys: fuzz-
 
-      # Built, their names read - they are in no build the clang-tidy job reads - and run for
-      # the Makefile's FUZZ_SECONDS each.
       - name: Fuzz
         run: make fuzz
 
-      # The input that failed, so it can be replayed: build/fuzz/fuzz/<fuzzer> crash-<hash>.
-      - name: Keep what was found
+      # The input that failed, to replay with the fuzzer: build/fuzz/fuzz/<Name> crash-<hash>.
+      - name: Keep what failed
         if: failure()
         uses: actions/upload-artifact@v7
         with:
@@ -208,61 +134,3 @@ jobs:
           path: |
             build/fuzz/work/*/crash-*
             build/fuzz/work/*/log.txt
-          if-no-files-found: ignore
-
-  # The layout of the C++ sources, clang-format's and cpplint's, and the scripts and workflows that
-  # build, test and check everything else: shellcheck over every .sh, ruff over every .py with the
-  # checks pyproject.toml selects, actionlint over .github/workflows with what
-  # .github/actionlint.yaml adds. All at the versions uv.lock pins; shellcheck from the archive as
-  # well, for actionlint's checks of the run: scripts. Seconds, not minutes.
-  scripts:
-    name: Style and scripts
-    runs-on: ubuntu-26.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Install shellcheck
-        uses: ./.github/actions/apt-install
-        with:
-          packages: shellcheck
-
-      - uses: ./.github/actions/uv-sync
-
-      - name: clang-format, cpplint, shellcheck, ruff and actionlint
-        run: make lint
-
-  # The two pages a clock serves, which only a browser had ever read: html-validate over each as
-  # a whole document, eslint over the scripts inline in them. Node at the major version the dev
-  # container's Ubuntu ships, the packages at the versions package-lock.json pins, npm's download
-  # cache keyed by that lock. Seconds, not minutes.
-  web-lint:
-    name: Web page linters
-    runs-on: ubuntu-26.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: html-validate and eslint
-        run: make web-lint
-
-  docs:
-    name: Doxygen blocks
-    runs-on: ubuntu-26.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Install doxygen
-        uses: ./.github/actions/apt-install
-        with:
-          packages: doxygen
-
-      # The runner's python3 is enough.
-      - name: Check
-        run: make docs

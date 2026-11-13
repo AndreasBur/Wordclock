@@ -80,7 +80,7 @@ know `-mmcu`. The `avr` preset names both:
 ```bash
 cmake --preset avr                          # PLATFORM and the toolchain file, into build-avr/
 cmake --build --preset avr
-ctest --preset avr                          # the documented sizes and the stack, see below
+ctest --preset avr                          # the documented sizes; make stack for the stack, see below
 cmake --build --preset avr --target flash   # over UPDI, via pymcuprog
 ```
 

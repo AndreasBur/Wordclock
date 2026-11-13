@@ -1,0 +1,193 @@
+# Wordclock's own jobs, beside the template's ci.yml and static-analysis.yml: what the template's
+# targets do not reach. Each step that builds or checks something is a target of tools/project.mk
+# or of the template's Makefile, and the reasons for what it runs are written beside it there.
+#
+#   web         the simulator, and both web pages it serves loaded in headless Chromium
+#   host-suites the backends' host tests - each built by its own test/run.sh against stand-ins
+#               of its framework - by g++, by clang and under the sanitizers, and their names
+#   web-lint    html-validate and eslint over both pages
+#   docs        the Doxygen blocks, once per backend
+#   firmware    every target's image, the sizes the documentation states, and the images kept:
+#               what release.yml publishes, and what a pull request can be tried on a board with
+#
+# A job of the project's own lies here rather than in ci.yml, which is the template's: `copier
+# update` brings its changes into a file that is still as it wrote it.
+name: Wordclock
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # release.yml runs it for the images it publishes.
+  workflow_call:
+
+# Read the repository and nothing else: no job here writes to it.
+permissions:
+  contents: read
+
+# A second push to the same branch makes the first answer worthless. The workflow's name in the
+# group, as release.yml runs it beside the others.
+concurrency:
+  group: ${{ github.workflow }}-wordclock-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  web:
+    name: Web pages in a browser
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build xvfb
+          file: .devcontainer/apt-packages.txt
+
+      - uses: ./.github/actions/uv-sync
+
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(python -c 'from importlib.metadata import version; print(version("playwright"))')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the browser
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        run: playwright install --with-deps chromium
+
+      - name: Load the pages
+        run: make web
+
+  host-suites:
+    name: The backends' host suites
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # g++ is the runner's; clang for the second compiler; python3 for embed_web.py, which
+      # run.sh calls for the pages the web interface serves.
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: clang python3
+
+      # clang-tidy, for the names.
+      - uses: ./.github/actions/uv-sync
+
+      - name: By g++
+        run: make host-esp32 host-rp2350
+
+      - name: By clang
+        run: make host-clang
+
+      - name: Under ASan and UBSan
+        run: make host-sanitize
+
+      - name: Their names
+        run: make tidy-host-suites
+
+  web-lint:
+    name: Web page linters
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: html-validate and eslint
+        run: make web-lint
+
+  docs:
+    name: Doxygen blocks
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install doxygen
+        uses: ./.github/actions/apt-install
+        with:
+          packages: doxygen
+
+      - name: Check
+        run: make docs
+
+  firmware:
+    name: Firmware
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the toolchain
+        uses: ./.github/actions/apt-install
+        with:
+          packages: cmake ninja-build python3
+          file: .devcontainer/apt-packages.txt
+
+      # Asked before the build rather than met inside it. Whether an avr-gcc knows this part
+      # is a property of its device-specs, and a build that walks into a missing one stops
+      # halfway with an error that reads like a broken checkout rather than a toolchain that
+      # is too old. The version is printed beside it, because that is the thing that decides.
+      - name: Check the toolchain knows the device
+        run: |
+          avr-gcc --version | head -1
+          avr-gcc -mmcu=avr128da48 -E -x c /dev/null -o /dev/null
+
+      # PlatformIO and its packages for the ESP32 and the RP2350, cached.
+      - uses: ./.github/actions/target-setup
+
+      # Every target's image into build/targets/, failing on a warning in Wordclock's own files,
+      # then every size the documentation states against them: every size in this repository has
+      # been wrong at least once, always the same way - the code grew and the sentence did not.
+      - name: Build every target's image
+        run: make examples
+
+      - name: The sizes the documentation states
+        run: make documented-sizes
+
+      # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is the only
+      # one of the two that still knows the symbols, and a report about a clock in somebody's
+      # living room is worth little without the binary it ran. firmware.bin is what an update over
+      # the network takes, firmware.factory.bin the whole flash of a new ESP32, firmware.uf2 what
+      # a Pico 2 W takes in its boot mode.
+      - name: Keep the AVR's
+        uses: actions/upload-artifact@v7
+        with:
+          name: avr128da48-firmware
+          path: |
+            build/targets/avr128da48/default/programs/Wordclock.hex
+            build/targets/avr128da48/default/programs/Wordclock.elf
+          if-no-files-found: error
+
+      - name: Keep the ESP32-S3's
+        uses: actions/upload-artifact@v7
+        with:
+          name: esp32-s3-firmware
+          path: |
+            build/targets/esp32/default/wordclock/firmware.bin
+            build/targets/esp32/default/wordclock/firmware.factory.bin
+          if-no-files-found: error
+
+      - name: Keep the RP2350's
+        uses: actions/upload-artifact@v7
+        with:
+          name: rp2350-firmware
+          path: |
+            build/targets/rp2350/default/wordclock/firmware.uf2
+            build/targets/rp2350/default/wordclock/firmware.bin
+          if-no-files-found: error

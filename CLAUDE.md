@@ -168,7 +168,7 @@ reconstruct from the code.
 Every size written in this repository has been wrong at least once, always the same way: the
 code grew and the sentence did not. So a number that describes **the artefact as it is now**
 is enforced rather than remembered — `tools/documented-sizes.py` compares the documentation
-against a build, each firmware CI job runs it for its own target, and `--fix` writes the
+against a build, the firmware job of wordclock.yml runs it for every target, and `--fix` writes the
 measured values in. One flag per target, and a target left out is simply skipped:
 
 ```bash

@@ -1,5 +1,5 @@
-# The repository's Python tools for a CI job - PlatformIO, Playwright, ruff, actionlint - at the
-# versions uv.lock pins: the same environment the dev container builds into its image.
+# The repository's Python tools for a CI job - clang-format, clang-tidy, cpplint, gcovr,
+# shellcheck, actionlint, ruff - at the versions uv.lock pins.
 #
 # uv itself comes from PyPI at the version the dev container installs, read from the ARG
 # UV_VERSION line of .devcontainer/Dockerfile, so there is one place that says which uv. It goes
@@ -8,8 +8,8 @@
 # Python is 3.14, the dev container's.
 #
 # uv's download cache is kept between runs, keyed by the lockfile, so a run whose lock has not
-# changed fetches nothing. After this action the environment's bin directory is on PATH, so the
-# steps after it call `pio`, `ruff` or `playwright` as the dev container does.
+# changed fetches nothing. After this action the environment's bin directory is on PATH, and
+# `uv run --frozen` in the steps after it finds the environment in .venv.
 name: Sync the Python tools
 description: uv at the dev container's version, and uv sync --frozen
 
