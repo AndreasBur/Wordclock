@@ -103,7 +103,7 @@ class Clock {
   static HourType const kHoursTable[][CLOCK_NUMBER_OF_HOURS];
   static MinuteType const kMinutesTable[][CLOCK_NUMBER_OF_MINUTE_STEPS];
 
-  constexpr Clock(ModeType mode) : mode_(mode) {}
+  explicit constexpr Clock(ModeType mode) : mode_(mode) {}
   ~Clock() = default;
 
   MinuteTableElementType GetMinutesTableElement(byte minute) const {

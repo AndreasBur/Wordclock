@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * What Pixels::Render() puts on the wire, checked against a captured transfer. The DMA
  * call is stubbed here rather than in pio_stubs.cpp because this test has to keep the frame
@@ -17,7 +20,7 @@
 #include "Arduino.h"
 #include "Pixels.h"
 #include "WS2812Pio.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 static uint32_t captured[256];
 static size_t captured_count = 0;

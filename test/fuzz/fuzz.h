@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * What both fuzzers do around their input: put the clock back to a known state before it, and
  * run the firmware's ticks after it.
@@ -13,8 +16,8 @@
  * task, which counts on from the host's own clock and would make every run a little different;
  * the date and time are set instead.
  */
-#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_
-#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_
+#ifndef WORDCLOCK_TEST_FUZZ_FUZZ_H_
+#define WORDCLOCK_TEST_FUZZ_FUZZ_H_
 
 #include "Arduino.h"
 #include "ClockDateTime.h"
@@ -65,4 +68,4 @@ inline void RunUntilThePortIsRead() {
   RunTicks(1u);
 }
 
-#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_
+#endif  // WORDCLOCK_TEST_FUZZ_FUZZ_H_

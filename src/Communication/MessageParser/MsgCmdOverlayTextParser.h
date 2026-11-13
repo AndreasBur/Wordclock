@@ -26,7 +26,6 @@
  * commands behind it down by one.
  */
 class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextParser> {
- public:
  private:
   friend class MsgCmdOverlayParser;
 
@@ -37,7 +36,8 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  constexpr MsgCmdOverlayTextParser(char const* parameter) : MsgCmdOverlayParser(parameter) {}
+  explicit constexpr MsgCmdOverlayTextParser(char const* parameter)
+      : MsgCmdOverlayParser(parameter) {}
 
   /*! \brief Destroys the parser. */
   ~MsgCmdOverlayTextParser() = default;

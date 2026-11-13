@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The three overlays - when they may start, what they show, and how long they hold the display.
 
 #include "Animations.h"
@@ -8,9 +11,9 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Temperature.h"
-#include "cases.h"
-#include "check.h"
 #include "sim/DS3231.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * The procedures that act now rather than at the next word change. What makes them worth

@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * The one assertion these tests need, and the tally that decides what main() returns.
  * Stood in four copies before, one per test, all of them the same fifteen lines.

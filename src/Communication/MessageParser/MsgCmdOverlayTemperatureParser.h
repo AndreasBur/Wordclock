@@ -27,7 +27,6 @@
  * the commands behind it down by one.
  */
 class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayTemperatureParser> {
- public:
  private:
   friend class MsgCmdOverlayParser;
 
@@ -38,7 +37,7 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  constexpr MsgCmdOverlayTemperatureParser(char const* parameter)
+  explicit constexpr MsgCmdOverlayTemperatureParser(char const* parameter)
       : MsgCmdOverlayParser(parameter) {}
 
   /*! \brief Destroys the parser. */

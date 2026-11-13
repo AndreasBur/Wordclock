@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // That every animation ends on the time it was started for.
 
 #include "AnimationSnake.h"
@@ -7,8 +10,8 @@
 #include "DisplayManager.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * The one promise every animation makes, and the one that is easy to break: whatever it

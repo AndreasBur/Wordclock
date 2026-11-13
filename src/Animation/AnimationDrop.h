@@ -28,7 +28,6 @@
  * idle.
  */
 class AnimationDrop : public Animation {
- public:
  private:
   DisplayWords words_;
   ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};

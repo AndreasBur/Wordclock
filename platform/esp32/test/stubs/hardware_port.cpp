@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * The hardware port itself, plus the two C functions the core would provide.
  *
@@ -22,6 +25,7 @@ void pinMode(uint8_t, uint8_t) {}
 void digitalWrite(uint8_t, uint8_t) {}
 
 char* itoa(int value, char* buffer, int) {
-  snprintf(buffer, 12, "%d", value);
+  // The caller's buffer, whose size itoa() is not told: 12 holds every int with its sign.
+  snprintf(buffer, 12, "%d", value);  // NOLINT(runtime/printf)
   return buffer;
 }

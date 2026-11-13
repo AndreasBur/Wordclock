@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * How this backend opens the bus the BH1750 and the DS3231 share: the pins and the clock reach
  * Wire, and the clock does so after begin(), which would otherwise put its default back over it.
@@ -6,7 +9,7 @@
 #include <Wire.h>
 
 #include "I2cBus.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 namespace {
 constexpr byte kPinSda{4u};

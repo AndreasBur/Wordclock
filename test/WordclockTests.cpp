@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Runs the regression tests for the firmware core, in the order they need.
  *
@@ -17,8 +20,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 int main() {
   TestSingleBits();

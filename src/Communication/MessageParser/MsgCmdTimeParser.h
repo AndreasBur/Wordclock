@@ -115,7 +115,8 @@ class MsgCmdTimeParser
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  MsgCmdTimeParser(char const* parameter) : MsgParameterParser(kParameterTable, parameter) {
+  explicit MsgCmdTimeParser(char const* parameter)
+      : MsgParameterParser(kParameterTable, parameter) {
     time_ = RealTimeClock::GetInstance().GetTime();
   }
 

@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The speed/cycle round trip, the uptime counter, and when and in which order the scheduler runs a
 // task.
 
@@ -13,9 +16,9 @@
 #include "Pixels.h"
 #include "Power.h"
 #include "Uptime.h"
-#include "cases.h"
-#include "check.h"
 #include "sim/SerialShim.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * Only the round trip. That speed 1 maps to cycle 255 and speed 255 to cycle 1 is

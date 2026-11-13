@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Every case the runner calls, declared in one place so main.cpp needs no knowledge of
  * which file a case lives in - and so a case that is written and never called shows up as
@@ -6,8 +9,8 @@
  * Grouped by subject, the same way platform/esp32/test/cases/ is. The order they run in
  * is main.cpp's business and is not arbitrary; it says why there.
  */
-#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_
-#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_
+#ifndef WORDCLOCK_TEST_CASES_H_
+#define WORDCLOCK_TEST_CASES_H_
 
 /* display_test.cpp */
 void TestSingleBits();
@@ -158,4 +161,4 @@ void TestFloatConversionKeepsToTheType();
 /* webhost_test.cpp */
 void TestWebHostOutlastsAnIdleConnection();
 
-#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_
+#endif  // WORDCLOCK_TEST_CASES_H_

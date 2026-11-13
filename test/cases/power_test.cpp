@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The order the strip's supply is switched in, which is the whole of this feature.
 
 #include "Power.h"
@@ -6,8 +9,8 @@
 #include "Display.h"
 #include "Pixels.h"
 #include "PowerSwitch.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 /*

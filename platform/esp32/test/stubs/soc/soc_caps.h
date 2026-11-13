@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * What the IDF's own soc_caps.h says about the part this backend targets, reduced to the one
  * capability the firmware reads: how many symbols one RMT memory block holds.

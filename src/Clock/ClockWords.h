@@ -21,7 +21,7 @@
 /*! \brief The places for all the words of a time: ES IST, the minute words and the hour words. */
 #define CLOCK_WORDS_MAX_NUMBER_OF_WORDS                                            \
   (CLOCK_WORDS_MAX_NUMBER_OF_HOUR_WORDS + CLOCK_WORDS_MAX_NUMBER_OF_MINUTE_WORDS + \
-   CLOCK_WORDS_IT_IS_NUMBER_OF_WORDS)
+   CLOCK_WORDS_IT_IS_NUMBER_OF_WORDS)  // NOLINT(whitespace/indent): as clang-format aligns it
 
 /*!
  * \brief The words that tell one time: whether ES IST stands, the hour words and the minute words.

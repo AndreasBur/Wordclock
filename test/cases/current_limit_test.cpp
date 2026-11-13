@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * That the supply's budget is what decides how bright the display may get.
  *
@@ -12,8 +15,8 @@
 #include "DisplayCurrentLimit.h"
 #include "DisplayManager.h"
 #include "Pixels.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 constexpr uint32_t kBudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) *

@@ -10,7 +10,7 @@
 
 #ifndef WORDCLOCK_ARDUINO_SHIM
 #error \
-    "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/rp2350/include ahead of the framework on the include path, or the web console will be silently mute."
+    "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/rp2350/include ahead of the framework on the include path, or the web console will be silently mute."  // NOLINT(whitespace/line_length)
 #endif
 
 #include <stdio.h>
@@ -24,7 +24,7 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-void WordclockSerial::begin(unsigned long baud_rate) {
+void WordclockSerial::begin(unsigned long baud_rate) {  // NOLINT(runtime/int)
   wordclock_platform::HardwarePortBegin(baud_rate);
 }
 

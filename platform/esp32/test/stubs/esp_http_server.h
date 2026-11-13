@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -6,7 +9,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "esp_err.h"
+#include "esp_err.h"  // NOLINT(build/include_subdir): ESP-IDF's own spelling
 typedef struct httpd_t* httpd_handle_t;
 typedef enum { HTTP_GET = 1, HTTP_POST = 2 } httpd_method_t;
 typedef struct httpd_req {
@@ -34,7 +37,7 @@ typedef struct {
 } httpd_config_t;
 // The 8 is the framework's own default for max_uri_handlers, kept here because it is the
 // number the backend raises the count against.
-#define HTTPD_DEFAULT_CONFIG() httpd_config_t{80, 7, 8, nullptr, 0}
+#define HTTPD_DEFAULT_CONFIG() httpd_config_t{80, 7, 8, nullptr, 0}  // NOLINT(whitespace/braces)
 typedef enum {
   HTTPD_WS_TYPE_CONTINUE = 0,
   HTTPD_WS_TYPE_TEXT = 1,

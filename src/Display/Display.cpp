@@ -387,12 +387,7 @@ StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column) {
   return return_value;
 }
 
-Display::Display(Pixel color)
-    : pixel_stripe_{Pixels::GetInstance()}
-#if (PIXELS_IS_SINGLETON == STD_OFF)
-    : pixel_stripe_()
-#endif
-{
+Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()} {
   state_ = StateType::kUninit;
   color_.SetColor(color);
 
@@ -402,11 +397,7 @@ Display::Display(Pixel color)
 }
 
 Display::Display(ColorType red, ColorType green, ColorType blue)
-    : pixel_stripe_{Pixels::GetInstance()}
-#if (PIXELS_IS_SINGLETON == STD_OFF)
-    : pixel_stripe_()
-#endif
-{
+    : pixel_stripe_{Pixels::GetInstance()} {
   color_.SetColorRed(red);
   color_.SetColorGreen(green);
   color_.SetColorBlue(blue);

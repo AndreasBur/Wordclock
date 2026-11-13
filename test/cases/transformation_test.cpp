@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The shifts of the display, and the roll animation that is their one user in every direction.
 
 #include "Transformation.h"
@@ -8,8 +11,8 @@
 #include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 using GridType = std::array<std::array<bool, DISPLAY_NUMBER_OF_COLUMNS>, DISPLAY_NUMBER_OF_ROWS>;

@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // What survives a restart, and what a reset puts back.
 
 #include "Persistence.h"
@@ -8,9 +11,9 @@
 #include "Illuminance.h"
 #include "Overlays.h"
 #include "Pixels.h"
-#include "cases.h"
-#include "check.h"
 #include "sim/Storage.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * Reaches around Storage on purpose, which nothing else may: damaging a stored blob is

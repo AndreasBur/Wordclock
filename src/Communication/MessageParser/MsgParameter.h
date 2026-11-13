@@ -46,7 +46,6 @@ class MsgParameter {
   char option_short_name_;
   ArgumentTypeType argument_type_;
 
- protected:
  public:
   /*!
    * \brief Makes the option `option_short_name` with an argument of type `argument_type`.

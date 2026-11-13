@@ -268,7 +268,7 @@ class DisplayCharacters {
    */
   static bool IsCharacterIdValid(CharacterIdType character_id) {
     return character_id < CharacterIdType::kNumberOfCharacters;
-  };
+  }
 
   /*!
    * \brief Returns whether `index` lies on the grid.
@@ -276,7 +276,7 @@ class DisplayCharacters {
    * \param[in] index The index.
    * \return True if it lies below DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS.
    */
-  static bool IsIndexValid(byte index) { return index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; };
+  static bool IsIndexValid(byte index) { return index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; }
 
   /*!
    * \brief Returns whether `column` and `row` lie on the grid.

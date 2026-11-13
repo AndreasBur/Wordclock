@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * The clock chip and what the firmware makes of it: the temperature the overlay shows, and
  * the time it keeps over a power cut. What these checks are here for is the part no
@@ -17,7 +20,7 @@
 #include "Arduino.h"
 #include "Overlays.h"
 #include "Temperature.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 /* One temperature reading, handed over the way the chip would. */
 static void AnswerWith(uint8_t degrees, uint8_t fraction) {

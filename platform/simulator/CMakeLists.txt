@@ -195,7 +195,9 @@ if(WORDCLOCK_BUILD_TESTS)
     # way and had to build an object cache to stop compiling the core once per executable.
     file(GLOB TEST_CASES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/cases/*.cpp)
     add_executable(WordclockTests ${CMAKE_SOURCE_DIR}/test/WordclockTests.cpp ${TEST_CASES})
-    target_include_directories(WordclockTests PRIVATE ${CMAKE_SOURCE_DIR}/test)
+    # The root, so that a test names its helpers as "test/check.h", as Google wants an include to name
+    # the folder.
+    target_include_directories(WordclockTests PRIVATE ${CMAKE_SOURCE_DIR})
     target_link_libraries(WordclockTests PRIVATE WordclockCore WordclockShims)
     add_test(NAME WordclockTests COMMAND WordclockTests)
 endif()
@@ -212,6 +214,5 @@ if(WORDCLOCK_FUZZ)
     add_library(WordclockFuzzBase STATIC
         $<TARGET_OBJECTS:WordclockCore> $<TARGET_OBJECTS:WordclockShims>)
     target_link_libraries(WordclockFuzzBase PUBLIC WordclockBuildSettings)
-    target_include_directories(WordclockFuzzBase PUBLIC ${CMAKE_SOURCE_DIR}/test/fuzz)
 endif()
 add_fuzzers(DIRECTORY ${CMAKE_SOURCE_DIR}/test/fuzz LIBRARY WordclockFuzzBase)

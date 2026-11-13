@@ -1,8 +1,11 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The weekday of every date the clock can hold.
 
 #include "ClockDate.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * Every date from 1 January 2000 to 31 December 2099, against a count that knows nothing of the

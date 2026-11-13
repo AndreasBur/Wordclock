@@ -73,7 +73,6 @@ class MsgCmdBaseOverlayParser {
   /*! \brief Destroys the options of an overlay parser. */
   ~MsgCmdBaseOverlayParser() = default;
 
- private:
  public:
 };
 

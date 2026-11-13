@@ -25,7 +25,6 @@
  * MsgCmdParser takes the command only while OVERLAYS_SUPPORT_DATE is STD_ON.
  */
 class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDateParser> {
- public:
  private:
   friend class MsgCmdOverlayParser;
 
@@ -36,7 +35,8 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  constexpr MsgCmdOverlayDateParser(char const* parameter) : MsgCmdOverlayParser(parameter) {}
+  explicit constexpr MsgCmdOverlayDateParser(char const* parameter)
+      : MsgCmdOverlayParser(parameter) {}
 
   /*! \brief Destroys the parser. */
   ~MsgCmdOverlayDateParser() = default;

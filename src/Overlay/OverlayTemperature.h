@@ -24,7 +24,6 @@
  * never shows it. The overlay has no settings of its own beyond those of Overlay.
  */
 class OverlayTemperature : public Overlay<OverlayTemperature> {
- public:
  private:
   friend class Overlay;
 

@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The commands as a line arrives over the serial port or the web socket: the number picks the
 // parser, the options change the clock.
 
@@ -22,8 +25,8 @@
 #include "RealTimeClock.h"
 #include "Scheduler.h"
 #include "Text.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * What is checked is what a command changes, not what it answers. The simulator's port collects

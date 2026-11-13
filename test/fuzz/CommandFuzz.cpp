@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Fuzzes the way a command reaches the clock from the network.
  *
@@ -19,15 +22,14 @@
 #include <cstdint>
 
 #include "WebFrontend.h"
-#include "fuzz.h"
+#include "test/fuzz/fuzz.h"
 
 namespace {
 constexpr unsigned kTicksAfterTheLastLine{8u};
 }  // namespace
 
-extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data,
-                                      size_t size)  // NOLINT(readability-identifier-naming)
-{
+// NOLINTNEXTLINE(readability-identifier-naming)
+extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) {
   StartFromANewClock();
 
   WebFrontend::InjectCommand(reinterpret_cast<char const*>(data), size);

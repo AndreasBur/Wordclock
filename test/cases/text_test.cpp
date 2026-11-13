@@ -1,11 +1,14 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Which characters the text overlay can draw, through the entry point that refuses the rest.
 
 #include "Text.h"
 
 #include "Display.h"
 #include "Pixels.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * Which characters the text overlay can draw, checked through the one entry point that

@@ -157,7 +157,7 @@ class StringTools {
                              uint8_t base = 10u) {
     char* end = nullptr;
     errno = 0;
-    unsigned long const value_big{strtoul(string, &end, base)};
+    auto const value_big = strtoul(string, &end, base);
     position = ToPosition(string, end);
 
     if (string == end) {
@@ -185,7 +185,7 @@ class StringTools {
                              uint8_t base = 10u) {
     char* end = nullptr;
     errno = 0;
-    long const value_big{strtol(string, &end, base)};
+    auto const value_big = strtol(string, &end, base);
     position = ToPosition(string, end);
 
     if (string == end) {

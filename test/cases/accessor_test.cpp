@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // What an accessor answers for an index that is not there, now that each one has a single form.
 
 #include "Display.h"
@@ -6,8 +9,8 @@
 #include "FontChar.h"
 #include "FontSprite5x8.h"
 #include "Pixels.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * Every reader used to come in two forms, and the second one trusted its caller: it read

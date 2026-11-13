@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Fuzzes what Persistence::Load() makes of a stored blob that passes its own checks.
  *
@@ -26,7 +29,7 @@
 #include <vector>
 
 #include "Storage.h"
-#include "fuzz.h"
+#include "test/fuzz/fuzz.h"
 
 namespace {
 // Two uint16_t before it: the magic, the favourites and the two calibration values.
@@ -135,9 +138,8 @@ void ShowEveryOverlay() {
 }
 }  // namespace
 
-extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data,
-                                      size_t size)  // NOLINT(readability-identifier-naming)
-{
+// NOLINTNEXTLINE(readability-identifier-naming)
+extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) {
   BlobType const blob = ToAcceptedBlob(data, size);
   StartFromANewClock();
 

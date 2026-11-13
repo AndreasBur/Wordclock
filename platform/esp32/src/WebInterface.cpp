@@ -20,9 +20,9 @@
 #include "WebTransport.h"
 #include "WordclockSerial.h"
 
-#include <atomic>
-#include <string.h>
-#include <unistd.h>
+#include <atomic>  // NOLINT(build/include_order)
+#include <string.h>  // NOLINT(build/include_order)
+#include <unistd.h>  // NOLINT(build/include_order)
 // clang-format on
 
 namespace {

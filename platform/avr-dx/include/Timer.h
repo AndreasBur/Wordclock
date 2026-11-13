@@ -65,14 +65,14 @@
 #define TIMER_TCA0_ROUTE_PORT B
 #else
 #error \
-    "Timer.h: this derivative has no PORTB for TCA0 to drive. Define TIMER_TCA0_ROUTE_PORT as the letter of a port this board keeps free, or set TIMER_USE_TCA0 to STD_OFF."
+    "Timer.h: this derivative has no PORTB for TCA0 to drive. Define TIMER_TCA0_ROUTE_PORT as the letter of a port this board keeps free, or set TIMER_USE_TCA0 to STD_OFF."  // NOLINT(whitespace/line_length)
 #endif
 #endif
 
 #if (TIMER_USE_TCA1 == STD_ON)
 #if !defined(TCA1)
 #error \
-    "Timer.h: this derivative has no TCA1 - it is fitted to the 48- and 64-pin parts only. Set TIMER_USE_TCA1 to STD_OFF."
+    "Timer.h: this derivative has no TCA1 - it is fitted to the 48- and 64-pin parts only. Set TIMER_USE_TCA1 to STD_OFF."  // NOLINT(whitespace/line_length)
 #endif
 #if !defined(TIMER_TCA1_ROUTE_PORT)
 /*!

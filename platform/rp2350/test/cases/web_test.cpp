@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Drives the registered handlers the way the server reaches them - through the registration
  * call - so WebInterface's own wiring is covered rather than bypassed.
@@ -27,7 +30,7 @@
 #include "System.h"
 #include "WebInterface.h"
 #include "WordclockSerial.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 /*
  * Enough of a parse to say the document is well formed: brackets balanced and no string

@@ -32,7 +32,6 @@
  * derives it from the colour to show, and until the next call it keeps what that call made.
  */
 class DisplayColor {
- public:
  private:
   // White, and named rather than written into the member below alone: it is also what
   // the reset puts back, and two literals could drift apart.

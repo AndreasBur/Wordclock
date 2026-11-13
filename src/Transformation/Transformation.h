@@ -20,8 +20,6 @@
  */
 class Transformation {
  public:
- private:
- public:
   /*! \brief Makes the transformation, which holds no state. */
   constexpr Transformation() {}
 

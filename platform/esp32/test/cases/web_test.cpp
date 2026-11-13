@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Drives the registered handlers the way the server reaches them - through the
 // registration call - so WebInterface's own wiring is covered rather than bypassed.
 #include <ESPmDNS.h>
@@ -20,7 +23,7 @@
 #include "Update.h"
 #include "WebInterface.h"
 #include "WordclockSerial.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 /*
  * A registered route as the server keeps it: the handler and the context handed back with
@@ -52,20 +55,20 @@ static RouteType icon192_handler;
 static RouteType icon512_handler;
 static RouteType update_handler;
 static RouteType console_handler;
-static std::string sent_type;
-static std::string sent_status;
+static std::string sent_type;    // NOLINT(runtime/string)
+static std::string sent_status;  // NOLINT(runtime/string)
 /* Every header a handler set, by name - the gate's WWW-Authenticate is read out of here. */
 static std::map<std::string, std::string> sent_headers;
 // The body the next upload is to be fed, and how much of it the stub is willing to hand
 // over - short of the announced length is a connection that went away mid-upload.
-static std::string body;
+static std::string body;  // NOLINT(runtime/string)
 static size_t body_offset = 0u;
 static size_t body_limit = 0u;
-static std::string pending_frame;
+static std::string pending_frame;  // NOLINT(runtime/string)
 static std::vector<std::string> sent;
-static std::string root_body;
-static std::string root_encoding;
-static std::string chunked;
+static std::string root_body;      // NOLINT(runtime/string)
+static std::string root_encoding;  // NOLINT(runtime/string)
+static std::string chunked;        // NOLINT(runtime/string)
 
 esp_err_t httpd_start(httpd_handle_t* h, httpd_config_t const*) {
   *h = reinterpret_cast<httpd_handle_t>(1);
@@ -116,7 +119,7 @@ esp_err_t httpd_resp_set_status(httpd_req_t*, char const* s) {
 }
 
 /* The Authorization header the next request is to carry, empty for a request without one. */
-static std::string authorization;
+static std::string authorization;  // NOLINT(runtime/string)
 
 esp_err_t httpd_req_get_hdr_value_str(httpd_req_t*, char const* field, char* target,
                                       size_t capacity) {

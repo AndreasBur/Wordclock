@@ -317,20 +317,18 @@ StdReturnType Text::ConvertCharToFontIndex(char character, byte& index) {
   } else if ('\xFC' == character) {
     index = 101u;
     return_value = kEOk;
-  }
-  // The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
-  // ASCII run, so it is appended past its end rather than shifting every index after it.
-  else if ('\xB0' == character) {
+  } else if ('\xB0' == character) {
+    // The degree sign sits with them for the same reason: Latin-1 0xB0 is nowhere near the
+    // ASCII run, so it is appended past its end rather than shifting every index after it.
     index = 102u;
     return_value = kEOk;
-  }
-  /*
-   * For all others only add the offset - within both bounds, and compared as a byte.
-   * Whether char is signed is the platform's decision: where it is not, and AVR is one
-   * of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
-   * and indexes past the end of a font table that has 102 entries.
-   */
-  else {
+  } else {
+    /*
+     * For all others only add the offset - within both bounds, and compared as a byte.
+     * Whether char is signed is the platform's decision: where it is not, and AVR is one
+     * of those, every Latin-1 byte above the six umlauts passes a lower bound on its own
+     * and indexes past the end of a font table that has 102 entries.
+     */
     byte const value = static_cast<byte>(character);
 
     if ((value >= TEXT_ASCII_CHAR_MIN) && (value <= TEXT_ASCII_CHAR_MAX)) {

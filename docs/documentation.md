@@ -56,8 +56,8 @@ the line it is for.
 - One space between a command, its direction and its name, `\param[in] column`; nothing is aligned
   in columns.
 - A line that continues a command starts where the text after the command starts, as the
-  `\return` above does. `tools/doc-indent.py --fix` indents it so; without `--fix`, it fails where
-  a line is not indented so.
+  `\return` above does. `make fmt` indents it so, after clang-format; `make style` fails where a
+  line is not indented so. Both run the template's `tools/lib/doc_indent.py`.
 
 ### The parts, in this order
 
@@ -121,8 +121,9 @@ the paragraphs after the brief.
 
 ### A file
 
-Every file of `src/` and `platform/` outside the tests starts with the licence, as `//` lines
-that tools such as REUSE read, and then a block for the file:
+Every file of `src/`, `platform/` and `test/` starts with the licence, as `//` lines that tools
+such as REUSE read and cpplint checks for, the tests and their stubs included. A file outside the
+tests then has a block for the file:
 
 ```cpp
 // Copyright 2017 Andreas Burnickl
@@ -149,8 +150,8 @@ animation."
   clangd shows these in the editor as you type. A backslash meant as a char is written `\\`, or
   clang takes it for a command.
 
-- **`tools/doc-indent.py`** checks that the lines continuing a command are indented under its
-  text.
+- **`tools/lib/doc_indent.py`**, through `make style`, checks that the lines continuing a command
+  are indented under its text.
 
 All three run in `static-analysis.yml` on every pull request.
 

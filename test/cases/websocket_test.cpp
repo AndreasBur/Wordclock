@@ -1,12 +1,15 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The web socket protocol, against the RFCs rather than against a browser.
 
 #include "sim/WebSocket.h"
 
-#include <cstdio>
-#include <string>
+#include <cstdio>  // NOLINT(build/include_order)
+#include <string>  // NOLINT(build/include_order)
 
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 std::string ToSha1Hex(std::string const& message) {

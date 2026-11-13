@@ -27,8 +27,8 @@
  * \pre `base` is from 2 to 36, and `buffer` holds every digit, a minus sign and the terminator;
  *      neither is checked.
  */
-inline char* itoa(int value, char* buffer, int base)  // NOLINT(readability-identifier-naming)
-{
+// NOLINTNEXTLINE(readability-identifier-naming)
+inline char* itoa(int value, char* buffer, int base) {
   char* p = buffer;
   bool negative = (base == 10 && value < 0);
   unsigned int u = negative ? static_cast<unsigned int>(-value) : static_cast<unsigned int>(value);
@@ -36,7 +36,7 @@ inline char* itoa(int value, char* buffer, int base)  // NOLINT(readability-iden
   char* start = p;
   do {
     unsigned int const digit = u % static_cast<unsigned int>(base);
-    *p++ = (digit < 10) ? char('0' + digit) : char('a' + digit - 10);
+    *p++ = (digit < 10) ? static_cast<char>('0' + digit) : static_cast<char>('a' + digit - 10);
     u /= static_cast<unsigned int>(base);
   } while (u);
   if (negative) *p++ = '-';

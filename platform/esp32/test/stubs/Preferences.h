@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_PREFERENCES_H_
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_PREFERENCES_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -35,7 +38,7 @@ struct Preferences {
     if ((Found == Keys.end()) || (Found->second.size() + 1u > Capacity)) {
       return 0u;
     }
-    strcpy(Value, Found->second.c_str());
+    memcpy(Value, Found->second.c_str(), Found->second.size() + 1u);
     return Found->second.size() + 1u;
   }
 

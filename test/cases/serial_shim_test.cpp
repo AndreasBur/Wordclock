@@ -1,10 +1,13 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The simulator's port speaks the firmware's Latin-1, as the hardware's ports do.
 
 #include <cstring>
 
-#include "cases.h"
-#include "check.h"
 #include "sim/SerialShim.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * An answer with an umlaut, as the text overlay can hold one. The port took the firmware's

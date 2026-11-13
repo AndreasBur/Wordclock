@@ -34,7 +34,6 @@
  * flickered and stays off: the run only counts its steps and then lights the words.
  */
 class AnimationFlicker : public Animation {
- public:
  private:
   byte minute_{0u};
   byte hour_{0u};

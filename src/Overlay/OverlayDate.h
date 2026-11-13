@@ -24,7 +24,6 @@
  * of its own beyond those of Overlay.
  */
 class OverlayDate : public Overlay<OverlayDate> {
- public:
  private:
   friend class Overlay;
   static constexpr byte kDateStringLength{10u + 1u};

@@ -27,7 +27,6 @@
  * idle.
  */
 class AnimationCursor : public Animation {
- public:
  private:
   ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
   byte current_pixel_index_{0u};
