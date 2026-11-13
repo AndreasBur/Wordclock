@@ -143,16 +143,17 @@ jobs:
       - name: Analyse
         run: make cppcheck
 
-  # Which lines of src/ the tests run, as a table in the job's summary - the least covered
-  # files first, because the gaps are what it is for. Read rather than enforced: there is no
-  # threshold, so a pull request is never held up by a number, and the job fails only when a
-  # test does. All three suites at once, because each alone reads as a gap where another
-  # covers it: the core tests never reach the command line, which the host suites drive through
-  # the web socket. Here rather than in ci.yml because it reads the tests and builds nothing a
-  # release would ship, and ci.yml is what release.yml runs.
+  # Which lines, branches and conditions of src/ the tests run, against COVERAGE_MINIMUM of
+  # tools/project.sh: what Wordclock reached when it came onto the template, a floor that only
+  # rises. What none of them runs goes into the job's summary as a table. All three suites at
+  # once, because each alone reads as a gap where another covers it: the core tests never reach
+  # the command line, which the host suites drive through the web socket. Here rather than in
+  # ci.yml because it reads the tests and builds nothing a release would ship, and ci.yml is what
+  # release.yml runs.
   #
-  # Cheap: the test binaries only - no simulator window, no PlatformIO, no cross compiler. How
-  # the instrumented builds are made, and why -O0, is in tools/coverage.py.
+  # Cheap: the test binaries and the simulator - no PlatformIO, no cross compiler. How
+  # the instrumented builds are made is in tools/coverage.sh, and which suites it counts in
+  # coverage_suites() of tools/project.sh.
   coverage:
     name: Coverage report
     runs-on: ubuntu-26.04
@@ -165,8 +166,11 @@ jobs:
         with:
           packages: cmake ninja-build libwxgtk3.2-dev
 
+      # gcovr, at the version uv.lock pins.
+      - uses: ./.github/actions/uv-sync
+
       # Into the job's summary, which the target writes to whenever GITHUB_STEP_SUMMARY is set.
-      - name: Run the three suites and report
+      - name: Run the three suites and check what they reach
         run: make coverage
 
   # The same three suites, built with AddressSanitizer and UndefinedBehaviorSanitizer. A test
@@ -197,7 +201,7 @@ jobs:
   # inputs for the two ways data from outside reaches the firmware - a command line as a
   # browser's web socket frame brings it, and a stored blob as Persistence::Load() reads it -
   # under the same two sanitizers, steered by which branches of the core each input reaches.
-  # What the fuzzers are and how to run them is test/fuzz/run.sh.
+  # What the fuzzers are is test/fuzz/, and how they are run tools/fuzz.sh.
   #
   # Three minutes each, side by side, on every pull request. Short for a fuzzer, which is why
   # the corpus is cached: every run starts from the inputs all earlier runs found, so the
@@ -221,7 +225,7 @@ jobs:
       - name: Restore the corpus
         uses: actions/cache@v6
         with:
-          path: build-fuzz/work/*/corpus
+          path: build/fuzz/work/*/corpus
           key: fuzz-corpus-${{ github.run_id }}
           restore-keys: fuzz-corpus-
 
@@ -230,15 +234,15 @@ jobs:
       - name: Fuzz
         run: make fuzz
 
-      # The input that failed, so it can be replayed: build-fuzz/bin/<fuzzer> crash-<hash>.
+      # The input that failed, so it can be replayed: build/fuzz/fuzz/<fuzzer> crash-<hash>.
       - name: Keep what was found
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: fuzz-findings
           path: |
-            build-fuzz/work/*/crash-*
-            build-fuzz/work/*/log.txt
+            build/fuzz/work/*/crash-*
+            build/fuzz/work/*/log.txt
           if-no-files-found: ignore
 
   # The shell scripts, the Python ones and the workflows, which build, test and check everything

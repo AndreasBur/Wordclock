@@ -3,12 +3,12 @@
 # Copyright 2026 Andreas Burnickl
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Runs the tests on the host with --coverage and fails unless they reach every
-# line, branch and condition of src/ (docs/Testing.md TS-4), or as much of them
-# as COVERAGE_MINIMUM of tools/project.sh says: what no test
-# reaches on the terminal, and all of it as HTML in build/coverage/html/. The variants of CMakeLists.txt count together, as
-# each takes other branches of #if. gcovr runs from the environment uv.lock
-# pins, like the tools of lint.sh.
+# Runs the tests on the host with --coverage and fails unless they reach every line, branch and
+# condition of src/ (docs/Testing.md TS-4), or as much of them as COVERAGE_MINIMUM of
+# tools/project.sh says: what no test reaches on the terminal, and all of it as HTML in
+# build/coverage/html/. The variants of CMakeLists.txt count together, as each takes other
+# branches of #if, and with them the suites coverage_suites() of tools/project.sh runs. gcovr
+# runs from the environment uv.lock pins, like the tools of lint.sh.
 
 set -euo pipefail
 
@@ -24,7 +24,8 @@ readonly COVERAGE_DIR="${BUILD_DIR}/coverage"
 # <dir>/CMakeFiles/<target>.dir/<source>.gcno, which gives its source: <dir>
 # is the build directory of the CMakeLists.txt that adds the target, empty for
 # the root's and <subdir>/ for one of add_subdirectory(<subdir>), and <source>
-# is relative to that CMakeLists.txt.
+# is relative to that CMakeLists.txt, with each .. written as __: a source outside the folder of
+# its CMakeLists.txt, as ../../src/Display.cpp, lies at __/__/src/Display.cpp.gcno.
 remove_stale_notes() {
   local notes
   notes="$(find "${COVERAGE_DIR}" -name '*.gcno')"
@@ -35,7 +36,8 @@ remove_stale_notes() {
     subdir="${note#"${COVERAGE_DIR}"/}"
     subdir="${subdir%%CMakeFiles/*}"
     source="${note#*.dir/}"
-    source="${ROOT_DIR}/${subdir}${source%.gcno}"
+    source="${source%.gcno}"
+    source="${ROOT_DIR}/${subdir}${source//__\//..\/}"
     if [[ -n "${note}" && ! -f "${source}" ]]; then
       rm -f "${note}"
     fi
@@ -102,6 +104,13 @@ main() {
   find "${COVERAGE_DIR}" -name '*.gcda' -delete 2>/dev/null || true
   cmake --workflow --preset coverage
   remove_stale_notes
+  # The project's suites beyond CMake's, as a backend's tests built by a script of its own.
+  local listed
+  listed="$(coverage_suites)"
+  local suites=()
+  if [[ -n "${listed}" ]]; then
+    mapfile -t suites <<< "${listed}"
+  fi
 
   # No counts is a build that was not instrumented, not a library without code: a build
   # directory configured with another compiler is made anew, and CMake drops the preset's
@@ -122,7 +131,7 @@ main() {
   local tracefile="${COVERAGE_DIR}/coverage.json"
   uv run --frozen gcovr --root "${ROOT_DIR}" --filter 'src/' \
     --exclude-throw-branches \
-    --json "${tracefile}" "${COVERAGE_DIR}"
+    --json "${tracefile}" "${COVERAGE_DIR}" "${suites[@]}"
   local metric
   : > "${COVERAGE_DIR}/coverage.txt"
   for metric in line branch condition; do

@@ -64,6 +64,10 @@ readonly BUILD_DIR="${ROOT_DIR}/build"
   check_elf() {
     :
   }
+
+  coverage_suites() {
+    :
+  }
 }
 
 # shellcheck source=tools/project.sh

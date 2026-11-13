@@ -53,7 +53,7 @@ HTTP and the web socket there, and the host binary answered a line protocol, so 
 `cases/web_test.cpp` drives directly.
 
 The pages themselves are served by the simulator now, which needs no second process and no
-node: `./build/bin/Wordclock` answers `http://localhost:8080/`. See
+node: `./build/host/bin/Wordclock` answers `http://localhost:8080/`. See
 [`../../simulator/README.md`](../../simulator/README.md).
 
 ## The stand-ins

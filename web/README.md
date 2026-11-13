@@ -142,7 +142,7 @@ disk and it asks for the clock's address instead of using its own host. The edit
 a browser reload.
 
 **The simulator serves them too**, which is the shortest way to see a page with a working
-clock behind it: `./build/bin/Wordclock` opens `http://localhost:8080/` beside its window, and
+clock behind it: `./build/host/bin/Wordclock` opens `http://localhost:8080/` beside its window, and
 both are the same clock. It answers everything on this page except `/update` - a host process
 has no second partition to write an image into.
 

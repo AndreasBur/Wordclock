@@ -13,7 +13,7 @@
 # Run over the simulator's compile database, which covers the whole firmware core:
 #
 #   cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-#   run-clang-tidy -p build -quiet "^$PWD/src/|platform/simulator/src"
+#   run-clang-tidy -p build/host -quiet "^$PWD/src/|platform/simulator/src"
 #
 # and over each hardware backend's, through tools/cross-clang-tidy.py - the same checks, with
 # the database rewritten so that clang can read what a GCC cross compiler was told:

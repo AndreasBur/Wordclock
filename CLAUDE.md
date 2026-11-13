@@ -124,12 +124,12 @@ with the copyright, an SPDX line and a `\file` block. What a block holds, and ho
 ## Build
 
 ```bash
-cmake --preset simulator
-cmake --build --preset simulator     # -> build/bin/Wordclock
-cmake --workflow --preset simulator  # configure, build and run the tests in one
+cmake --preset default
+cmake --build --preset default       # -> build/host/bin/Wordclock
+cmake --workflow --preset default  # configure, build and run the tests in one
 ```
 
-`cmake --list-presets=all` names the others - `avr`, `clang`, `sanitizers`, `coverage`, `fuzz`
+`cmake --list-presets=all` names the others - `avr`, `clang`, `sanitize`, `coverage`, `fuzz`
 and the `ci-` variants, which are the same with warnings as errors.
 
 Everything else - the analysers, the host suites, the PlatformIO builds, the web smoke test -
@@ -210,7 +210,7 @@ plumbing the next section works around applies here.
 uv run python shot.py
 ```
 
-They need the firmware behind them, and **the simulator is it**: `./build/bin/Wordclock`
+They need the firmware behind them, and **the simulator is it**: `./build/host/bin/Wordclock`
 answers `http://localhost:8080/` — the panel at `/`, the console at `/console`, `/commands`,
 `/display`, the web socket and an honest `/update` that installs nothing. It is started the
 way the section below starts the window, `( ... &)` inside the call, and killed with
@@ -250,7 +250,7 @@ looks. And **behaviour that needs input** — `set_input_files` on the update pa
 plus a click on Install exercises the whole upload, both answers included.
 
 The first of them runs on every pull request: `make web`, which is `tools/web-smoke.py
-build/bin/Wordclock`, starts the simulator under `xvfb-run` — no window on anybody's desktop, no
+build/host/bin/Wordclock`, starts the simulator under `xvfb-run` — no window on anybody's desktop, no
 sandbox to disable — and checks both pages at 390 and 1280 px for console errors, sideways scrolling and a command
 answered. Run it before reaching for a script of your own; write one for what it does not
 check.
@@ -291,7 +291,7 @@ not — none of them says what went wrong:
    `pkill` sits at the start of the call.
 
 ```bash
-(GDK_BACKEND=x11 ./build/bin/Wordclock > run.log 2>&1 &) && sleep 6
+(GDK_BACKEND=x11 ./build/host/bin/Wordclock > run.log 2>&1 &) && sleep 6
 WIN=$(xdotool search --name "Wordclock Pixels" | head -1)
 # Guard the empty case: `import -window ""` waits for the user to click a window and
 # takes the call into its timeout instead of failing.

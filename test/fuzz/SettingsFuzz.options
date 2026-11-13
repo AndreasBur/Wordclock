@@ -1,0 +1,5 @@
+# The input is laid over a stored blob, at most Storage::kCapacity long. Without
+# -len_control=0 libFuzzer takes its time growing an input that far: one run left all but
+# the first 25 bytes untouched.
+-max_len=256
+-len_control=0

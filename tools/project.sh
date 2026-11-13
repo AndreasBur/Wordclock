@@ -77,3 +77,24 @@ SIMAVR_MCU=""
 HOST_CODE=(platform/simulator)
 VARIANTS=(default)
 TIDY_VARIANTS=(default)
+# What the core tests and the two host suites reached together when Wordclock came onto the
+# template, the lines, branches and conditions of src/ in percent: 93.6, 84.0 and 81.2. A floor
+# to raise as the tests reach more, never to lower (Testing.md TS-4).
+COVERAGE_MINIMUM=(93 84 81)
+
+# The two backends' host tests, which their own run.sh builds against stand-ins of the frameworks
+# and CMake does not: they reach the command line through the web socket, which the core tests
+# never do. Counts of an earlier run go first, as they would add to this one.
+coverage_suites() {
+  local backend
+  local dir
+  for backend in esp32 rp2350; do
+    dir="${ROOT_DIR}/platform/${backend}/.pio/host-tests"
+    if [[ -d "${dir}" ]]; then
+      find "${dir}" -name '*.gcda' -delete
+    fi
+    HOST_TESTS_CXXFLAGS="--coverage -fcondition-coverage -O0" \
+      "${ROOT_DIR}/platform/${backend}/test/run.sh" >&2
+    echo "${dir}"
+  done
+}
