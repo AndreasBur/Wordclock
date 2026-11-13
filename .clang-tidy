@@ -44,18 +44,20 @@ Checks: >
   -readability-named-parameter,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
+  -bugprone-std-namespace-modification,
   -bugprone-suspicious-enum-usage,
   -bugprone-too-small-loop-variable,
   -cert-err58-cpp,
   -cert-int09-c,
   -cert-str34-c,
   -clang-analyzer-optin.performance.Padding,
+  -cppcoreguidelines-pro-type-union-access,
   -misc-header-include-cycle,
+  -misc-include-cleaner,
   -performance-enum-size,
   -performance-unnecessary-value-param,
   -readability-enum-initial-value,
   -house-braced-var-init,
-  -misc-include-cleaner,
   -modernize-macro-to-enum,
   -modernize-use-nodiscard,
   -cppcoreguidelines-macro-usage,
@@ -66,12 +68,10 @@ Checks: >
   -cppcoreguidelines-special-member-functions,
   -misc-const-correctness,
   -house-braced-member-init,
-  -cppcoreguidelines-pro-type-union-access,
   -clang-diagnostic-unreachable-code-break,
   -readability-magic-numbers,
   -readability-function-size,
   -readability-braces-around-statements,
-  -bugprone-std-namespace-modification,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -modernize-use-equals-default,
   -modernize-use-auto,
@@ -97,7 +97,6 @@ Checks: >
   -misc-use-internal-linkage,
   -readability-function-cognitive-complexity,
   -cppcoreguidelines-pro-type-member-init,
-  -modernize-use-scoped-lock,
   -readability-redundant-casting,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-do-while,
@@ -106,12 +105,10 @@ Checks: >
   -modernize-raw-string-literal,
   -clang-diagnostic-deprecated-copy-with-dtor,
   -google-runtime-float,
-  -clang-diagnostic-old-style-cast,
   -misc-use-anonymous-namespace,
   -readability-use-std-min-max,
   -bugprone-derived-method-shadowing-base-method,
   -cert-err33-c,
-  -cppcoreguidelines-pro-type-const-cast,
   -cppcoreguidelines-virtual-class-destructor,
   -misc-non-private-member-variables-in-classes,
   -modernize-use-constraints,
@@ -122,10 +119,8 @@ Checks: >
   -readability-redundant-typename,
   -readability-use-anyofallof,
   -readability-use-concise-preprocessor-directives,
-  -cppcoreguidelines-pro-type-cstyle-cast,
   -readability-suspicious-call-argument,
   -bugprone-implicit-widening-of-multiplication-result,
-  -bugprone-invalid-enum-default-initialization,
   -clang-diagnostic-c++98-compat-extra-semi,
   -clang-diagnostic-comma,
   -clang-diagnostic-sign-conversion,
@@ -184,6 +179,9 @@ Checks: >
 # bugprone-narrowing-conversions, cert-str34-c: 183 findings, which is byte arithmetic itself:
 #   every b = b + 1 promotes to int and narrows back. The alternative is a cast on every line of
 #   the display and animation code, which would hide the few casts that mean something.
+# bugprone-std-namespace-modification: avr-gcc ships no libstdc++, and platform/avr-dx/include/stl
+#   writes the part of std the core uses - array, limits, type_traits. Each of its declarations
+#   is a finding, and none lies anywhere else.
 # bugprone-suspicious-enum-usage: it reports every wxWidgets flag combination - wxLEFT | wxTOP is
 #   two enumerators of two enumerations, which is how that library is written.
 # bugprone-too-small-loop-variable: a byte counting over a table of a hundred entries. The
@@ -196,11 +194,18 @@ Checks: >
 #   command set is written down: BH1750::ModeType carries the chip's opcodes.
 # clang-analyzer-optin.performance.Padding: it reports the message catalog's two structs. Their
 #   field order is the order the tables are written in, and those tables sit in flash.
+# cppcoreguidelines-pro-type-union-access: the memory of the animations is a union, as only one
+#   runs at a time and the AVR has 16 KiB of RAM; the rest are the AVR's 16-bit registers, which
+#   its vendor header declares as unions of the word and its two bytes, TCB0.CCMP among them.
+#   std::variant is not in the std the AVR has, and would add a tag the animations keep already.
 # misc-header-include-cycle: the ESP32's and the RP2350's Arduino.h stand in for the core's, to
 #   bind Serial to WordclockSerial, and include it by its path, WORDCLOCK_CORE_ARDUINO_H; the
 #   core's own headers include "Arduino.h" again and find this one, a cycle the include guards
 #   end. Every finding lies in the frameworks' headers, which the filter above does not keep out
 #   of this check.
+# misc-include-cleaner: a source leans on what its own header includes, as Google's rule allows
+#   and CLAUDE.md asks; the check wants every name's header included where it is used, which
+#   would put StdReturnType's and byte's header into nearly every file.
 # performance-enum-size: it would put ": uint8_t" on some sixty enumerations, several of them
 #   members of structs that PROGMEM tables are memcpy_P'd out of, where the layout is the format
 #   of those tables.
@@ -213,11 +218,12 @@ Checks: >
 # pull request of its own - fixed, or kept off here with its reason - and leaves this list then.
 # The bugprone- and cert- among them were on before; their findings are clang-tidy 23's, which
 # uv.lock pins, where Wordclock was read by 21.
-# misc-include-cleaner, -macro-to-enum, cppcoreguidelines-macro-usage and modernize-avoid-c-arrays
-# meet conventions of Wordclock's own (CLAUDE.md: a source leans on its own header's includes; a
-# module's switches are #define, as #if reads them), decided one by one.
+# modernize-macro-to-enum and cppcoreguidelines-macro-usage are not the configuration switches
+# alone that #if reads, which CLAUDE.md keeps as #define: most of what they report are constants
+# of a module - a chip's registers and commands, a font's sizes, a table's length - which
+# CLAUDE.md wants static constexpr. modernize-avoid-c-arrays likewise wants a change rather than a
+# reason: std::array is there on every target, the AVR's from platform/avr-dx/include/stl.
 #    1014 house-braced-var-init
-#     719 misc-include-cleaner
 #     343 modernize-macro-to-enum
 #     323 modernize-use-nodiscard
 #     281 cppcoreguidelines-macro-usage
@@ -228,12 +234,10 @@ Checks: >
 #     116 cppcoreguidelines-special-member-functions
 #      90 misc-const-correctness
 #      89 house-braced-member-init
-#      86 cppcoreguidelines-pro-type-union-access
 #      66 clang-diagnostic-unreachable-code-break
 #      65 readability-magic-numbers
 #      59 readability-function-size
 #      55 readability-braces-around-statements
-#      54 bugprone-std-namespace-modification
 #      54 cppcoreguidelines-pro-type-reinterpret-cast
 #      54 modernize-use-equals-default
 #      48 modernize-use-auto
@@ -259,7 +263,6 @@ Checks: >
 #       8 misc-use-internal-linkage
 #       8 readability-function-cognitive-complexity
 #       7 cppcoreguidelines-pro-type-member-init
-#       7 modernize-use-scoped-lock
 #       7 readability-redundant-casting
 #       6 cppcoreguidelines-avoid-const-or-ref-data-members
 #       6 cppcoreguidelines-avoid-do-while
@@ -268,12 +271,10 @@ Checks: >
 #       6 modernize-raw-string-literal
 #       5 clang-diagnostic-deprecated-copy-with-dtor
 #       5 google-runtime-float
-#       4 clang-diagnostic-old-style-cast
 #       4 misc-use-anonymous-namespace
 #       4 readability-use-std-min-max
 #       3 bugprone-derived-method-shadowing-base-method
 #       3 cert-err33-c
-#       3 cppcoreguidelines-pro-type-const-cast
 #       3 cppcoreguidelines-virtual-class-destructor
 #       3 misc-non-private-member-variables-in-classes
 #       3 modernize-use-constraints
@@ -284,10 +285,8 @@ Checks: >
 #       3 readability-redundant-typename
 #       3 readability-use-anyofallof
 #       3 readability-use-concise-preprocessor-directives
-#       2 cppcoreguidelines-pro-type-cstyle-cast
 #       2 readability-suspicious-call-argument
 #       1 bugprone-implicit-widening-of-multiplication-result
-#       1 bugprone-invalid-enum-default-initialization
 #       1 clang-diagnostic-c++98-compat-extra-semi
 #       1 clang-diagnostic-comma
 #       1 clang-diagnostic-sign-conversion
