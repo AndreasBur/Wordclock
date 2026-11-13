@@ -109,7 +109,7 @@ Two kinds, as in Utl and MaxMatrix: a Doxygen block `/*! ... */` above a declara
 in the header, for whoever calls it, and a comment on the implementation, `//` for one
 or two lines and `/* ... */` with a ` * ` on every line from three. Every file starts
 with the copyright, an SPDX line and a `\file` block. What a block holds, and how
-`tools/docs.py` and `-Wdocumentation` check it, is
+`make docs` and `-Wdocumentation` check it, is
 [docs/documentation.md](docs/documentation.md).
 
 ## Layout

@@ -106,7 +106,7 @@ the paragraphs after the brief.
   reasons, and both matter: a helper earns its own name precisely because that name carries the
   meaning a comment would otherwise have to (see CLAUDE.md), so a `\brief` would only say it
   again; and `EXTRACT_PRIVATE` is `NO` in the `Doxyfile`, so Doxygen never reads a block there -
-  `tools/docs.py` would not check it, and a `\param` naming a parameter that has since been
+  `make docs` would not check it, and a `\param` naming a parameter that has since been
   renamed would never be caught. An unchecked block is worse than a plain comment, because it
   looks checked.
 - **A private type is the exception**, documented like a public one with its fields, as
@@ -141,9 +141,11 @@ animation."
 
 ## Checking
 
-- **`tools/docs.py`** has Doxygen read the blocks, once per backend, and fails on every warning: a
-  block Doxygen cannot read, a parameter without its `\param`, an entity without a block. It
-  writes what Doxygen made of the blocks into `build/doxygen/<backend>/html`.
+- **`make docs`**, the template's `tools/docs.sh`, has Doxygen read the blocks, once per backend as
+  `docs_inputs()` of `tools/project.sh` lists them, and fails on every warning but a missing
+  `\return`: a block Doxygen cannot read, a parameter without its `\param`, an entity without a
+  block. A warning of `src/`, which every run reads, counts once. It writes what Doxygen made of
+  the blocks into `build/docs/<n>/html`, one for each backend.
 - **clang's `-Wdocumentation`**, through clang-tidy in `static-analysis.yml` and through clangd,
   checks each block against the declaration it stands at: a `\param` whose name the function does
   not have, a `\return` on a function that returns nothing, an empty command, an unknown command.

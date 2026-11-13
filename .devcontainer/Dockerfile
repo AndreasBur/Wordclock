@@ -32,7 +32,7 @@ FROM ${BASE_IMAGE}
 # request on; running them here is what keeps that from being a surprise. run-clang-tidy,
 # which walks the compile database in parallel, is part of the same package.
 # cppcheck is the second analyser of that same workflow, and is here for the same reason.
-# doxygen is what tools/docs.py reads the Doxygen blocks with, a job of that workflow as well.
+# doxygen is what tools/docs.sh reads the Doxygen blocks with, a job of that workflow as well.
 # shellcheck reads the shell scripts, in the "Scripts" job of that workflow; ruff and actionlint,
 # the job's other two, come with the tool environment below.
 # clang, libclang-rt-dev and llvm build and read the fuzzers of that workflow's fuzz job. clang
