@@ -49,7 +49,8 @@ mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
 INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/src")
-while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROOT/src" -type d)
+directories="$(find "$ROOT/src" -type d)"
+while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done <<< "$directories"
 
 # The path this platform's Arduino.h includes the core's own through. On the target the
 # build script finds it in the framework; here it is the stub.
@@ -57,7 +58,8 @@ INCLUDES+=(-DWORDCLOCK_CORE_ARDUINO_H="\"$TEST_DIR/stubs/Arduino.h\"")
 
 # The warnings are the ones in platform/warnings.txt, which says why each is on.
 FLAGS=(-std=gnu++17 -Werror)
-while IFS= read -r flag; do FLAGS+=("$flag"); done < <(grep '^-' "$ROOT/platform/warnings.txt")
+warnings="$(grep '^-' "$ROOT/platform/warnings.txt")"
+while IFS= read -r flag; do FLAGS+=("$flag"); done <<< "$warnings"
 
 # The compiler: g++, unless CXX names another. The clang job in ci.yml runs these suites with
 # clang++, and it is the only build that reads this backend's own sources with a second
@@ -94,7 +96,7 @@ INCLUDES+=(-I"$CACHE")
 # cheapest correct answer to that is to throw them away.
 KEY_FILE="$CACHE/flags"
 KEY="$COMPILER ${FLAGS[*]} ${INCLUDES[*]}"
-if [ ! -f "$KEY_FILE" ] || [ "$(cat "$KEY_FILE")" != "$KEY" ]; then
+if [ ! -f "$KEY_FILE" ] || [ "$(< "$KEY_FILE")" != "$KEY" ]; then
     find "$CACHE" -name '*.o' -delete
     find "$CACHE" -name '*.d' -delete
     # The coverage notes and counts belong to the objects they were written beside.
@@ -108,7 +110,8 @@ fi
 # linking one without the other does not resolve. That is the same split the WEB entry below
 # already makes, now that half of what it served lives in the firmware.
 CORE=()
-while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/src" -name '*.cpp' -not -name 'WebFrontend.cpp')
+sources="$(find "$ROOT/src" -name '*.cpp' -not -name 'WebFrontend.cpp')"
+while IFS= read -r source; do CORE+=("$source"); done <<< "$sources"
 
 # WebInterface is not in here: it needs the HTTP server, and the two tests that want it
 # bring their own so they can see what it sends. A test that has no business with HTTP
@@ -178,7 +181,11 @@ compileAll() {
 
     for source in "$@"; do
         compile "$source" &
-        while [ "$(jobs -rp | wc -l)" -ge "$jobs" ]; do wait -n; done
+        running="$(jobs -rp | wc -l)"
+        while [ "$running" -ge "$jobs" ]; do
+            wait -n
+            running="$(jobs -rp | wc -l)"
+        done
     done
     wait
 

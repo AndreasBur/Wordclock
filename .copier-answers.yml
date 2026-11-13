@@ -1,0 +1,19 @@
+# The answers this project was made from, which `copier update` reads. Change one with
+# `copier update --data name=value`, not here.
+_commit: v0.7.2
+_src_path: gh:theAndreas/embedded-cpp-template
+author: Andreas Burnickl
+copyright_year: 2026
+description: A word clock firmware for the AVR128DA48, ESP32-S3 and RP2350, with a
+    simulator.
+f_cpu: 24000000
+github_owner: theAndreas
+kind: firmware
+license: GPL-3.0-or-later
+macro_prefix: WORDCLOCK
+mcu: avr128da48
+namespace: wordclock
+platformio: false
+project_name: Wordclock
+skeleton: false
+url: https://github.com/theAndreas/Wordclock

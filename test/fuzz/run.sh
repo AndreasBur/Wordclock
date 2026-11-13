@@ -47,9 +47,10 @@ for source in "$HERE"/*Fuzz.cpp; do
     mkdir -p "$WORK/$name/corpus"
     seeds=()
     if [ -d "$HERE/corpus/$name" ]; then seeds=("$HERE/corpus/$name"); fi
-    # shellcheck disable=SC2046 # the options are meant to split into their flags
+    listed="$(OptionsOf "$name")"
+    read -r -a options <<< "$listed"
     (cd "$WORK/$name" && "$BUILD/bin/$name" -max_total_time="$DURATION" -print_final_stats=1 \
-        $(OptionsOf "$name") corpus "${seeds[@]}" > log.txt 2>&1) &
+        "${options[@]}" corpus "${seeds[@]}" > log.txt 2>&1) &
     names+=("$name")
     pids+=("$!")
 done
@@ -58,7 +59,8 @@ status=0
 for index in "${!names[@]}"; do
     name="${names[$index]}"
     if wait "${pids[$index]}"; then
-        echo "$name: $(grep -E '^#[0-9]+.*DONE' "$WORK/$name/log.txt" | tail -1)"
+        done_line="$(grep -E '^#[0-9]+.*DONE' "$WORK/$name/log.txt" | tail -1 || true)"
+        echo "$name: $done_line"
     else
         status=1
         echo "$name: FAILED - $WORK/$name/log.txt"
