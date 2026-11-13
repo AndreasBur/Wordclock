@@ -110,8 +110,11 @@ main() {
   for dir in "${host_code[@]}" "${TIDY_SKIP[@]}"; do
     platform_paths+=(":!${dir%/}/*")
   done
-  local platform_sources
-  list_files platform_sources '\.cpp$' "${platform_paths[@]}"
+  # Asked only where the folder is: a library has none, and list_files fails on no file.
+  local platform_sources=()
+  if [[ -d platform ]]; then
+    list_files platform_sources '\.cpp$' "${platform_paths[@]}"
+  fi
   local -A compiled=()
   MODULE=''
   if ((!database_only)); then

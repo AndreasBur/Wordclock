@@ -101,3 +101,20 @@ coverage_suites() {
     echo "${dir}"
   done
 }
+
+# cppcheck is given include folders, not a database: each module's folder, as the core includes
+# its headers by their bare names, and the simulator's stand-ins for the Arduino core, which a
+# firmware compiles against everywhere else; the two suppressions of .cppcheck-suppressions, with
+# their reasons there; and C++17, as every target compiles the core.
+cppcheck_flags() {
+  local folders
+  folders="$(find "${ROOT_DIR}/src" -type d)"
+  local folder
+  while IFS= read -r folder; do
+    echo "-I${folder}"
+  done <<< "${folders}"
+  echo "-I${ROOT_DIR}/platform/simulator/include/sim"
+  echo "-I${ROOT_DIR}/platform/simulator/include"
+  echo "--suppressions-list=${ROOT_DIR}/.cppcheck-suppressions"
+  echo "--std=c++17"
+}

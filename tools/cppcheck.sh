@@ -62,6 +62,14 @@ main() {
     mock=(-Itest/mock)
   fi
 
+  # What the project adds, after the flags below, so that a --std of its own wins.
+  local listed
+  listed="$(cppcheck_flags)"
+  local flags=()
+  if [[ -n "${listed}" ]]; then
+    mapfile -t flags <<< "${listed}"
+  fi
+
   # The headers as well, by name: given a folder, cppcheck reads only its .cpp
   # files, and a library of templates may have none.
   local files
@@ -82,6 +90,7 @@ main() {
     "${mock[@]}" \
     '-D__has_include(x)=1' \
     "${defines[@]}" \
+    "${flags[@]}" \
     "${files[@]}"
 }
 

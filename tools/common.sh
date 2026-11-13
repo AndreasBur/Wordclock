@@ -69,6 +69,10 @@ readonly BUILD_DIR="${ROOT_DIR}/build"
   coverage_suites() {
     :
   }
+
+  cppcheck_flags() {
+    :
+  }
 }
 
 # shellcheck source=tools/project.sh
