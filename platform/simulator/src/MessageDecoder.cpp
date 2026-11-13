@@ -251,7 +251,7 @@ wxString MessageDecoder::DescribeValue(char const* label, wxString const& value,
  * into a different one.
  */
 bool MessageDecoder::ToValue(wxString const& text, uint16_t& value) {
-  unsigned long parsed{0ul};  // NOLINT(runtime/int)
+  unsigned long parsed{0uL};  // NOLINT(runtime/int)
 
   if (!text.ToULong(&parsed)) {
     return false;

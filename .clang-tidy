@@ -54,7 +54,6 @@ Checks: >
   -performance-enum-size,
   -performance-unnecessary-value-param,
   -readability-enum-initial-value,
-  -readability-uppercase-literal-suffix,
   -house-braced-var-init,
   -misc-include-cleaner,
   -modernize-macro-to-enum,
@@ -217,7 +216,6 @@ Checks: >
 # misc-include-cleaner, -macro-to-enum, cppcoreguidelines-macro-usage and modernize-avoid-c-arrays
 # meet conventions of Wordclock's own (CLAUDE.md: a source leans on its own header's includes; a
 # module's switches are #define, as #if reads them), decided one by one.
-#    2435 readability-uppercase-literal-suffix
 #    1014 house-braced-var-init
 #     719 misc-include-cleaner
 #     343 modernize-macro-to-enum
@@ -365,6 +363,11 @@ CheckOptions:
   readability-function-cognitive-complexity.Threshold: 15
   # A text in PROGMEM is a char array, as F() and a table of texts need one.
   modernize-avoid-c-arrays.AllowStringArrays: true
+  # A literal's suffix, docs/CodingStyle.md T-22: every L upper case, which MISRA 5.13.5 asks
+  # and the check exists for; the u lower case rather than the check's U, which a hexadecimal
+  # value reads on as a digit. The check looks a suffix up in the list in either case and
+  # reports one written otherwise; one the list does not name, as the f of 1.0f, it leaves.
+  readability-uppercase-literal-suffix.NewSuffixes: 'u;uL;uLL;Lu;LLu;L;LL'
   # A list over several lines ends in a comma, unless it is one value whose
   # expression wraps, as in Result<...> const end{ReadDigits(...)}: there a
   # comma would read as the start of a second value.
