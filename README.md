@@ -1,8 +1,8 @@
 # Wordclock — a German word clock (Wortuhr)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/ci.yml?branch=master&label=CI&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
-[![static analysis](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/static-analysis.yml?branch=master&label=static%20analysis&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
-[![Last commit](https://img.shields.io/github/last-commit/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/commits/master)
+[![CI](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/ci.yml?branch=main&label=CI&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
+[![static analysis](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/static-analysis.yml?branch=main&label=static%20analysis&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
+[![Last commit](https://img.shields.io/github/last-commit/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/commits/main)
 [![Contributors](https://img.shields.io/github/contributors/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/graphs/contributors)
 
 [![Platforms](https://img.shields.io/badge/platform-ESP32--S3%20%7C%20RP2350%20%7C%20AVR128DA48%20%7C%20Simulator-blue)](platform/)
