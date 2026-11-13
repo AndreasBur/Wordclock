@@ -16,7 +16,7 @@
  *
  * After the load, each overlay is shown in turn, because the stored date, text and font of an
  * overlay are only read when it draws. For a few ticks each and not for its whole endurance: the
- * first frame is the one that reads them, and a tick is what an input costs - see FuzzCommand.cpp.
+ * first frame is the one that reads them, and a tick is what an input costs - see CommandFuzz.cpp.
  */
 
 #include <cstddef>
@@ -78,7 +78,7 @@ struct LayoutType {
 LayoutType FindLayout() {
   StartFromANewClock();
   if (Persistence::Save() != kEOk) {
-    std::fputs("FuzzSettings: the store took no blob\n", stderr);
+    std::fputs("SettingsFuzz: the store took no blob\n", stderr);
     std::abort();
   }
   BlobType const fresh_blob = ReadStoredBlob();
@@ -92,7 +92,7 @@ LayoutType FindLayout() {
       return {fresh_blob, offset};
     }
   }
-  std::fputs("FuzzSettings: the stored blob no longer has its checksum at its end\n", stderr);
+  std::fputs("SettingsFuzz: the stored blob no longer has its checksum at its end\n", stderr);
   std::abort();
 }
 
@@ -145,7 +145,7 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data,
     return 0;
   }
   if (Persistence::Load() != kEOk) {
-    std::fputs("FuzzSettings: a blob with the right header and checksum was refused\n", stderr);
+    std::fputs("SettingsFuzz: a blob with the right header and checksum was refused\n", stderr);
     std::abort();
   }
   RunTicks(kTicksAfterTheLoad);

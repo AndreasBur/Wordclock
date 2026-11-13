@@ -197,7 +197,7 @@ jobs:
   # inputs for the two ways data from outside reaches the firmware - a command line as a
   # browser's web socket frame brings it, and a stored blob as Persistence::Load() reads it -
   # under the same two sanitizers, steered by which branches of the core each input reaches.
-  # What the fuzzers are and how to run them is platform/simulator/tests/fuzz/run.sh.
+  # What the fuzzers are and how to run them is test/fuzz/run.sh.
   #
   # Three minutes each, side by side, on every pull request. Short for a fuzzer, which is why
   # the corpus is cached: every run starts from the inputs all earlier runs found, so the

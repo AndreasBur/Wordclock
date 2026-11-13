@@ -122,7 +122,7 @@ tidy: ## clang-tidy and the standalone headers: the core, the simulator and the 
 # leaves out: what the other checks would say about test scaffolding is not worth answering, but
 # a test written in the old names reads as the old code. Seconds, not minutes - one check.
 	run-clang-tidy -p build -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
-	    'platform/simulator/(tests|Wordclock)'
+	    '^$(CURDIR)/test/|platform/simulator/Wordclock'
 # The backends' host tests are compiled by their own run.sh and by nothing CMake or PlatformIO
 # sees, so their names are read through the compile database run.sh writes. That takes python3
 # and nothing else: no PlatformIO and no cross compiler, the stubs stand in for both.
@@ -225,8 +225,8 @@ coverage: ## Core tests and both host suites with --coverage, and the report
 fuzz: ## The fuzzers, FUZZ_SECONDS each, going on from the corpus in FUZZ_WORK
 	cmake --workflow --preset fuzz
 	run-clang-tidy -p build-fuzz -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
-	    'platform/simulator/tests/fuzz'
-	platform/simulator/tests/fuzz/run.sh build-fuzz $(FUZZ_SECONDS) $(FUZZ_WORK)
+	    'test/fuzz'
+	test/fuzz/run.sh build-fuzz $(FUZZ_SECONDS) $(FUZZ_WORK)
 
 ## Housekeeping
 

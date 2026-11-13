@@ -81,7 +81,7 @@
         {
             "name": "fuzz",
             "displayName": "Fuzzers",
-            "description": "The libFuzzer targets of platform/simulator/tests/fuzz, which take clang; run them with that directory's run.sh.",
+            "description": "The libFuzzer targets of test/fuzz, which take clang; run them with that directory's run.sh.",
             "inherits": "clang",
             "binaryDir": "${sourceDir}/build-fuzz",
             "cacheVariables": {
@@ -111,7 +111,7 @@
         { "name": "avr", "configurePreset": "avr" },
         { "name": "sanitizers", "configurePreset": "sanitizers", "targets": ["WordclockTests"] },
         { "name": "coverage", "configurePreset": "coverage", "targets": ["WordclockTests"] },
-        { "name": "fuzz", "configurePreset": "fuzz", "targets": ["FuzzCommand", "FuzzSettings"] },
+        { "name": "fuzz", "configurePreset": "fuzz", "targets": ["CommandFuzz", "SettingsFuzz"] },
         { "name": "ci-simulator", "configurePreset": "ci-simulator" },
         { "name": "ci-clang", "configurePreset": "ci-clang" },
         { "name": "ci-avr", "configurePreset": "ci-avr" }

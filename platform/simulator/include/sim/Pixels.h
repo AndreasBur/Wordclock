@@ -10,7 +10,7 @@
  *
  * Deliberately free of wxWidgets: the window that renders this buffer is PixelsFrame. Nothing on
  * the way from the firmware to a pixel constructs a window any more, which is what lets the tests
- * in tests/ drive Display and DisplayManager without a display.
+ * in test/ drive Display and DisplayManager without a display.
  *
  * Serial still reaches wxWidgets through the Arduino shim, but SerialShim holds null controls until
  * it is attached and checks for them, so printing headless is a no-op rather than a crash.

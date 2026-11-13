@@ -4,14 +4,14 @@
 # that runs:
 #
 #   cmake --workflow --preset fuzz
-#   platform/simulator/tests/fuzz/run.sh build-fuzz 300 build-fuzz/work
+#   test/fuzz/run.sh build-fuzz 300 build-fuzz/work
 #
 # Each fuzzer gets a directory of its own under the work directory, and runs in it: the
 # simulator's store is a file in the working directory, and two fuzzers sharing one would load
 # each other's settings. What it finds stays there - corpus/ the inputs that reached something
 # new, crash-* an input that failed, log.txt what it said - and the corpus is read again on the
 # next run, so a second run goes on from where the first stopped. A crash replays with the
-# fuzzer and the file alone: build-fuzz/bin/FuzzCommand crash-<hash>.
+# fuzzer and the file alone: build-fuzz/bin/CommandFuzz crash-<hash>.
 #
 # The seeds in corpus/<fuzzer> are read as well and never written to.
 
@@ -28,21 +28,21 @@ DURATION="$2"
 mkdir -p "$3"
 WORK="$(cd "$3" && pwd)"
 
-# What each fuzzer is told beyond the duration. FuzzCommand's input is a web socket frame, which
-# the firmware refuses above WEB_FRONTEND_MAX_FRAME_LENGTH. FuzzSettings' input is laid over a
+# What each fuzzer is told beyond the duration. CommandFuzz's input is a web socket frame, which
+# the firmware refuses above WEB_FRONTEND_MAX_FRAME_LENGTH. SettingsFuzz' input is laid over a
 # stored blob, at most Storage::kCapacity long, and without -len_control=0 libFuzzer would take
 # its time growing an input that far - one run left all but the first 25 bytes untouched.
 OptionsOf() {
     case "$1" in
-        FuzzCommand)  echo "-max_len=192 -dict=$HERE/FuzzCommand.dict" ;;
-        FuzzSettings) echo "-max_len=256 -len_control=0" ;;
+        CommandFuzz)  echo "-max_len=192 -dict=$HERE/CommandFuzz.dict" ;;
+        SettingsFuzz) echo "-max_len=256 -len_control=0" ;;
         *)            echo "" ;;
     esac
 }
 
 names=()
 pids=()
-for source in "$HERE"/Fuzz*.cpp; do
+for source in "$HERE"/*Fuzz.cpp; do
     name="$(basename "$source" .cpp)"
     mkdir -p "$WORK/$name/corpus"
     seeds=()
