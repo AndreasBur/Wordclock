@@ -55,8 +55,9 @@ include, and a source per parser would only add files: such a header keeps its b
 and gives them up when a second file includes it.
 
 Moving a body moves its includes, and a file that leaned on one of them breaks only
-once that include is gone. `tools/self-contained-headers.py` compiles every header as
-the only include of an empty file, and the static-analysis jobs run it for each target.
+once that include is gone. `make headers` - the template's `tools/self_contained_headers.py` -
+compiles every header as the only include of an empty file, by each target's compiler and the
+host's.
 
 A source may lean on what its own header includes, as Google's rule allows, and includes
 everything else it names itself: an animation that walks `DisplayWords` includes

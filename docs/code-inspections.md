@@ -16,9 +16,9 @@ every pull request. Functions that need no instance state can be static, and fun
 that only read it can be const.
 
 CI reads four builds with the same checks: the simulator's, and each hardware backend's
-through `tools/cross-clang-tidy.py`, which rewrites a GCC cross build's compile database so
-that clang can follow it. The firmware core is read in every one of them, as each compiler
-sees it.
+through the template's `tools/lib/clang_database.py`, which rewrites a GCC cross build's compile
+database so that clang can follow it. The firmware core is read in every one of them, as each
+compiler sees it.
 
 A function using a mutable referenced object is still reviewed for its meaning: compiling
 with const does not by itself make a setter a read-only operation.

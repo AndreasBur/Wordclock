@@ -155,6 +155,16 @@ RUN cd /opt/wordclock-tools && \
     chown -R vscode:vscode /opt/wordclock-env && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# The headers of LLVM, clang and clang-tidy that tools/lib/tidy_module.sh compiles the template's
+# checks of its own against, as a module that the clang-tidy of uv.lock loads. LLVM_MAJOR is that
+# clang-tidy's major version: tools/lib/tidy_module.sh fails, saying so, when uv.lock moves on and
+# this does not. CI's action llvm-headers reads it from here, so there is one place that says
+# which LLVM. llvm-headers.sh, the template's, says where they come from.
+ARG LLVM_MAJOR=23
+COPY .devcontainer/llvm-headers.sh /tmp/llvm-headers.sh
+RUN /tmp/llvm-headers.sh "${LLVM_MAJOR}" "/opt/llvm-${LLVM_MAJOR}/include" && \
+    rm /tmp/llvm-headers.sh
+
 # The package cache is a named volume, and an empty one takes its ownership from the path
 # it covers - so the path has to exist and belong to the remote user first, or PlatformIO
 # cannot write the ~1.5 GB of toolchain into it.

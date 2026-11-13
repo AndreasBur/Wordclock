@@ -1,7 +1,9 @@
 # The dev container is built with the repository as its context, because the Dockerfile copies
-# pyproject.toml and uv.lock from here; the context directory .devcontainer/ cannot reach them.
+# pyproject.toml and uv.lock from here, and .devcontainer/llvm-headers.sh; the context directory
+# .devcontainer/ cannot reach the first two.
 # Everything else stays out: the build trees and .pio directories make a working copy several
-# hundred megabytes, all of which would be sent to the daemon on every build for two files.
+# hundred megabytes, all of which would be sent to the daemon on every build for three files.
 *
 !pyproject.toml
 !uv.lock
+!.devcontainer/llvm-headers.sh

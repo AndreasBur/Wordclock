@@ -1,0 +1,8 @@
+# The fuzzers. One check reads wrong here:
+#
+# cppcoreguidelines-pro-bounds-pointer-arithmetic: libFuzzer hands its input as
+# a pointer and a size, LLVMFuzzerTestOneInput(data, size), and a fuzzer cuts
+# it into values by offsets into it; C++17 has no span to take it as instead.
+InheritParentConfig: true
+Checks: >
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic

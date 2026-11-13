@@ -36,7 +36,7 @@ HOST_SUITES := platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
 .PHONY: help check lint run clean \
         simulator clang avr esp32 rp2350 host-esp32 host-rp2350 web \
-        tidy tidy-avr tidy-esp32 tidy-rp2350 cppcheck style fmt docs web-lint \
+        tidy headers cppcheck style fmt docs web-lint \
         sanitizers coverage fuzz
 
 help: ## This list
@@ -50,8 +50,8 @@ help: ## This list
 # The order is cheap first, so that a typo fails in seconds rather than after the fuzzers.
 check: STRICT := 1
 check: ## What CI runs, all of it
-check: lint simulator clang avr host-esp32 host-rp2350 web tidy tidy-avr \
-       sanitizers coverage esp32 rp2350 tidy-esp32 tidy-rp2350 fuzz
+check: lint simulator clang avr host-esp32 host-rp2350 web sanitizers coverage \
+       esp32 rp2350 tidy headers fuzz
 lint: style docs cppcheck web-lint ## The checks that need no build: seconds
 
 ## Builds, each with its tests
@@ -99,59 +99,40 @@ web: ## Both web pages in headless Chromium, against the simulator
 
 ## Analysers
 
-# Configured, not built: clang-tidy compiles each translation unit itself and needs nothing from
-# the build but compile_commands.json, which every preset writes. Which checks, and why the rest
-# are off, is in .clang-tidy; WarningsAsErrors is set there, so a finding fails.
-tidy: ## clang-tidy and the standalone headers: the core, the simulator and the host tests
-	cmake --preset $(PRESET)default
+# The template's tools/tidy.sh: each target of tools/project.sh with its own flags - the AVR's
+# database from CMake, the ESP32's and the RP2350's from PlatformIO - then the tests and the
+# simulator, then the fuzzers. Configured, not built: clang-tidy compiles each translation unit
+# itself. Which checks, and why the rest are off, is in .clang-tidy; WarningsAsErrors is set
+# there, so a finding fails.
+tidy: ## clang-tidy: every target, the tests, the fuzzers and the host suites' names
 # The one exception to "not built". WebPage.h holds the two pages as arrays and is generated
 # rather than checked in, so a translation unit that includes it does not compile until the rule
 # has run - and clang-tidy reports that as the file being missing, which reads like a bad include
 # path rather than a build step that was skipped. It is a python script and costs no build time.
-	cmake --build --preset $(PRESET)default --target WordclockWebPage
-	run-clang-tidy -p build/host -quiet -j "$$(nproc)" '^$(CURDIR)/src/|platform/simulator/src'
-# Every header compiled as the only include of an empty file, by the compiler and with the flags
-# the database records. A header that leans on what its includers happen to include first builds
-# everywhere until one of them stops - tools/self-contained-headers.py says why that is not a
-# finding any analyser above can make. Each backend's target runs it again with its own compiler,
-# because the #if branches a header takes are the target's.
-	python3 tools/self-contained-headers.py build/host src platform/simulator/include
-# The names are the same everywhere, the tests and the window included, which the run above
-# leaves out: what the other checks would say about test scaffolding is not worth answering, but
-# a test written in the old names reads as the old code. Seconds, not minutes - one check.
-	run-clang-tidy -p build/host -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
-	    '^$(CURDIR)/test/|platform/simulator/Wordclock'
+	cmake --preset default
+	cmake --build --preset default --target WordclockWebPage
+	tools/tidy.sh
 # The backends' host tests are compiled by their own run.sh and by nothing CMake or PlatformIO
-# sees, so their names are read through the compile database run.sh writes. That takes python3
-# and nothing else: no PlatformIO and no cross compiler, the stubs stand in for both.
+# sees - TIDY_SKIP in tools/project.sh - so their names are read through the compile database
+# run.sh writes. That takes python3 and nothing else: the stubs stand in for the frameworks.
+# The names alone, so -Wno-error: run.sh compiles with -Werror, and the warnings .clang-tidy adds
+# with ExtraArgs would otherwise each stop the run as an error no check list switches off.
 	for backend in esp32 rp2350; do \
 	    "platform/$$backend/test/run.sh" compiledb; \
-	    run-clang-tidy -p "platform/$$backend/.pio/host-tests" -quiet -j "$$(nproc)" \
-	        -checks='-*,readability-identifier-naming' 'platform/'; \
+	    $(UV_RUN) run-clang-tidy.py -p "platform/$$backend/.pio/host-tests" -quiet \
+	        -j "$$(nproc)" -checks='-*,readability-identifier-naming' -extra-arg=-Wno-error \
+	        'platform/'; \
 	done
 
-# Configured, not built, as above. The preset names the toolchain file, which matters here: the
-# database records whichever compiler project() found. The headers by avr-g++, which the
-# cross-compiling clang-tidy needs installed anyway.
-tidy-avr: ## clang-tidy and the standalone headers for the AVR backend
-	cmake --preset $(PRESET)avr
-	python3 tools/cross-clang-tidy.py build-avr '^$(CURDIR)/src/|platform/avr-dx/src'
-	python3 tools/self-contained-headers.py build-avr src platform/avr-dx/include
-
-# compiledb rather than a build: it fetches the platform, runs the pre-scripts - which is what
-# writes WebPage.h - and writes the database, and compiles nothing. The headers by the board's own
-# compiler out of the PlatformIO packages.
-tidy-esp32: ## clang-tidy and the standalone headers for the ESP32 backend
-	$(UV_RUN) pio run -d platform/esp32 -t compiledb
-	python3 tools/cross-clang-tidy.py platform/esp32 '^$(CURDIR)/src/|platform/esp32/src|platform/arduino/src'
-	python3 tools/self-contained-headers.py platform/esp32 src platform/esp32/include \
-	    platform/arduino/include
-
-tidy-rp2350: ## clang-tidy and the standalone headers for the RP2350 backend
-	$(UV_RUN) pio run -d platform/rp2350 -t compiledb
-	python3 tools/cross-clang-tidy.py platform/rp2350 '^$(CURDIR)/src/|platform/rp2350/src|platform/arduino/src'
-	python3 tools/self-contained-headers.py platform/rp2350 src platform/rp2350/include \
-	    platform/arduino/include
+# Every header of src/ and platform/ compiled as the only include of an empty file, by each
+# target's compiler and the host's, with the flags its database records:
+# tools/self_contained_headers.py says why that is a finding no analyser above can make. A header
+# of platform/<name>/ is compiled by the targets that compile that folder.
+headers: ## Every header compiled on its own, for the host and for each target
+	cmake --preset default >/dev/null
+	cmake --build --preset default --target WordclockWebPage
+	tools/tidy.sh --database-only >/dev/null
+	python3 tools/self_contained_headers.py build/host @build/tidy/databases
 
 # No cmake, no wxWidgets, no compile database: cppcheck is given the include directories and
 # works out the configurations itself, which for the firmware core is enough - it reports the
