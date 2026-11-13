@@ -77,6 +77,10 @@ jobs:
       # clang-tidy and PlatformIO at the versions uv.lock pins.
       - uses: ./.github/actions/uv-sync
 
+      # The headers of LLVM that the template's checks of its own, house-*, are compiled against,
+      # as the module the clang-tidy of uv.lock loads.
+      - uses: ./.github/actions/llvm-headers
+
       # Each step that checks something is a target of the Makefile, the same a developer runs,
       # and the reasons for what it runs are written beside it there: clang-tidy over every target
       # of tools/project.sh, the tests and the fuzzers, and the names in the backends' host tests;
