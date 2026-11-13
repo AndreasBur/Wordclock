@@ -171,11 +171,12 @@ style: ## clang-format, cpplint, shellcheck, ruff and actionlint: tools/lint.sh
 fmt: ## Format the C++ sources and the Doxygen blocks in place
 	tools/lint.sh --fix
 
-# Once per backend, over src/ and that backend: a \param that names no parameter, a command
-# Doxygen does not know, an entity without a block or a block that leaves something out.
-# docs/documentation.md says what a block holds.
+# The template's tools/docs.sh, once per backend as docs_inputs() of tools/project.sh lists them,
+# over src/ and that backend: a \param that names no parameter, a command Doxygen does not know,
+# an entity without a block or a block that leaves something out. docs/documentation.md says
+# what a block holds.
 docs: ## The Doxygen blocks, per backend
-	python3 tools/docs.py
+	tools/docs.sh
 
 # html-validate over both pages as whole documents, and eslint over the scripts inline in them;
 # what each checks and leaves out is in .htmlvalidate.mjs and eslint.config.mjs. The packages

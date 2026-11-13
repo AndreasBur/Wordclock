@@ -118,3 +118,13 @@ cppcheck_flags() {
   echo "--suppressions-list=${ROOT_DIR}/.cppcheck-suppressions"
   echo "--std=c++17"
 }
+
+# Doxygen once per backend, over src/ and the backend's folders: each backend has a Pixels, a
+# System and a Storage of its own, which one run over all of them would merge into one class.
+# The two Arduino backends share the drivers of platform/arduino.
+docs_inputs() {
+  echo "src platform/simulator"
+  echo "src platform/avr-dx"
+  echo "src platform/esp32 platform/arduino"
+  echo "src platform/rp2350 platform/arduino"
+}

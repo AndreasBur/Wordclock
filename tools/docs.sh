@@ -10,7 +10,12 @@
 # is API after all. And a missing \return: a one-line block whose \brief says what comes back,
 # "Returns the number of elements.", needs none, while every parameter needs its \param.
 # Doxygen cannot be told to fail on some warnings and not others, so they go into a log and
-# are sorted here. Doxygen comes from apt, in the Dockerfile and in CI alike, as it is not on
+# are sorted here.
+#
+# A firmware whose backends each define a class of the same name, a Pixels of every board, runs
+# Doxygen once per backend, over the input folders docs_inputs() of tools/project.sh prints, one
+# line a run, each into build/docs/<n>/; one run over all of them would merge the classes into one.
+# A warning of what the runs share, src/, is counted once. Doxygen comes from apt, in the Dockerfile and in CI alike, as it is not on
 # PyPI.
 
 set -euo pipefail
@@ -36,6 +41,34 @@ failing_warnings() {
         { print }'
 }
 
+# Runs Doxygen over the folders given, or over the Doxyfile's INPUT where none are, into the
+# folder given first, and adds its warnings to LOG.
+# Arguments:
+#   the output folder, then the input folders
+run_doxygen() {
+  local out="$1"
+  shift
+  mkdir -p "${out}"
+  {
+    cat Doxyfile
+    echo "OUTPUT_DIRECTORY = ${out}"
+    echo "WARN_LOGFILE = ${out}/doxygen.log"
+    if (($# > 0)); then
+      echo "INPUT = $*"
+    fi
+  } | doxygen -
+  cat "${out}/doxygen.log" >> "${LOG}"
+}
+
+# Prints LOG with each warning once: a warning starts with its path and line, and the lines after
+# it that do not are part of it.
+unique_warnings() {
+  awk '
+    /^[^ \t:][^:]*:[0-9]+: / { if (record != "" && !seen[record]++) print record; record = $0; next }
+    { record = (record == "" ? $0 : record "\n" $0) }
+    END { if (record != "" && !seen[record]++) print record }' "${LOG}"
+}
+
 main() {
   if [[ $# -gt 0 ]]; then
     err "Usage: $0"
@@ -48,7 +81,26 @@ main() {
 
   cd "${ROOT_DIR}"
   mkdir -p "${DOCS_DIR}"
-  doxygen Doxyfile
+  : > "${LOG}"
+  local listed
+  listed="$(docs_inputs)"
+  local where="${DOCS_DIR}/html"
+  if [[ -z "${listed}" ]]; then
+    run_doxygen "${DOCS_DIR}"
+  else
+    local index=0
+    local line
+    local inputs
+    while IFS= read -r line; do
+      index=$((index + 1))
+      read -r -a inputs <<< "${line}"
+      run_doxygen "${DOCS_DIR}/${index}" "${inputs[@]}"
+    done <<< "${listed}"
+    where="${DOCS_DIR}/<n>/html, one for each line of docs_inputs()"
+  fi
+  local unique
+  unique="$(unique_warnings)"
+  printf '%s\n' "${unique}" > "${LOG}"
 
   local all
   all="$(grep -c 'warning:' "${LOG}" || true)"
@@ -57,13 +109,17 @@ main() {
   if [[ -n "${failing}" ]]; then
     echo "${failing}"
   fi
+  # Warnings, not lines: a warning may go on over lines of its own, as the parameters it names.
   local count=0
   if [[ -n "${failing}" ]]; then
-    count="$(wc -l <<< "${failing}")"
+    count="$(grep -c ': warning: ' <<< "${failing}" || true)"
   fi
-  echo "docs.sh: ${count} warnings that fail, $((all - count)) gaps let" \
-    "pass: in ${NAMESPACE}::internal, or a missing return;" \
-    "the reference is in ${DOCS_DIR}/html."
+  local passing="a missing return"
+  if [[ -n "${NAMESPACE}" ]]; then
+    passing="in ${NAMESPACE}::internal, or ${passing}"
+  fi
+  echo "docs.sh: ${count} warnings that fail, $((all - count)) gaps let pass: ${passing};" \
+    "the reference is in ${where}."
   if ((count > 0)); then
     exit 1
   fi

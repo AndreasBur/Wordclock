@@ -2,13 +2,14 @@
 # published: Wordclock is a firmware with no reader of a reference outside its code, and docs/
 # is the project's site. Only what differs from Doxygen's defaults is set.
 #
-# tools/docs.py runs it once per backend and sets INPUT, OUTPUT_DIRECTORY and WARN_LOGFILE for
-# each: the backends have a Pixels, a System and a Storage of their own, which one run would
-# merge into one class. See docs/documentation.md.
+# The template's tools/docs.sh runs it once per line of docs_inputs() in tools/project.sh - once
+# per backend - and sets INPUT, OUTPUT_DIRECTORY and WARN_LOGFILE for each: the backends have a
+# Pixels, a System and a Storage of their own, which one run would merge into one class. See
+# docs/documentation.md.
 
 PROJECT_NAME           = Wordclock
 PROJECT_BRIEF          = "A German word clock"
-OUTPUT_DIRECTORY       = build/doxygen/simulator
+OUTPUT_DIRECTORY       = build/docs
 
 INPUT                  = src platform/simulator
 RECURSIVE              = YES
@@ -31,8 +32,8 @@ GENERATE_LATEX         = NO
 
 QUIET                  = YES
 WARN_IF_UNDOCUMENTED   = YES
-# A parameter without its \param fails, even the only one; docs.py lets a missing \return pass,
+# A parameter without its \param fails, even the only one; docs.sh lets a missing \return pass,
 # which a one-line block whose brief says what comes back needs not have.
 WARN_IF_INCOMPLETE_DOC = YES
 WARN_NO_PARAMDOC       = YES
-WARN_LOGFILE           = build/doxygen/simulator/warnings.log
+WARN_LOGFILE           = build/docs/warnings.log

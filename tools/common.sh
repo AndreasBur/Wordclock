@@ -73,6 +73,10 @@ readonly BUILD_DIR="${ROOT_DIR}/build"
   cppcheck_flags() {
     :
   }
+
+  docs_inputs() {
+    :
+  }
 }
 
 # shellcheck source=tools/project.sh
