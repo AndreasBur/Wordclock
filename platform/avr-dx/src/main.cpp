@@ -24,7 +24,7 @@
 namespace {
 WordclockMain wordclock;
 
-} // namespace
+}  // namespace
 
 /*!
  * \brief Brings the clock up and runs it, one tick every Scheduler::GetTaskIntervalMs()
@@ -39,32 +39,33 @@ WordclockMain wordclock;
  *
  * \return Never: the loop runs until the controller is reset.
  */
-int main()
-{
-    InitRuntime();
+int main() {
+  InitRuntime();
 
-    Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
-    Serial.println(F("Wordclock"));
+  Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
+  Serial.println(F("Wordclock"));
 
-    wordclock.Init();
+  wordclock.Init();
 
-    uint32_t next_tick = millis();
+  uint32_t next_tick = millis();
 
-    for(;;) {
-        // Subtraction rather than a comparison of the two, so that the wrap of the
-        // millisecond counter passes without a tick that never comes due.
-        if(static_cast<int32_t>(millis() - next_tick) < 0) { continue; }
-
-        next_tick += Scheduler::GetTaskIntervalMs();
-
-        wordclock.Task();
-
-        // After the firmware, not from inside its pixel writes: the strip gets whatever the
-        // buffer holds once the whole pass over the tasks is done.
-        Pixels::GetInstance().Render();
-
-        // Last, so a restart asked for by a command takes place once that command's answer
-        // has reached the wire.
-        System::GetInstance().PerformPendingRestart();
+  for (;;) {
+    // Subtraction rather than a comparison of the two, so that the wrap of the
+    // millisecond counter passes without a tick that never comes due.
+    if (static_cast<int32_t>(millis() - next_tick) < 0) {
+      continue;
     }
+
+    next_tick += Scheduler::GetTaskIntervalMs();
+
+    wordclock.Task();
+
+    // After the firmware, not from inside its pixel writes: the strip gets whatever the
+    // buffer holds once the whole pass over the tasks is done.
+    Pixels::GetInstance().Render();
+
+    // Last, so a restart asked for by a command takes place once that command's answer
+    // has reached the wire.
+    System::GetInstance().PerformPendingRestart();
+  }
 }

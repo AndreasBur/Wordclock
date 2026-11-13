@@ -18,6 +18,7 @@
  * ESP32, and for the same reason.
  */
 
+// clang-format off
 // The framework headers come first, ahead of this platform's Arduino.h: that one binds
 // Serial to WordclockSerial, and the macro would otherwise reach into them.
 #include <WiFi.h>
@@ -32,13 +33,14 @@
 #include "WebInterface.h"
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
+// clang-format on
 
 namespace {
 WordclockMain wordclock;
 
 // The tick the whole firmware is timed against: every module's task cycle counts in this
 // unit, so it is read from the scheduler rather than repeated as a number here.
-const uint32_t kTaskIntervalMs{Scheduler::GetTaskIntervalMs()};
+uint32_t const kTaskIntervalMs{Scheduler::GetTaskIntervalMs()};
 uint32_t next_tick_ms{0u};
 
 /*
@@ -47,17 +49,16 @@ uint32_t next_tick_ms{0u};
  * that changes the credentials, and a line printed there would land inside that command's
  * answer.
  */
-void ReportNetwork()
-{
-    char ssid[System::kSsidStringLength]{};
+void ReportNetwork() {
+  char ssid[System::kSsidStringLength]{};
 
-    if(System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
-        Serial.print(F("WiFi: joining "));
-        Serial.println(ssid);
-    } else {
-        Serial.print(F("WiFi: no network configured, console on the access point "));
-        Serial.println(SYSTEM_ACCESS_POINT_SSID);
-    }
+  if (System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
+    Serial.print(F("WiFi: joining "));
+    Serial.println(ssid);
+  } else {
+    Serial.print(F("WiFi: no network configured, console on the access point "));
+    Serial.println(SYSTEM_ACCESS_POINT_SSID);
+  }
 }
 
 /*
@@ -66,24 +67,23 @@ void ReportNetwork()
  * which is the one thing a first bring-up needs to be able to tell apart from a dead
  * strip.
  */
-void ReportProgress()
-{
-    static bool connection_reported{false};
-    static bool time_reported{false};
+void ReportProgress() {
+  static bool connection_reported{false};
+  static bool time_reported{false};
 
-    if(!connection_reported && System::GetInstance().IsNetworkJoined()) {
-        connection_reported = true;
-        // Here rather than in setup(): the server names are resolved when this is called,
-        // so before the link there is nothing to resolve them over.
-        wordclock_time::StartTimeServers();
-        Serial.print(F("WiFi: connected, address "));
-        Serial.println(WiFi.localIP().toString().c_str());
-    }
+  if (!connection_reported && System::GetInstance().IsNetworkJoined()) {
+    connection_reported = true;
+    // Here rather than in setup(): the server names are resolved when this is called,
+    // so before the link there is nothing to resolve them over.
+    wordclock_time::StartTimeServers();
+    Serial.print(F("WiFi: connected, address "));
+    Serial.println(WiFi.localIP().toString().c_str());
+  }
 
-    if(!time_reported && RealTimeClock::IsSystemTimeSet()) {
-        time_reported = true;
-        Serial.println(F("Time: synchronised"));
-    }
+  if (!time_reported && RealTimeClock::IsSystemTimeSet()) {
+    time_reported = true;
+    Serial.println(F("Time: synchronised"));
+  }
 }
 
 /*
@@ -96,17 +96,19 @@ void ReportProgress()
  * The difference is taken as a signed value so that the millisecond counter's wrap, which
  * a clock reaches after seven weeks, passes without a tick that waits for another seven.
  */
-void WaitForNextTick()
-{
-    next_tick_ms += kTaskIntervalMs;
+void WaitForNextTick() {
+  next_tick_ms += kTaskIntervalMs;
 
-    const int32_t remaining_ms = static_cast<int32_t>(next_tick_ms - millis());
+  int32_t const remaining_ms = static_cast<int32_t>(next_tick_ms - millis());
 
-    if(remaining_ms > 0) { delay(static_cast<uint32_t>(remaining_ms)); }
-    else                { next_tick_ms = millis(); }
+  if (remaining_ms > 0) {
+    delay(static_cast<uint32_t>(remaining_ms));
+  } else {
+    next_tick_ms = millis();
+  }
 }
 
-} // namespace
+}  // namespace
 
 /*!
  * \brief Brings the clock up: the serial port, the firmware, the network, the zone rule and the web
@@ -117,34 +119,33 @@ void WaitForNextTick()
  * says on the console which network the clock is joining, or which access point it opened. The
  * time servers are not started here but from loop(), once the link is up; see TimeSync.h.
  */
-void setup()
-{
-    Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
+void setup() {
+  Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
 
-    wordclock.Init();
+  wordclock.Init();
 
-    /*
-     * Which network, and whether there is one at all, is System's answer now: what was
-     * stored over the console, what was compiled in, or - when neither - an access point
-     * of its own, so that the console the credentials are entered through can be reached
-     * without a cable.
-     */
-    System::GetInstance().StartNetwork();
-    ReportNetwork();
-    /*
-     * The zone rule only, which is what makes every conversion in RealTimeClock local time.
-     * The servers cannot follow it here as they do on the ESP32 - see TimeSync.h - so they
-     * are started from the tick, at the moment the link comes up.
-     */
-    wordclock_time::ApplyTimeZone();
-    /*
-     * Before the network is up on purpose: the server listens on whatever address arrives
-     * later, and starting it here keeps the order in setup() the same whether there is a
-     * WiFi or not.
-     */
-    WebInterface::GetInstance().Begin();
+  /*
+   * Which network, and whether there is one at all, is System's answer now: what was
+   * stored over the console, what was compiled in, or - when neither - an access point
+   * of its own, so that the console the credentials are entered through can be reached
+   * without a cable.
+   */
+  System::GetInstance().StartNetwork();
+  ReportNetwork();
+  /*
+   * The zone rule only, which is what makes every conversion in RealTimeClock local time.
+   * The servers cannot follow it here as they do on the ESP32 - see TimeSync.h - so they
+   * are started from the tick, at the moment the link comes up.
+   */
+  wordclock_time::ApplyTimeZone();
+  /*
+   * Before the network is up on purpose: the server listens on whatever address arrives
+   * later, and starting it here keeps the order in setup() the same whether there is a
+   * WiFi or not.
+   */
+  WebInterface::GetInstance().Begin();
 
-    next_tick_ms = millis();
+  next_tick_ms = millis();
 }
 
 /*!
@@ -165,23 +166,22 @@ void setup()
  * The link counts as up when System::IsNetworkJoined() says so, which the access point does not
  * count for: the time servers are started once a network is joined, an entered one included.
  */
-void loop()
-{
-    wordclock.Task();
+void loop() {
+  wordclock.Task();
 
-    // After the firmware, not from inside its pixel writes: the strip gets whatever the
-    // buffer holds once the whole pass over the tasks is done.
-    Pixels::GetInstance().Render();
+  // After the firmware, not from inside its pixel writes: the strip gets whatever the
+  // buffer holds once the whole pass over the tasks is done.
+  Pixels::GetInstance().Render();
 
-    // After the strip, so a watching browser is shown the frame that went out rather than
-    // one the firmware is still assembling.
-    WebInterface::GetInstance().BroadcastFrame();
+  // After the strip, so a watching browser is shown the frame that went out rather than
+  // one the firmware is still assembling.
+  WebInterface::GetInstance().BroadcastFrame();
 
-    ReportProgress();
+  ReportProgress();
 
-    // Last, so a restart asked for by a command takes place once that command's answer has
-    // reached both the wire and the browser.
-    System::GetInstance().PerformPendingRestart();
+  // Last, so a restart asked for by a command takes place once that command's answer has
+  // reached both the wire and the browser.
+  System::GetInstance().PerformPendingRestart();
 
-    WaitForNextTick();
+  WaitForNextTick();
 }

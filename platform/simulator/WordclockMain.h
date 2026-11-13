@@ -18,29 +18,25 @@
  * drives the scheduler. What reaches the display is the DisplayManager's decision, so nothing of
  * that lives here.
  */
-class WordclockMain
-{
-    public:
-        /*!
-         * \brief Starts the firmware: sets the real time clock to the host's local time,
-         *        initialises the power switch and restores the stored settings with Persistence.
-         *
-         * The host's time is read this once; from here the real time clock keeps it.
-         */
-        WordclockMain();
-        /*! \brief Destroys the firmware's runner. */
-        ~WordclockMain();
+class WordclockMain {
+ public:
+  /*!
+   * \brief Starts the firmware: sets the real time clock to the host's local time, initialises the
+   *        power switch and restores the stored settings with Persistence.
+   *
+   * The host's time is read this once; from here the real time clock keeps it.
+   */
+  WordclockMain();
+  /*! \brief Destroys the firmware's runner. */
+  ~WordclockMain();
 
-        /*! \brief Runs one tick: the real time clock's task, then the scheduler's. */
-        void Task();
+  /*! \brief Runs one tick: the real time clock's task, then the scheduler's. */
+  void Task();
 
-    protected:
-
-    private:
-        Scheduler wc_scheduler_;
-        enum {
-            kTimerId = 1500
-        };
+ protected:
+ private:
+  Scheduler wc_scheduler_;
+  enum { kTimerId = 1500 };
 };
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKMAIN_H_

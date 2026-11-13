@@ -38,142 +38,141 @@
  * while the system clock holds no valid year, and is written from the system clock once an hour
  * and after every setting. The chip keeps UTC.
  */
-class RealTimeClock
-{
-  public:
-    /*! \copydoc ClockDateTime::HourType */
-    using HourType = ClockDateTime::HourType;
-    /*! \copydoc ClockDateTime::MinuteType */
-    using MinuteType = ClockDateTime::MinuteType;
-    /*! \copydoc ClockDateTime::SecondType */
-    using SecondType = ClockDateTime::SecondType;
+class RealTimeClock {
+ public:
+  /*! \copydoc ClockDateTime::HourType */
+  using HourType = ClockDateTime::HourType;
+  /*! \copydoc ClockDateTime::MinuteType */
+  using MinuteType = ClockDateTime::MinuteType;
+  /*! \copydoc ClockDateTime::SecondType */
+  using SecondType = ClockDateTime::SecondType;
 
-    /*! \copydoc ClockDateTime::YearType */
-    using YearType = ClockDateTime::YearType;
-    /*! \copydoc ClockDateTime::MonthType */
-    using MonthType = ClockDateTime::MonthType;
-    /*! \copydoc ClockDateTime::DayType */
-    using DayType = ClockDateTime::DayType;
-    /*! \copydoc ClockDateTime::WeekdayType */
-    using WeekdayType = ClockDateTime::WeekdayType;
+  /*! \copydoc ClockDateTime::YearType */
+  using YearType = ClockDateTime::YearType;
+  /*! \copydoc ClockDateTime::MonthType */
+  using MonthType = ClockDateTime::MonthType;
+  /*! \copydoc ClockDateTime::DayType */
+  using DayType = ClockDateTime::DayType;
+  /*! \copydoc ClockDateTime::WeekdayType */
+  using WeekdayType = ClockDateTime::WeekdayType;
 
-  private:
-    // No hour, so the first pass with a system time writes the chip. A byte the hours
-    // cannot reach, rather than a second flag beside it.
-    static constexpr byte kNoHourWritten{0xFFu};
+ private:
+  // No hour, so the first pass with a system time writes the chip. A byte the hours
+  // cannot reach, rather than a second flag beside it.
+  static constexpr byte kNoHourWritten{0xFFu};
 
-    /*
-     * Ticks between two attempts to read the chip, so once a second. This runs from the
-     * application's tick rather than through the scheduler, and a read is two transfers -
-     * trying on every tick would put a hundred of them a second on a bus the light sensor
-     * shares, for a value that only has to arrive before the display is worth looking at.
-     */
-    static constexpr byte kChipReadInterval{100u};
+  /*
+   * Ticks between two attempts to read the chip, so once a second. This runs from the
+   * application's tick rather than through the scheduler, and a read is two transfers -
+   * trying on every tick would put a hundred of them a second on a bus the light sensor
+   * shares, for a value that only has to arrive before the display is worth looking at.
+   */
+  static constexpr byte kChipReadInterval{100u};
 
-    ClockDateTime date_time_;
+  ClockDateTime date_time_;
 
-    /*
-     * An instance of its own, next to the one Temperature keeps. The chip has no state
-     * that two readers could disturb, both open the same bus - which Wire.begin() allows
-     * twice - and sharing one would mean either a singleton the simulator's stand-in would
-     * have to grow too, or the time-keeping side reaching through the core's Temperature,
-     * which knows nothing about time.
-     */
-    DS3231 chip_;
-    byte hour_written_to_chip_{kNoHourWritten};
-    /* Zero, so the first tick without a system time asks the chip straight away. */
-    byte chip_read_countdown_{0u};
+  /*
+   * An instance of its own, next to the one Temperature keeps. The chip has no state
+   * that two readers could disturb, both open the same bus - which Wire.begin() allows
+   * twice - and sharing one would mean either a singleton the simulator's stand-in would
+   * have to grow too, or the time-keeping side reaching through the core's Temperature,
+   * which knows nothing about time.
+   */
+  DS3231 chip_;
+  byte hour_written_to_chip_{kNoHourWritten};
+  /* Zero, so the first tick without a system time asks the chip straight away. */
+  byte chip_read_countdown_{0u};
 
-    RealTimeClock() {}
-    ~RealTimeClock() = default;
+  RealTimeClock() {}
+  ~RealTimeClock() = default;
 
-    static bool ReadSystemDateTime(ClockDateTime& value);
-    static StdReturnType WriteSystemDateTime(const ClockDateTime& value);
+  static bool ReadSystemDateTime(ClockDateTime& value);
+  static StdReturnType WriteSystemDateTime(ClockDateTime const& value);
 
-    StdReturnType ReadChip();
-    void WriteChip();
+  StdReturnType ReadChip();
+  void WriteChip();
 
-  public:
-    /*! \brief Returns the one clock. */
-    static RealTimeClock& GetInstance() {
-        static RealTimeClock singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one clock. */
+  static RealTimeClock& GetInstance() {
+    static RealTimeClock singleton_instance;
+    return singleton_instance;
+  }
 
-    /*! \brief Returns the date and time. */
-    ClockDateTime GetDateTime() const { return date_time_; }
+  /*! \brief Returns the date and time. */
+  ClockDateTime GetDateTime() const { return date_time_; }
 
-    /*! \brief Returns the time of day. */
-    ClockTime GetTime() const { return date_time_.GetTime(); }
+  /*! \brief Returns the time of day. */
+  ClockTime GetTime() const { return date_time_.GetTime(); }
 
-    /*! \brief Returns the date. */
-    ClockDate GetDate() const { return date_time_.GetDate(); }
+  /*! \brief Returns the date. */
+  ClockDate GetDate() const { return date_time_.GetDate(); }
 
-    /*!
-     * \brief Returns whether the system clock holds a date yet: one whose year ClockDate accepts.
-     *
-     * The system clock is set by SNTP, by a setter here, or by Task() from the chip. Until it is,
-     * Task() leaves the date and time as they were rather than handing the display the epoch,
-     * which ClockDate would reject anyway.
-     *
-     * Asked as "is the year one ClockDate accepts" rather than by querying SNTP: that answers the
-     * question the firmware actually has, and it stays true for a time that arrived from a command
-     * or from the chip instead of the net.
-     *
-     * \return True once the system clock holds such a date.
-     */
-    static bool IsSystemTimeSet();
+  /*!
+   * \brief Returns whether the system clock holds a date yet: one whose year ClockDate accepts.
+   *
+   * The system clock is set by SNTP, by a setter here, or by Task() from the chip. Until it is,
+   * Task() leaves the date and time as they were rather than handing the display the epoch,
+   * which ClockDate would reject anyway.
+   *
+   * Asked as "is the year one ClockDate accepts" rather than by querying SNTP: that answers the
+   * question the firmware actually has, and it stays true for a time that arrived from a command
+   * or from the chip instead of the net.
+   *
+   * \return True once the system clock holds such a date.
+   */
+  static bool IsSystemTimeSet();
 
-    /*!
-     * \brief Sets the date and time.
-     *
-     * It keeps them at once and writes them to the system clock as local time, through the zone
-     * rule, ignoring whether the system clock took them; the next Task() that finds the system clock
-     * set writes the chip as well. Written through rather than just stored: Task() reads the system
-     * clock back on the very next tick, so a value kept only here would be overwritten within 10 ms
-     * and the time command would look like it did nothing.
-     *
-     * \param[in] date_time The date and time.
-     */
-    void SetDateTime(ClockDateTime date_time);
+  /*!
+   * \brief Sets the date and time.
+   *
+   * It keeps them at once and writes them to the system clock as local time, through the zone
+   * rule, ignoring whether the system clock took them; the next Task() that finds the system clock
+   * set writes the chip as well. Written through rather than just stored: Task() reads the system
+   * clock back on the very next tick, so a value kept only here would be overwritten within 10 ms
+   * and the time command would look like it did nothing.
+   *
+   * \param[in] date_time The date and time.
+   */
+  void SetDateTime(ClockDateTime date_time);
 
-    /*!
-     * \brief Sets the time of day, and keeps the date.
-     *
-     * It writes the date it holds and the new time to the system clock, as
-     * SetDateTime() does, and has the next Task() write the chip.
-     *
-     * \param[in] time The time of day.
-     */
-    void SetTime(ClockTime time);
+  /*!
+   * \brief Sets the time of day, and keeps the date.
+   *
+   * It writes the date it holds and the new time to the system clock, as
+   * SetDateTime() does, and has the next Task() write the chip.
+   *
+   * \param[in] time The time of day.
+   */
+  void SetTime(ClockTime time);
 
-    /*!
-     * \brief Sets the date, and keeps the time of day.
-     *
-     * It writes the new date and the time it holds to the system clock, as
-     * SetDateTime() does, and has the next Task() write the chip.
-     *
-     * \param[in] date The date.
-     */
-    void SetDate(ClockDate date);
+  /*!
+   * \brief Sets the date, and keeps the time of day.
+   *
+   * It writes the new date and the time it holds to the system clock, as
+   * SetDateTime() does, and has the next Task() write the chip.
+   *
+   * \param[in] date The date.
+   */
+  void SetDate(ClockDate date);
 
-    /*!
-     * \brief Brings the date and time up to date.
-     *
-     * It takes them from the system clock, as local time, while the system clock holds a valid
-     * year, and then writes the chip in UTC when the hour differs from the one it last wrote, or
-     * after a setting. Nothing is counted forward here, unlike on the simulator: SNTP
-     * keeps the system clock right on its own, so counting would only add a second source of truth
-     * that drifts away from it.
-     *
-     * While the system clock holds no valid year it leaves the date and time as they were and tries
-     * the chip instead, on its first such call and then about once a second. A chip that answers
-     * sets the system clock, which the next call then reads. The clock chip is the source of last
-     * resort rather than a second one: it is read only while the system clock holds nothing. Which
-     * way round matters - the chip drifts a few seconds a month and SNTP does not, so a chip that
-     * could overwrite a synchronised clock would make the clock worse.
-     */
-    void Task();
+  /*!
+   * \brief Brings the date and time up to date.
+   *
+   * It takes them from the system clock, as local time, while the system clock holds a valid
+   * year, and then writes the chip in UTC when the hour differs from the one it last wrote, or
+   * after a setting. Nothing is counted forward here, unlike on the simulator: SNTP
+   * keeps the system clock right on its own, so counting would only add a second source of truth
+   * that drifts away from it.
+   *
+   * While the system clock holds no valid year it leaves the date and time as they were and tries
+   * the chip instead, on its first such call and then about once a second. A chip that answers
+   * sets the system clock, which the next call then reads. The clock chip is the source of last
+   * resort rather than a second one: it is read only while the system clock holds nothing. Which
+   * way round matters - the chip drifts a few seconds a month and SNTP does not, so a chip that
+   * could overwrite a synchronised clock would make the clock worse.
+   */
+  void Task();
 };
 
 #endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_REALTIMECLOCK_H_

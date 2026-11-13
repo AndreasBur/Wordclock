@@ -18,6 +18,6 @@
  *
  * The same rate the other backends' consoles run at, so one terminal setting fits all three.
  */
-#define WORDCLOCK_SERIAL_BAUDRATE                       115200uL
+#define WORDCLOCK_SERIAL_BAUDRATE 115200uL
 
 #endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKCONFIGURATION_H_

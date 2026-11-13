@@ -41,10 +41,10 @@
  *
  * USART1 on PC0/PC1, because USART0 drives the LED strip - see WS2812.h.
  */
-#define ARDUINO_SERIAL_USART                            USART1
+#define ARDUINO_SERIAL_USART USART1
 /*! \brief The port of the console's pins. */
-#define ARDUINO_SERIAL_PORT                             PORTC
-#define ARDUINO_SERIAL_PIN_TXD                          0u /*!< The pin of TXD, PC0. */
+#define ARDUINO_SERIAL_PORT PORTC
+#define ARDUINO_SERIAL_PIN_TXD 0u /*!< The pin of TXD, PC0. */
 
 /*!
  * \brief The size of the transmit queue in characters, a power of two; it holds one less.
@@ -53,7 +53,7 @@
  * it, so they are queued rather than waited on; the longest the command set produces is the help
  * text, and this is comfortably above it.
  */
-#define ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE             256u
+#define ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE 256u
 /*!
  * \brief The size of the receive queue in characters, a power of two; it holds one less.
  *
@@ -61,7 +61,7 @@
  * polled every tenth tick, which at 115200 baud is far more than the hardware's own two bytes of
  * headroom - so the receiver has to buffer or it drops what was typed.
  */
-#define ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE              128u
+#define ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE 128u
 
 /*!
  * \brief The type of a string in flash, as Arduino's.
@@ -79,7 +79,7 @@ class __FlashStringHelper;  // NOLINT(bugprone-reserved-identifier): the Arduino
  *
  * \param[in] String The string literal.
  */
-#define F(String)               (reinterpret_cast<const __FlashStringHelper*>(PSTR(String)))
+#define F(String) (reinterpret_cast<const __FlashStringHelper*>(PSTR(String)))
 
 #ifndef bitRead
 /*!
@@ -88,7 +88,7 @@ class __FlashStringHelper;  // NOLINT(bugprone-reserved-identifier): the Arduino
  * \param[in] value The value.
  * \param[in] bit The number of the bit, counted from 0 at the least significant one.
  */
-#define bitRead(value, bit)     (((value) >> (bit)) & 0x01u) // NOLINT(readability-identifier-naming)
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01u)  // NOLINT(readability-identifier-naming)
 #endif
 
 /*!
@@ -96,14 +96,14 @@ class __FlashStringHelper;  // NOLINT(bugprone-reserved-identifier): the Arduino
  *
  * On Arduino, Serial is an object of the core; here it is a macro for SerialPort::GetInstance().
  */
-#define Serial                  SerialPort::GetInstance() // NOLINT(readability-identifier-naming)
+#define Serial SerialPort::GetInstance()  // NOLINT(readability-identifier-naming)
 
 // Here and below, a NOLINT keeps a name the Arduino core gives it: the firmware is written
 // against that API, and these are its stand-ins.
 /*! \brief An unsigned 8-bit number, as Arduino's byte. */
-using byte = uint8_t; // NOLINT(readability-identifier-naming)
+using byte = uint8_t;  // NOLINT(readability-identifier-naming)
 /*! \brief A truth value, as Arduino's boolean. */
-using boolean = bool; // NOLINT(readability-identifier-naming)
+using boolean = bool;  // NOLINT(readability-identifier-naming)
 
 /*!
  * \brief Brings the clock and the millisecond time base up, and enables interrupts.
@@ -131,7 +131,7 @@ void InitRuntime();
  * as long as it is read more often than that. The counter is read with interrupts off, which are
  * then restored to as they were.
  */
-uint32_t millis(); // NOLINT(readability-identifier-naming)
+uint32_t millis();  // NOLINT(readability-identifier-naming)
 
 /*!
  * \brief The serial console on USART1, with the functions of Arduino's Serial that the firmware
@@ -152,137 +152,152 @@ uint32_t millis(); // NOLINT(readability-identifier-naming)
  * \warning print() from an interrupt handler, or with interrupts off, never returns once the
  *          transmit queue is full: the handler that empties it cannot run.
  */
-class SerialPort
-{
-  private:
-    static constexpr uint16_t kTransmitBufferSize{ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE};
-    static constexpr uint16_t kReceiveBufferSize{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE};
+class SerialPort {
+ private:
+  static constexpr uint16_t kTransmitBufferSize{ARDUINO_SERIAL_TRANSMIT_BUFFER_SIZE};
+  static constexpr uint16_t kReceiveBufferSize{ARDUINO_SERIAL_RECEIVE_BUFFER_SIZE};
 
-    // Long enough for the widest number any overload below prints, plus sign and
-    // terminator.
-    static constexpr byte kNumberStringLength{12u};
+  // Long enough for the widest number any overload below prints, plus sign and
+  // terminator.
+  static constexpr byte kNumberStringLength{12u};
 
-    SerialPort() { }
-    ~SerialPort() = default;
+  SerialPort() {}
+  ~SerialPort() = default;
 
-    /*
-     * Reads no member, and is still not static: made static it cost 72 bytes of flash, as
-     * GCC then compiles it and the print() overloads built on it differently. The check is
-     * answered where it is defined, in Arduino.cpp.
-     */
-    void write(char character); // NOLINT(readability-identifier-naming)
-    void PrintNumber(int32_t number);
-    void PrintUnsignedNumber(uint32_t number);
+  /*
+   * Reads no member, and is still not static: made static it cost 72 bytes of flash, as
+   * GCC then compiles it and the print() overloads built on it differently. The check is
+   * answered where it is defined, in Arduino.cpp.
+   */
+  void write(char character);  // NOLINT(readability-identifier-naming)
+  void PrintNumber(int32_t number);
+  void PrintUnsignedNumber(uint32_t number);
 
-  public:
-    /*! \brief Returns the one serial port, which Serial names. */
-    static SerialPort& GetInstance() {
-        static SerialPort singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one serial port, which Serial names. */
+  static SerialPort& GetInstance() {
+    static SerialPort singleton_instance;
+    return singleton_instance;
+  }
 
-    /*!
-     * \brief Opens the port at `baudrate`, with 8 data bits, no parity and 1 stop bit, as Arduino's
-     *        begin().
-     *
-     * It makes TXD an output, sets the baud rate to the nearest step of the baud register, and
-     * enables the transmitter, the receiver and the receive interrupt.
-     *
-     * \param[in] baudrate The baud rate. Nothing checks it: one too low for the 16 bits of the baud
-     *                     register, below 1465 at 24 MHz, wraps.
-     */
-    void begin(uint32_t baudrate); // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Opens the port at `baudrate`, with 8 data bits, no parity and 1 stop bit, as Arduino's
+   *        begin().
+   *
+   * It makes TXD an output, sets the baud rate to the nearest step of the baud register, and
+   * enables the transmitter, the receiver and the receive interrupt.
+   *
+   * \param[in] baudrate The baud rate. Nothing checks it: one too low for the 16 bits of the baud
+   *                     register, below 1465 at 24 MHz, wraps.
+   */
+  void begin(uint32_t baudrate);  // NOLINT(readability-identifier-naming)
 
-    /*!
-     * \brief Queues a string that lives in flash, as F() makes one.
-     *
-     * The whole point of F(): read byte by byte out of program memory, so the literal never
-     * occupies RAM. Every fixed word the command answers are built from goes through here.
-     *
-     * \param[in] text The string, or `nullptr`, which prints nothing.
-     */
-    void print(const __FlashStringHelper* text); // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues a string in RAM, up to its terminator.
-     *
-     * \param[in] text The string, or `nullptr`, which prints nothing.
-     */
-    void print(const char* text); // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues one character.
-     *
-     * \param[in] character The character.
-     */
-    void print(char character) { write(character); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues `number` in decimal, with a minus sign if it is negative.
-     *
-     * \param[in] number The number.
-     */
-    void print(int number) { PrintNumber(number); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues `number` in decimal.
-     *
-     * \param[in] number The number.
-     */
-    void print(unsigned int number) { PrintUnsignedNumber(number); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues `number` in decimal, with a minus sign if it is negative.
-     *
-     * \param[in] number The number.
-     */
-    void print(long number) { PrintNumber(number); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues `number` in decimal.
-     *
-     * \param[in] number The number.
-     */
-    void print(unsigned long number) { PrintUnsignedNumber(number); } // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues a string that lives in flash, as F() makes one.
+   *
+   * The whole point of F(): read byte by byte out of program memory, so the literal never
+   * occupies RAM. Every fixed word the command answers are built from goes through here.
+   *
+   * \param[in] text The string, or `nullptr`, which prints nothing.
+   */
+  void print(__FlashStringHelper const* text);  // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues a string in RAM, up to its terminator.
+   *
+   * \param[in] text The string, or `nullptr`, which prints nothing.
+   */
+  void print(char const* text);  // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues one character.
+   *
+   * \param[in] character The character.
+   */
+  void print(char character) { write(character); }  // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues `number` in decimal, with a minus sign if it is negative.
+   *
+   * \param[in] number The number.
+   */
+  void print(int number) { PrintNumber(number); }  // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues `number` in decimal.
+   *
+   * \param[in] number The number.
+   */
+  void print(unsigned int number) {  // NOLINT(readability-identifier-naming)
+    PrintUnsignedNumber(number);
+  }
+  /*!
+   * \brief Queues `number` in decimal, with a minus sign if it is negative.
+   *
+   * \param[in] number The number.
+   */
+  void print(long number) { PrintNumber(number); }  // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Queues `number` in decimal.
+   *
+   * \param[in] number The number.
+   */
+  void print(unsigned long number) {  // NOLINT(readability-identifier-naming)
+    PrintUnsignedNumber(number);
+  }
 
-    /*! \brief Queues the end of a line: a carriage return and a line feed. */
-    void println() { write('\r'); write('\n'); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues a string that lives in flash, then the end of a line.
-     *
-     * \param[in] text The string, or `nullptr`, which prints the end of the line alone.
-     */
-    void println(const __FlashStringHelper* text) { print(text); println(); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues a string in RAM, then the end of a line.
-     *
-     * \param[in] text The string, or `nullptr`, which prints the end of the line alone.
-     */
-    void println(const char* text) { print(text); println(); } // NOLINT(readability-identifier-naming)
-    /*!
-     * \brief Queues `number` in decimal, then the end of a line.
-     *
-     * \param[in] number The number.
-     */
-    void println(int number) { print(number); println(); } // NOLINT(readability-identifier-naming)
+  /*! \brief Queues the end of a line: a carriage return and a line feed. */
+  void println() {  // NOLINT(readability-identifier-naming)
+    write('\r');
+    write('\n');
+  }
+  /*!
+   * \brief Queues a string that lives in flash, then the end of a line.
+   *
+   * \param[in] text The string, or `nullptr`, which prints the end of the line alone.
+   */
+  void println(__FlashStringHelper const* text) {  // NOLINT(readability-identifier-naming)
+    print(text);
+    println();
+  }
+  /*!
+   * \brief Queues a string in RAM, then the end of a line.
+   *
+   * \param[in] text The string, or `nullptr`, which prints the end of the line alone.
+   */
+  void println(char const* text) {  // NOLINT(readability-identifier-naming)
+    print(text);
+    println();
+  }
+  /*!
+   * \brief Queues `number` in decimal, then the end of a line.
+   *
+   * \param[in] number The number.
+   */
+  void println(int number) {  // NOLINT(readability-identifier-naming)
+    print(number);
+    println();
+  }
 
-    /*! \brief Returns whether a received character is waiting to be read. */
-    bool available() const; // NOLINT(readability-identifier-naming)
+  /*! \brief Returns whether a received character is waiting to be read. */
+  bool available() const;  // NOLINT(readability-identifier-naming)
 
-    /*!
-     * \brief Takes the next character out of the receive queue.
-     *
-     * \return The character, or a null character when there is nothing queued. That is what the
-     *         core's reader treats as "nothing there" - it asks available() first, so this only has
-     *         to be defined, not meaningful.
-     */
-    char read(); // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Takes the next character out of the receive queue.
+   *
+   * \return The character, or a null character when there is nothing queued. That is what the
+   *         core's reader treats as "nothing there" - it asks available() first, so this only has
+   *         to be defined, not meaningful.
+   */
+  char read();  // NOLINT(readability-identifier-naming)
 
-    /*!
-     * \brief Waits until the queue has reached the wire.
-     *
-     * Only for the paths that are about to stop the processor - a restart otherwise cuts its own
-     * answer off mid-sentence. It waits for the queue to empty, then for the USART's transmit
-     * complete flag `TXCIF`, which the transmit handler clears before every character, so that it
-     * is set once the last one has left the shift register. With nothing sent yet, it returns at
-     * once.
-     *
-     */
-    void flush(); // NOLINT(readability-identifier-naming)
+  /*!
+   * \brief Waits until the queue has reached the wire.
+   *
+   * Only for the paths that are about to stop the processor - a restart otherwise cuts its own
+   * answer off mid-sentence. It waits for the queue to empty, then for the USART's transmit
+   * complete flag `TXCIF`, which the transmit handler clears before every character, so that it
+   * is set once the last one has left the shift register. With nothing sent yet, it returns at
+   * once.
+   *
+   */
+  void flush();  // NOLINT(readability-identifier-naming)
 };
 
 #endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_ARDUINO_H_

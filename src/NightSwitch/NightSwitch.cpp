@@ -20,28 +20,33 @@
  * keeps its current because on that board it cannot do otherwise - which is the same
  * answer the procedures give, rather than a night that quietly does less than it says.
  */
-void NightSwitch::CutSupplyForTheNight()
-{
-    if constexpr (!Power::IsSwitchFitted()) { Display::GetInstance().Disable(); return; }
+void NightSwitch::CutSupplyForTheNight() {
+  if constexpr (!Power::IsSwitchFitted()) {
+    Display::GetInstance().Disable();
+    return;
+  }
 
-    Power::GetInstance().SwitchSupplyOff();
-    supply_cut_for_night_ = true;
+  Power::GetInstance().SwitchSupplyOff();
+  supply_cut_for_night_ = true;
 }
 
 // Ahead of the enable and not after it, because the rail has to be up before a frame
 // goes out - Power keeps the data line gated until it is, and releases it a tick later.
-void NightSwitch::RestoreSupplyAfterTheNight()
-{
-    if(!supply_cut_for_night_) { return; }
+void NightSwitch::RestoreSupplyAfterTheNight() {
+  if (!supply_cut_for_night_) {
+    return;
+  }
 
-    Power::GetInstance().SwitchSupplyOn();
-    supply_cut_for_night_ = false;
+  Power::GetInstance().SwitchSupplyOn();
+  supply_cut_for_night_ = false;
 }
 
-void NightSwitch::ApplyNight()
-{
-    if(IsDisplayOffAtNight(night_brightness_)) { CutSupplyForTheNight(); }
-    else                                     { Display::GetInstance().SetBrightnessNightLevel(night_brightness_); }
+void NightSwitch::ApplyNight() {
+  if (IsDisplayOffAtNight(night_brightness_)) {
+    CutSupplyForTheNight();
+  } else {
+    Display::GetInstance().SetBrightnessNightLevel(night_brightness_);
+  }
 }
 
 /*
@@ -49,11 +54,10 @@ void NightSwitch::ApplyNight()
  * been changed while the window was open, and then the morning has to put back
  * whichever of the two the evening happened to use.
  */
-void NightSwitch::ApplyDay()
-{
-    Display::GetInstance().ClearBrightnessNight();
-    RestoreSupplyAfterTheNight();
-    Display::GetInstance().Enable();
+void NightSwitch::ApplyDay() {
+  Display::GetInstance().ClearBrightnessNight();
+  RestoreSupplyAfterTheNight();
+  Display::GetInstance().Enable();
 }
 
 /*
@@ -68,49 +72,58 @@ void NightSwitch::ApplyDay()
  * its rail until the window's next edge, for the same reason the rest of this module acts
  * on crossings: a clock that undid what a hand just did would read as a fault.
  */
-void NightSwitch::FollowTheDisplayBackOn()
-{
-    if(!supply_cut_for_night_) { return; }
-    if(!Display::GetInstance().IsEnabled()) { return; }
+void NightSwitch::FollowTheDisplayBackOn() {
+  if (!supply_cut_for_night_) {
+    return;
+  }
+  if (!Display::GetInstance().IsEnabled()) {
+    return;
+  }
 
-    RestoreSupplyAfterTheNight();
+  RestoreSupplyAfterTheNight();
 }
 
-bool NightSwitch::IsNight() const
-{
-    const ClockTime now = RealTimeClock::GetInstance().GetTime();
+bool NightSwitch::IsNight() const {
+  ClockTime const now = RealTimeClock::GetInstance().GetTime();
 
-    return IsWithinWindow(ToTimeOfDay(now.GetHour(), now.GetMinute()),
-                          ToTimeOfDay(start_hour_, start_minute_),
-                          ToTimeOfDay(end_hour_, end_minute_));
+  return IsWithinWindow(ToTimeOfDay(now.GetHour(), now.GetMinute()),
+                        ToTimeOfDay(start_hour_, start_minute_),
+                        ToTimeOfDay(end_hour_, end_minute_));
 }
 
-void NightSwitch::SetIsActive(bool is_active)
-{
-    is_active_ = is_active;
-    if(!is_active_) { ApplyDay(); }
-    was_night_ = false;
+void NightSwitch::SetIsActive(bool is_active) {
+  is_active_ = is_active;
+  if (!is_active_) {
+    ApplyDay();
+  }
+  was_night_ = false;
 }
 
-void NightSwitch::ResetToDefaults()
-{
-    SetIsActive(kIsActiveInitValue);
-    start_hour_ = kStartHourInitValue;
-    start_minute_ = kStartMinuteInitValue;
-    end_hour_ = kEndHourInitValue;
-    end_minute_ = kEndMinuteInitValue;
-    night_brightness_ = kNightBrightnessInitValue;
+void NightSwitch::ResetToDefaults() {
+  SetIsActive(kIsActiveInitValue);
+  start_hour_ = kStartHourInitValue;
+  start_minute_ = kStartMinuteInitValue;
+  end_hour_ = kEndHourInitValue;
+  end_minute_ = kEndMinuteInitValue;
+  night_brightness_ = kNightBrightnessInitValue;
 }
 
-void NightSwitch::Task()
-{
-    if(!is_active_) { return; }
+void NightSwitch::Task() {
+  if (!is_active_) {
+    return;
+  }
 
-    const bool is_night_now = IsNight();
+  bool const is_night_now = IsNight();
 
-    if(is_night_now == was_night_) { FollowTheDisplayBackOn(); return; }
-    was_night_ = is_night_now;
+  if (is_night_now == was_night_) {
+    FollowTheDisplayBackOn();
+    return;
+  }
+  was_night_ = is_night_now;
 
-    if(is_night_now) { ApplyNight(); }
-    else           { ApplyDay(); }
+  if (is_night_now) {
+    ApplyNight();
+  } else {
+    ApplyDay();
+  }
 }

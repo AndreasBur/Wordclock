@@ -24,7 +24,7 @@
  * A build that wants to say more - a branch, a commit - overrides it from the outside rather than
  * editing this line.
  */
-# define WORDCLOCK_VERSION                              "0.1.0"
+#define WORDCLOCK_VERSION "0.1.0"
 #endif
 
 #endif  // WORDCLOCK_SRC_VERSION_VERSION_H_

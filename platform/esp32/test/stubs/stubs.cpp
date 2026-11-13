@@ -21,4 +21,4 @@ MDNSStub MDNS;
 WiFiStub WiFi;
 
 TickType_t xTaskGetTickCount() { return 0; }
-void vTaskDelayUntil(TickType_t*, TickType_t) { }
+void vTaskDelayUntil(TickType_t*, TickType_t) {}

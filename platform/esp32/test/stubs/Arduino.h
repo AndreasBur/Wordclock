@@ -17,8 +17,8 @@ typedef bool boolean;
 #define PROGMEM
 #define F(x) reinterpret_cast<const __FlashStringHelper*>(x)
 #define pgm_read_byte(x) (*(x))
-#define memcpy_P(x,y,z) memcpy((x),(y),(z))
-#define bitRead(v,b) (((v) >> (b)) & 0x01)
+#define memcpy_P(x, y, z) memcpy((x), (y), (z))
+#define bitRead(v, b) (((v) >> (b)) & 0x01)
 #define SDA 8
 #define SCL 9
 /*
@@ -33,17 +33,25 @@ void pinMode(uint8_t, uint8_t);
 void digitalWrite(uint8_t, uint8_t);
 class __FlashStringHelper;
 char* itoa(int, char*, int);
-void configTzTime(const char*, const char*, const char* = nullptr);
+void configTzTime(char const*, char const*, char const* = nullptr);
 
 /* The test drives Incoming and inspects Written. */
 struct Stream {
-    std::string Incoming;
-    std::string Written;
-    void begin(unsigned long) {}
-    int available() { return static_cast<int>(Incoming.size()); }
-    int read() { if(Incoming.empty()) return -1; int c = static_cast<unsigned char>(Incoming[0]); Incoming.erase(0,1); return c; }
-    size_t write(uint8_t b) { Written.push_back(static_cast<char>(b)); return 1; }
-    void flush() {}
+  std::string Incoming;
+  std::string Written;
+  void begin(unsigned long) {}
+  int available() { return static_cast<int>(Incoming.size()); }
+  int read() {
+    if (Incoming.empty()) return -1;
+    int c = static_cast<unsigned char>(Incoming[0]);
+    Incoming.erase(0, 1);
+    return c;
+  }
+  size_t write(uint8_t b) {
+    Written.push_back(static_cast<char>(b));
+    return 1;
+  }
+  void flush() {}
 };
 
 /*
@@ -53,9 +61,9 @@ struct Stream {
  * deferred and not done in the handler.
  */
 struct EspClass {
-    bool Restarted{false};
-    uint32_t getFreeHeap() { return 0u; }
-    void restart() { Restarted = true; }
+  bool Restarted{false};
+  uint32_t getFreeHeap() { return 0u; }
+  void restart() { Restarted = true; }
 };
 extern EspClass ESP;
 

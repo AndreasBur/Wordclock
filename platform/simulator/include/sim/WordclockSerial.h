@@ -25,7 +25,7 @@
  * Room for one answer, the same number the two networked backends use. What reads it is the web
  * front end, which sizes the buffer it widens a line into by it.
  */
-#define WORDCLOCK_SERIAL_LINE_LENGTH                    160u
+#define WORDCLOCK_SERIAL_LINE_LENGTH 160u
 
 /*!
  * \brief The port the web front end reaches by this name: here SerialShim, the port Serial is bound

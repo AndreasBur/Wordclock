@@ -9,7 +9,8 @@
 #include "Arduino.h"
 
 #ifndef WORDCLOCK_ARDUINO_SHIM
-# error "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/esp32/include ahead of the framework on the include path, or the web console will be silently mute."
+#error \
+    "WordclockSerial: the core's Arduino.h was included instead of this platform's. Put platform/esp32/include ahead of the framework on the include path, or the web console will be silently mute."
 #endif
 
 #include <stdio.h>
@@ -23,134 +24,135 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-void WordclockSerial::begin(unsigned long baud_rate)
-{
-    wordclock_platform::HardwarePortBegin(baud_rate);
+void WordclockSerial::begin(unsigned long baud_rate) {
+  wordclock_platform::HardwarePortBegin(baud_rate);
 }
 
 // Written by the producer only, which is what keeps this free of a lock - see the note on
 // the indices in the header.
-StdReturnType WordclockSerial::Inject(const char* characters, size_t length)
-{
-    if((characters == nullptr) || (length == 0u)) { return kENotOk; }
+StdReturnType WordclockSerial::Inject(char const* characters, size_t length) {
+  if ((characters == nullptr) || (length == 0u)) {
+    return kENotOk;
+  }
 
-    size_t head = inject_head_.load(std::memory_order_relaxed);
+  size_t head = inject_head_.load(std::memory_order_relaxed);
 
-    for(size_t index = 0u; index < length; index++) {
-        const size_t next = NextIndex(head);
+  for (size_t index = 0u; index < length; index++) {
+    size_t const next = NextIndex(head);
 
-        /* One slot stays empty, which is what tells a full buffer from an empty one. */
-        if(next == inject_tail_.load(std::memory_order_acquire)) { return kENotOk; }
-
-        inject_buffer_[head] = characters[index];
-        head = next;
-        // Published after the character, so the reader cannot see the index move ahead of
-        // the data it points at.
-        inject_head_.store(head, std::memory_order_release);
+    /* One slot stays empty, which is what tells a full buffer from an empty one. */
+    if (next == inject_tail_.load(std::memory_order_acquire)) {
+      return kENotOk;
     }
 
-    return kEOk;
+    inject_buffer_[head] = characters[index];
+    head = next;
+    // Published after the character, so the reader cannot see the index move ahead of
+    // the data it points at.
+    inject_head_.store(head, std::memory_order_release);
+  }
+
+  return kEOk;
 }
 
-int WordclockSerial::available() const
-{
-    const int from_port = wordclock_platform::HardwarePort().available();
+int WordclockSerial::available() const {
+  int const from_port = wordclock_platform::HardwarePort().available();
 
-    if(from_port > 0) { return from_port; }
+  if (from_port > 0) {
+    return from_port;
+  }
 
-    return IsInjectEmpty() ? 0 : 1;
+  return IsInjectEmpty() ? 0 : 1;
 }
 
-int WordclockSerial::read()
-{
-    Stream& port = wordclock_platform::HardwarePort();
+int WordclockSerial::read() {
+  Stream& port = wordclock_platform::HardwarePort();
 
-    if(port.available() > 0) { return port.read(); }
-    if(!IsInjectEmpty()) { return static_cast<unsigned char>(ReadInjected()); }
+  if (port.available() > 0) {
+    return port.read();
+  }
+  if (!IsInjectEmpty()) {
+    return static_cast<unsigned char>(ReadInjected());
+  }
 
-    return -1;
+  return -1;
 }
 
-void WordclockSerial::print(const char* text)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    if(text == nullptr) { return; }
+void WordclockSerial::print(char const* text) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  if (text == nullptr) {
+    return;
+  }
 
-    for(const char* character = text; *character != '\0'; character++) { print(*character); }
+  for (char const* character = text; *character != '\0'; character++) {
+    print(*character);
+  }
 }
 
-void WordclockSerial::print(const __FlashStringHelper* text)
-{
-    // On this target flash is read through the same address space, so what F() wrapped can
-    // be read as an ordinary string.
-    print(reinterpret_cast<const char*>(text));
+void WordclockSerial::print(__FlashStringHelper const* text) {
+  // On this target flash is read through the same address space, so what F() wrapped can
+  // be read as an ordinary string.
+  print(reinterpret_cast<char const*>(text));
 }
 
-void WordclockSerial::print(int number)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    char digits[12]{};
+void WordclockSerial::print(int number) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  char digits[12]{};
 
-    /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
-    (void)snprintf(digits, sizeof(digits), "%d", number);
-    print(digits);
+  /* Ten digits and a sign are the most an int can print to; nothing to truncate. */
+  (void)snprintf(digits, sizeof(digits), "%d", number);
+  print(digits);
 }
 
-void WordclockSerial::print(char character)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    if(character == '\n') { println(); return; }
-
-    wordclock_platform::HardwarePort().write(static_cast<uint8_t>(character));
-    AppendToLine(character);
-}
-
-void WordclockSerial::println()
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\r'));
-    wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\n'));
-
-    FlushLine();
-}
-
-void WordclockSerial::println(const char* text)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    print(text);
+void WordclockSerial::print(char character) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  if (character == '\n') {
     println();
+    return;
+  }
+
+  wordclock_platform::HardwarePort().write(static_cast<uint8_t>(character));
+  AppendToLine(character);
 }
 
-void WordclockSerial::println(int number)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    print(number);
-    println();
+void WordclockSerial::println() {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\r'));
+  wordclock_platform::HardwarePort().write(static_cast<uint8_t>('\n'));
+
+  FlushLine();
 }
 
-void WordclockSerial::println(const __FlashStringHelper* text)
-{
-    const std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-    print(text);
-    println();
+void WordclockSerial::println(char const* text) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  print(text);
+  println();
 }
 
-void WordclockSerial::flush()
-{
-    wordclock_platform::HardwarePort().flush();
+void WordclockSerial::println(int number) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  print(number);
+  println();
 }
+
+void WordclockSerial::println(__FlashStringHelper const* text) {
+  std::lock_guard<std::recursive_mutex> const lock(output_mutex_);
+  print(text);
+  println();
+}
+
+void WordclockSerial::flush() { wordclock_platform::HardwarePort().flush(); }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-char WordclockSerial::ReadInjected()
-{
-    const size_t tail = inject_tail_.load(std::memory_order_relaxed);
-    const char character = inject_buffer_[tail];
+char WordclockSerial::ReadInjected() {
+  size_t const tail = inject_tail_.load(std::memory_order_relaxed);
+  char const character = inject_buffer_[tail];
 
-    // Published after the character was taken, so the producer cannot refill the slot
-    // while it is still being read.
-    inject_tail_.store(NextIndex(tail), std::memory_order_release);
+  // Published after the character was taken, so the producer cannot refill the slot
+  // while it is still being read.
+  inject_tail_.store(NextIndex(tail), std::memory_order_release);
 
-    return character;
+  return character;
 }
 
 /*
@@ -158,11 +160,12 @@ char WordclockSerial::ReadInjected()
  * rather than cut: the client then sees the answer split over two frames, which is readable,
  * where a truncated line would silently lose its end.
  */
-void WordclockSerial::AppendToLine(char character)
-{
-    if(line_used_ >= (kLineLength - 1u)) { FlushLine(); }
+void WordclockSerial::AppendToLine(char character) {
+  if (line_used_ >= (kLineLength - 1u)) {
+    FlushLine();
+  }
 
-    line_buffer_[line_used_++] = character;
+  line_buffer_[line_used_++] = character;
 }
 
 /*
@@ -170,12 +173,15 @@ void WordclockSerial::AppendToLine(char character)
  * println() is also used to terminate output that print() already ended with a newline -
  * passing that on would send a blank frame after every answer.
  */
-void WordclockSerial::FlushLine()
-{
-    if(line_used_ == 0u) { return; }
+void WordclockSerial::FlushLine() {
+  if (line_used_ == 0u) {
+    return;
+  }
 
-    line_buffer_[line_used_] = '\0';
-    line_used_ = 0u;
+  line_buffer_[line_used_] = '\0';
+  line_used_ = 0u;
 
-    if(line_sink_ != nullptr) { line_sink_(line_buffer_); }
+  if (line_sink_ != nullptr) {
+    line_sink_(line_buffer_);
+  }
 }

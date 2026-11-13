@@ -22,7 +22,7 @@
 #include "NightSwitch.h"
 
 /*! \brief The number of options in the parameter table of the night switch command. */
-#define MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE        6u
+#define MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE 6u
 
 /*!
  * \brief The parser of command 14, the night switch command: sets the window of the night, and what
@@ -47,91 +47,109 @@
  * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
  * STD_OFF moves the commands behind it down by one.
  */
-class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParser, MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE>
-{
-  private:
-    friend class MsgParameterParser;
+class MsgCmdNightSwitchParser
+    : public MsgParameterParser<MsgCmdNightSwitchParser,
+                                MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE> {
+ private:
+  friend class MsgParameterParser;
 
-    static constexpr char kActiveShortName{'A'};
-    static constexpr char kStartHourShortName{'H'};
-    static constexpr char kStartMinuteShortName{'M'};
-    static constexpr char kEndHourShortName{'E'};
-    static constexpr char kEndMinuteShortName{'N'};
-    static constexpr char kBrightnessShortName{'B'};
+  static constexpr char kActiveShortName{'A'};
+  static constexpr char kStartHourShortName{'H'};
+  static constexpr char kStartMinuteShortName{'M'};
+  static constexpr char kEndHourShortName{'E'};
+  static constexpr char kEndMinuteShortName{'N'};
+  static constexpr char kBrightnessShortName{'B'};
 
-    static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kActiveShortName,      MsgParameter::ArgumentTypeType::kUint8),
-        ParameterTableElementType(kStartHourShortName,   MsgParameter::ArgumentTypeType::kUint8),
-        ParameterTableElementType(kStartMinuteShortName, MsgParameter::ArgumentTypeType::kUint8),
-        ParameterTableElementType(kEndHourShortName,     MsgParameter::ArgumentTypeType::kUint8),
-        ParameterTableElementType(kEndMinuteShortName,   MsgParameter::ArgumentTypeType::kUint8),
-        ParameterTableElementType(kBrightnessShortName,  MsgParameter::ArgumentTypeType::kUint8)
-    };
+  static constexpr ParameterTableType kParameterTable PROGMEM{
+      ParameterTableElementType(kActiveShortName, MsgParameter::ArgumentTypeType::kUint8),
+      ParameterTableElementType(kStartHourShortName, MsgParameter::ArgumentTypeType::kUint8),
+      ParameterTableElementType(kStartMinuteShortName, MsgParameter::ArgumentTypeType::kUint8),
+      ParameterTableElementType(kEndHourShortName, MsgParameter::ArgumentTypeType::kUint8),
+      ParameterTableElementType(kEndMinuteShortName, MsgParameter::ArgumentTypeType::kUint8),
+      ParameterTableElementType(kBrightnessShortName, MsgParameter::ArgumentTypeType::kUint8)};
 
-    /*
-     * Collected rather than applied as they arrive, and the switch applied last: switching
-     * it on is what makes the next tick an edge, and an edge acting on half a window would
-     * use one end from this command and the other from the one before it.
-     */
-    bool active_{false};
-    bool active_given_{false};
+  /*
+   * Collected rather than applied as they arrive, and the switch applied last: switching
+   * it on is what makes the next tick an edge, and an edge acting on half a window would
+   * use one end from this command and the other from the one before it.
+   */
+  bool active_{false};
+  bool active_given_{false};
 
-    static void HandleParameter(char parameter_short_name, const char* argument, PositionType length) {
-        UNUSED(parameter_short_name); UNUSED(argument); UNUSED(length);
+  static void HandleParameter(char parameter_short_name, char const* argument,
+                              PositionType length) {
+    UNUSED(parameter_short_name);
+    UNUSED(argument);
+    UNUSED(length);
+  }
+  void HandleParameter(char parameter_short_name, byte argument) {
+    NightSwitch& night_switch = NightSwitch::GetInstance();
+
+    if (parameter_short_name == kActiveShortName) {
+      active_ = (argument != 0u);
+      active_given_ = true;
     }
-    void HandleParameter(char parameter_short_name, byte argument)
-    {
-        NightSwitch& night_switch = NightSwitch::GetInstance();
-
-        if(parameter_short_name == kActiveShortName)      { active_ = (argument != 0u); active_given_ = true; }
-        if(parameter_short_name == kStartHourShortName)   { night_switch.SetStartHour(argument); }
-        if(parameter_short_name == kStartMinuteShortName) { night_switch.SetStartMinute(argument); }
-        if(parameter_short_name == kEndHourShortName)     { night_switch.SetEndHour(argument); }
-        if(parameter_short_name == kEndMinuteShortName)   { night_switch.SetEndMinute(argument); }
-        if(parameter_short_name == kBrightnessShortName)  { night_switch.SetNightBrightness(argument); }
+    if (parameter_short_name == kStartHourShortName) {
+      night_switch.SetStartHour(argument);
     }
-
-  public:
-    /*!
-     * \brief Makes the parser for the options in `parameter`.
-     *
-     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
-     *                      the pointer and reads it in Parse().
-     */
-    constexpr MsgCmdNightSwitchParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
-
-    /*! \brief Destroys the parser. */
-    ~MsgCmdNightSwitchParser() = default;
-
-    /*!
-     * \brief Sends the answer: the fields that follow the command number.
-     *
-     * It sends `A=<0|1> H=<hour> M=<minute> E=<hour> N=<minute> B=<brightness>`: whether the night
-     * switch is on, the start and the end of the window, and the night brightness, whatever the
-     * command carried. A space follows each field but the last; MsgCmdParser ends the line.
-     */
-    static void SendAnswer() {
-        const NightSwitch& night_switch = NightSwitch::GetInstance();
-
-        SendAnswerParameter(kActiveShortName, static_cast<byte>(night_switch.GetIsActive() ? 1u : 0u));
-        SendAnswerParameter(kStartHourShortName, night_switch.GetStartHour());
-        SendAnswerParameter(kStartMinuteShortName, night_switch.GetStartMinute());
-        SendAnswerParameter(kEndHourShortName, night_switch.GetEndHour());
-        SendAnswerParameter(kEndMinuteShortName, night_switch.GetEndMinute());
-        // Last field before the command parser's terminating println(), so no trailing
-        // separator space.
-        SendAnswerParameter(kBrightnessShortName, night_switch.GetNightBrightness(), false);
+    if (parameter_short_name == kStartMinuteShortName) {
+      night_switch.SetStartMinute(argument);
     }
-
-    /*!
-     * \brief Completes the command once Parse() has read its options.
-     *
-     * It switches the night switch on or off as `-A` asks, after the window and the brightness of
-     * the same command have been applied. Without `-A` it does nothing.
-     */
-    void Process() const {
-        if(active_given_) { NightSwitch::GetInstance().SetIsActive(active_); }
+    if (parameter_short_name == kEndHourShortName) {
+      night_switch.SetEndHour(argument);
     }
+    if (parameter_short_name == kEndMinuteShortName) {
+      night_switch.SetEndMinute(argument);
+    }
+    if (parameter_short_name == kBrightnessShortName) {
+      night_switch.SetNightBrightness(argument);
+    }
+  }
+
+ public:
+  /*!
+   * \brief Makes the parser for the options in `parameter`.
+   *
+   * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
+   *                      pointer and reads it in Parse().
+   */
+  constexpr MsgCmdNightSwitchParser(char const* parameter)
+      : MsgParameterParser(kParameterTable, parameter) {}
+
+  /*! \brief Destroys the parser. */
+  ~MsgCmdNightSwitchParser() = default;
+
+  /*!
+   * \brief Sends the answer: the fields that follow the command number.
+   *
+   * It sends `A=<0|1> H=<hour> M=<minute> E=<hour> N=<minute> B=<brightness>`: whether the night
+   * switch is on, the start and the end of the window, and the night brightness, whatever the
+   * command carried. A space follows each field but the last; MsgCmdParser ends the line.
+   */
+  static void SendAnswer() {
+    NightSwitch const& night_switch = NightSwitch::GetInstance();
+
+    SendAnswerParameter(kActiveShortName, static_cast<byte>(night_switch.GetIsActive() ? 1u : 0u));
+    SendAnswerParameter(kStartHourShortName, night_switch.GetStartHour());
+    SendAnswerParameter(kStartMinuteShortName, night_switch.GetStartMinute());
+    SendAnswerParameter(kEndHourShortName, night_switch.GetEndHour());
+    SendAnswerParameter(kEndMinuteShortName, night_switch.GetEndMinute());
+    // Last field before the command parser's terminating println(), so no trailing
+    // separator space.
+    SendAnswerParameter(kBrightnessShortName, night_switch.GetNightBrightness(), false);
+  }
+
+  /*!
+   * \brief Completes the command once Parse() has read its options.
+   *
+   * It switches the night switch on or off as `-A` asks, after the window and the brightness of
+   * the same command have been applied. Without `-A` it does nothing.
+   */
+  void Process() const {
+    if (active_given_) {
+      NightSwitch::GetInstance().SetIsActive(active_);
+    }
+  }
 };
 
 #endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_

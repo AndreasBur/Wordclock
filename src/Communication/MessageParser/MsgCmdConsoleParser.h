@@ -28,7 +28,7 @@
 #include "System.h"
 
 /*! \brief The number of options in the parameter table of the console command. */
-#define MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE             1u
+#define MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE 1u
 
 /*!
  * \brief The parser of command 16, the console command: sets the password the web console asks for.
@@ -44,89 +44,94 @@
  * The answer says whether a password is set, never which one.
  *
  * MsgParameterParser reads the options by the parameter table and hands each value to the private
- * `HandleParameter()`, which keeps it for Process(). MsgCmdParser makes the parser and calls Parse(),
- * Process() and SendAnswer() in this order, so an error answered for an option stands in the line
- * before the fields of the answer.
+ * `HandleParameter()`, which keeps it for Process(). MsgCmdParser makes the parser and calls
+ * Parse(), Process() and SendAnswer() in this order, so an error answered for an option stands in
+ * the line before the fields of the answer.
  *
  * The number holds while every overlay is built in; one whose `OVERLAYS_SUPPORT_*` switch is
  * STD_OFF moves the commands behind it down by one.
  */
-class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE>
-{
-  private:
-    friend class MsgParameterParser;
+class MsgCmdConsoleParser
+    : public MsgParameterParser<MsgCmdConsoleParser, MSG_CMD_CONSOLE_PARSER_PARAMETER_TABLE_SIZE> {
+ private:
+  friend class MsgParameterParser;
 
-    static constexpr char kPasswordShortName{'P'};
-    static constexpr char kProtectedShortName{'A'};
+  static constexpr char kPasswordShortName{'P'};
+  static constexpr char kProtectedShortName{'A'};
 
-    static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
-    };
+  static constexpr ParameterTableType kParameterTable PROGMEM{
+      ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)};
 
-    char password_[System::kPasswordStringLength]{0u};
-    /*
-     * Whether -P was given at all, which is not the same question as whether the password is
-     * empty: `16 -P` clears the password on purpose, and `16` alone must leave it alone. Without
-     * this the two cannot be told apart, and the bare number cleared - see the \file block.
-     */
-    bool password_given_{false};
+  char password_[System::kPasswordStringLength]{0u};
+  /*
+   * Whether -P was given at all, which is not the same question as whether the password is
+   * empty: `16 -P` clears the password on purpose, and `16` alone must leave it alone. Without
+   * this the two cannot be told apart, and the bare number cleared - see the \file block.
+   */
+  bool password_given_{false};
 
-    static void HandleParameter(char parameter_short_name, byte argument) {
-        UNUSED(parameter_short_name); UNUSED(argument);
+  static void HandleParameter(char parameter_short_name, byte argument) {
+    UNUSED(parameter_short_name);
+    UNUSED(argument);
+  }
+  /*
+   * Copied with its length rather than read to the end of the line, as it was: the argument is
+   * not terminated in the parameter string, and 16 -Psecret -A1 stored "secret -A1".
+   */
+  void HandleParameter(char parameter_short_name, char const* argument, PositionType length) {
+    if (parameter_short_name == kPasswordShortName) {
+      StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
+      TrimTrailingBlanks(password_);
+      password_given_ = true;
     }
-    /*
-     * Copied with its length rather than read to the end of the line, as it was: the argument is
-     * not terminated in the parameter string, and 16 -Psecret -A1 stored "secret -A1".
-     */
-    void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
-    {
-        if(parameter_short_name == kPasswordShortName) {
-            StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
-            TrimTrailingBlanks(password_);
-            password_given_ = true;
-        }
+  }
+
+  static constexpr size_t Minimum(size_t left, size_t right) {
+    return (left < right) ? left : right;
+  }
+
+  static void TrimTrailingBlanks(char* string) {
+    for (size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
+      string[index - 1u] = STD_NULL_CHARACTER;
     }
+  }
 
-    static constexpr size_t Minimum(size_t left, size_t right) { return (left < right) ? left : right; }
+ public:
+  /*!
+   * \brief Makes the parser for the options in `parameter`.
+   *
+   * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
+   *                      pointer and reads it in Parse().
+   */
+  constexpr MsgCmdConsoleParser(char const* parameter)
+      : MsgParameterParser(kParameterTable, parameter) {}
 
-    static void TrimTrailingBlanks(char* string) {
-        for(size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
-            string[index - 1u] = STD_NULL_CHARACTER;
-        }
+  /*! \brief Destroys the parser. */
+  ~MsgCmdConsoleParser() = default;
+
+  /*!
+   * \brief Sends the answer: the fields that follow the command number.
+   *
+   * It sends `A=<0|1>`: whether a password is set, and never which one. A space follows each
+   * field but the last; MsgCmdParser ends the line.
+   */
+  static void SendAnswer() {
+    SendAnswerParameter(kProtectedShortName,
+                        static_cast<byte>(System::GetInstance().IsConsoleProtected() ? 1u : 0u),
+                        false);
+  }
+
+  /*!
+   * \brief Completes the command once Parse() has read its options.
+   *
+   * It stores the password of `-P`, the empty one of `16 -P` included, which clears it. Without
+   * `-P` nothing is stored, so `16` alone only asks.
+   */
+  void Process() const {
+    if (password_given_) {
+      System::GetInstance().SetConsolePassword(password_);
     }
-
-  public:
-    /*!
-     * \brief Makes the parser for the options in `parameter`.
-     *
-     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
-     *                      the pointer and reads it in Parse().
-     */
-    constexpr MsgCmdConsoleParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
-
-    /*! \brief Destroys the parser. */
-    ~MsgCmdConsoleParser() = default;
-
-    /*!
-     * \brief Sends the answer: the fields that follow the command number.
-     *
-     * It sends `A=<0|1>`: whether a password is set, and never which one. A space follows each
-     * field but the last; MsgCmdParser ends the line.
-     */
-    static void SendAnswer() {
-        SendAnswerParameter(kProtectedShortName,
-                            static_cast<byte>(System::GetInstance().IsConsoleProtected() ? 1u : 0u), false);
-    }
-
-    /*!
-     * \brief Completes the command once Parse() has read its options.
-     *
-     * It stores the password of `-P`, the empty one of `16 -P` included, which clears it. Without
-     * `-P` nothing is stored, so `16` alone only asks.
-     */
-    void Process() const {
-        if(password_given_) { System::GetInstance().SetConsolePassword(password_); }
-    }
+  }
 };
 
 #endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_

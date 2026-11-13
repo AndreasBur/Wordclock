@@ -14,6 +14,7 @@
  * the background while the firmware already runs.
  */
 
+// clang-format off
 // The framework headers come first, ahead of this platform's Arduino.h: that one binds
 // Serial to WordclockSerial, and the macro would otherwise reach into them.
 #include <WiFi.h>
@@ -29,13 +30,14 @@
 #include "WebInterface.h"
 #include "WordclockConfiguration.h"
 #include "WordclockMain.h"
+// clang-format on
 
 namespace {
 WordclockMain wordclock;
 
 // The tick the whole firmware is timed against: every module's task cycle counts in this
 // unit, so it is read from the scheduler rather than repeated as a number here.
-const TickType_t kTaskInterval{pdMS_TO_TICKS(Scheduler::GetTaskIntervalMs())};
+TickType_t const kTaskInterval{pdMS_TO_TICKS(Scheduler::GetTaskIntervalMs())};
 TickType_t last_wake_time{0};
 
 /*
@@ -43,9 +45,8 @@ TickType_t last_wake_time{0};
  * in RealTimeClock local time. Safe to do before the link is up: the request is repeated
  * until an answer arrives.
  */
-void StartTimeSync()
-{
-    configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
+void StartTimeSync() {
+  configTzTime(WORDCLOCK_TIMEZONE, WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
 }
 
 /*
@@ -54,17 +55,16 @@ void StartTimeSync()
  * that changes the credentials, and a line printed there would land inside that command's
  * answer.
  */
-void ReportNetwork()
-{
-    char ssid[System::kSsidStringLength]{};
+void ReportNetwork() {
+  char ssid[System::kSsidStringLength]{};
 
-    if(System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
-        Serial.print(F("WiFi: joining "));
-        Serial.println(ssid);
-    } else {
-        Serial.print(F("WiFi: no network configured, console on the access point "));
-        Serial.println(SYSTEM_ACCESS_POINT_SSID);
-    }
+  if (System::GetInstance().GetNetworkSsid(ssid) == kEOk) {
+    Serial.print(F("WiFi: joining "));
+    Serial.println(ssid);
+  } else {
+    Serial.print(F("WiFi: no network configured, console on the access point "));
+    Serial.println(SYSTEM_ACCESS_POINT_SSID);
+  }
 }
 
 /*
@@ -73,24 +73,23 @@ void ReportNetwork()
  * which is the one thing a first bring-up needs to be able to tell apart from a dead
  * strip.
  */
-void ReportProgress()
-{
-    static bool connection_reported{false};
-    static bool time_reported{false};
+void ReportProgress() {
+  static bool connection_reported{false};
+  static bool time_reported{false};
 
-    if(!connection_reported && (WiFi.status() == WL_CONNECTED)) {
-        connection_reported = true;
-        Serial.print(F("WiFi: connected, address "));
-        Serial.println(WiFi.localIP().toString().c_str());
-    }
+  if (!connection_reported && (WiFi.status() == WL_CONNECTED)) {
+    connection_reported = true;
+    Serial.print(F("WiFi: connected, address "));
+    Serial.println(WiFi.localIP().toString().c_str());
+  }
 
-    if(!time_reported && RealTimeClock::IsSystemTimeSet()) {
-        time_reported = true;
-        Serial.println(F("Time: synchronised"));
-    }
+  if (!time_reported && RealTimeClock::IsSystemTimeSet()) {
+    time_reported = true;
+    Serial.println(F("Time: synchronised"));
+  }
 }
 
-} // namespace
+}  // namespace
 
 /*!
  * \brief Brings the clock up: the serial port, the firmware, the network, the time synchronisation
@@ -101,29 +100,28 @@ void ReportProgress()
  * the firmware already runs. It says on the console which network the clock is joining, or which
  * access point it opened.
  */
-void setup()
-{
-    Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
+void setup() {
+  Serial.begin(WORDCLOCK_SERIAL_BAUDRATE);
 
-    wordclock.Init();
+  wordclock.Init();
 
-    /*
-     * Which network, and whether there is one at all, is System's answer now: what was
-     * stored over the console, what was compiled in, or - when neither - an access point
-     * of its own, so that the console the credentials are entered through can be reached
-     * without a cable.
-     */
-    System::GetInstance().StartNetwork();
-    ReportNetwork();
-    StartTimeSync();
-    /*
-     * Before the network is up on purpose: the server listens on whatever address arrives
-     * later, and starting it here keeps the order in setup() the same whether there is a
-     * WiFi or not.
-     */
-    WebInterface::GetInstance().Begin();
+  /*
+   * Which network, and whether there is one at all, is System's answer now: what was
+   * stored over the console, what was compiled in, or - when neither - an access point
+   * of its own, so that the console the credentials are entered through can be reached
+   * without a cable.
+   */
+  System::GetInstance().StartNetwork();
+  ReportNetwork();
+  StartTimeSync();
+  /*
+   * Before the network is up on purpose: the server listens on whatever address arrives
+   * later, and starting it here keeps the order in setup() the same whether there is a
+   * WiFi or not.
+   */
+  WebInterface::GetInstance().Begin();
 
-    last_wake_time = xTaskGetTickCount();
+  last_wake_time = xTaskGetTickCount();
 }
 
 /*!
@@ -139,23 +137,22 @@ void setup()
  * stretch the interval: animation speeds, the sensor's sampling rate and the serial poll rate all
  * count in this interval, and a drifting one silently rescales all three.
  */
-void loop()
-{
-    wordclock.Task();
+void loop() {
+  wordclock.Task();
 
-    // After the firmware, not from inside its pixel writes: the strip gets whatever the
-    // buffer holds once the whole pass over the tasks is done.
-    Pixels::GetInstance().Render();
+  // After the firmware, not from inside its pixel writes: the strip gets whatever the
+  // buffer holds once the whole pass over the tasks is done.
+  Pixels::GetInstance().Render();
 
-    // After the strip, so a watching browser is shown the frame that went out rather than
-    // one the firmware is still assembling.
-    WebInterface::GetInstance().BroadcastFrame();
+  // After the strip, so a watching browser is shown the frame that went out rather than
+  // one the firmware is still assembling.
+  WebInterface::GetInstance().BroadcastFrame();
 
-    ReportProgress();
+  ReportProgress();
 
-    // Last, so a restart asked for by a command takes place once that command's answer has
-    // reached both the wire and the browser.
-    System::GetInstance().PerformPendingRestart();
+  // Last, so a restart asked for by a command takes place once that command's answer has
+  // reached both the wire and the browser.
+  System::GetInstance().PerformPendingRestart();
 
-    vTaskDelayUntil(&last_wake_time, kTaskInterval);
+  vTaskDelayUntil(&last_wake_time, kTaskInterval);
 }

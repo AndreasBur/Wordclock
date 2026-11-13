@@ -16,16 +16,17 @@
 #include "Animation.h"
 
 /*! \brief STD_ON to shift by columns, to the right; exactly one of the two switches is STD_ON. */
-#define ANIMATION_SHIFT_HORIZONTAL              STD_ON
+#define ANIMATION_SHIFT_HORIZONTAL STD_ON
 /*! \brief STD_ON to shift by rows, downwards; exactly one of the two switches is STD_ON. */
-#define ANIMATION_SHIFT_VERTICAL                STD_OFF
+#define ANIMATION_SHIFT_VERTICAL STD_OFF
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_OFF && ANIMATION_SHIFT_VERTICAL == STD_OFF)
-# error "AnimationShift: Exactly one switch must be set to STD_ON"
+#error "AnimationShift: Exactly one switch must be set to STD_ON"
 #endif
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
-# error "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
+#error \
+    "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
 #endif
 
 /*!
@@ -42,66 +43,64 @@
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle.
  */
-class AnimationShift : public Animation
-{
-  public:
-
-  private:
-    Transformation wc_transformation_;
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
+class AnimationShift : public Animation {
+ public:
+ private:
+  Transformation wc_transformation_;
+  ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON)
-    byte current_column_{0u};
+  byte current_column_{0u};
 #endif
 
 #if (ANIMATION_SHIFT_VERTICAL == STD_ON)
-    byte current_row_{0u};
+  byte current_row_{0u};
 #endif
 
-    void Reset();
-    void ClearTimeTask();
-    void SetTimeTask();
+  void Reset();
+  void ClearTimeTask();
+  void SetTimeTask();
 
-  public:
-    /*! \brief Makes the animation, with GetState() kNone until Init(). */
-    constexpr AnimationShift() : wc_transformation_() { }
+ public:
+  /*! \brief Makes the animation, with GetState() kNone until Init(). */
+  constexpr AnimationShift() : wc_transformation_() {}
 
-    /*! \brief Destroys the animation. */
-    ~AnimationShift() = default;
+  /*! \brief Destroys the animation. */
+  ~AnimationShift() = default;
 
-    /*!
-     * \brief Makes the animation idle and resets its progress.
-     *
-     * A running animation ends where it stands, and the display keeps what its last step drew.
-     */
-    void Init();
+  /*!
+   * \brief Makes the animation idle and resets its progress.
+   *
+   * A running animation ends where it stands, and the display keeps what its last step drew.
+   */
+  void Init();
 
-    /*!
-     * \brief Starts the animation towards the time `hour`:`minute`.
-     *
-     * It draws nothing itself.
-     *
-     * \param[in] hour The hour, 0 to 23.
-     * \param[in] minute The minute, 0 to 59.
-     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
-     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
-     *         the words of `hour`:`minute`.
-     */
-    StdReturnType SetTime(byte hour, byte minute);
+  /*!
+   * \brief Starts the animation towards the time `hour`:`minute`.
+   *
+   * It draws nothing itself.
+   *
+   * \param[in] hour The hour, 0 to 23.
+   * \param[in] minute The minute, 0 to 59.
+   * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is then
+   *         left as it was, or if it is not idle; a running one then runs on, but ends on the words
+   *         of `hour`:`minute`.
+   */
+  StdReturnType SetTime(byte hour, byte minute);
 
-    /*!
-     * \brief Takes one step of the animation; does nothing while it is idle.
-     *
-     * With ANIMATION_SHIFT_HORIZONTAL a step of the first half shifts the display one column to
-     * the right; the step after DISPLAY_NUMBER_OF_COLUMNS of them only starts the second half. A
-     * step of the second half shifts the display one column to the right and lights, in the
-     * leftmost column, the column of the new time that the remaining shifts carry to its place;
-     * the step after DISPLAY_NUMBER_OF_COLUMNS of them ends it. With ANIMATION_SHIFT_VERTICAL it
-     * is the same with rows, DISPLAY_NUMBER_OF_ROWS of them in each half.
-     *
-     * It writes the pixels of Display and leaves showing them to Show().
-     */
-    void Task();
+  /*!
+   * \brief Takes one step of the animation; does nothing while it is idle.
+   *
+   * With ANIMATION_SHIFT_HORIZONTAL a step of the first half shifts the display one column to
+   * the right; the step after DISPLAY_NUMBER_OF_COLUMNS of them only starts the second half. A
+   * step of the second half shifts the display one column to the right and lights, in the
+   * leftmost column, the column of the new time that the remaining shifts carry to its place;
+   * the step after DISPLAY_NUMBER_OF_COLUMNS of them ends it. With ANIMATION_SHIFT_VERTICAL it
+   * is the same with rows, DISPLAY_NUMBER_OF_ROWS of them in each half.
+   *
+   * It writes the pixels of Display and leaves showing them to Show().
+   */
+  void Task();
 };
 
 #endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_

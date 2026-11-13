@@ -14,13 +14,14 @@
 #include "Arduino.h"
 #include "PowerSwitch.h"
 
-void PowerSwitch::Init()
-{
-    if(!IsFitted()) { return; }
+void PowerSwitch::Init() {
+  if (!IsFitted()) {
+    return;
+  }
 
-    gpio_init(POWER_SWITCH_PIN);
-    gpio_set_dir(POWER_SWITCH_PIN, GPIO_OUT);
-    SwitchSupplyOn();
+  gpio_init(POWER_SWITCH_PIN);
+  gpio_set_dir(POWER_SWITCH_PIN, GPIO_OUT);
+  SwitchSupplyOn();
 }
 
 /*
@@ -28,9 +29,10 @@ void PowerSwitch::Init()
  * so on is high - the level reaches the gate of the small-signal MOSFET, not the high side
  * one, which is why the sense is not inverted here.
  */
-void PowerSwitch::DriveSupply(bool on)
-{
-    if(!IsFitted()) { return; }
+void PowerSwitch::DriveSupply(bool on) {
+  if (!IsFitted()) {
+    return;
+  }
 
-    gpio_put(POWER_SWITCH_PIN, on);
+  gpio_put(POWER_SWITCH_PIN, on);
 }

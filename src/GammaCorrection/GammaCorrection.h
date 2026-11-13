@@ -57,66 +57,68 @@
  * Despite its name it is an exponential curve, not a gamma (power) curve; the file says why it
  * is and how it is computed.
  */
-class GammaCorrection
-{
-  public:
-    /*! \brief A value of the stored top doubling of the curve. */
-    using TopDoublingElementType = byte;
+class GammaCorrection {
+ public:
+  /*! \brief A value of the stored top doubling of the curve. */
+  using TopDoublingElementType = byte;
 
-  private:
-    static constexpr byte kValuesPerDoubling{16u};
-    static constexpr byte kNumberOfDoublings{sizeof(byte) * CHAR_BIT};
-    static constexpr byte kNumberOfSteps{128u};
+ private:
+  static constexpr byte kValuesPerDoubling{16u};
+  static constexpr byte kNumberOfDoublings{sizeof(byte) * CHAR_BIT};
+  static constexpr byte kNumberOfSteps{128u};
 
-    static_assert(kValuesPerDoubling * kNumberOfDoublings == kNumberOfSteps,
-                  "GammaCorrection: the steps must be exactly the stored doubling shifted through every bit of the result");
+  static_assert(kValuesPerDoubling * kNumberOfDoublings == kNumberOfSteps,
+                "GammaCorrection: the steps must be exactly the stored doubling shifted through "
+                "every bit of the result");
 
-    // 2^(7 + n/16) for n = 1..16, as published - see the file header for the 1 they lie
-    // below the formula.
-    static constexpr TopDoublingElementType kTopDoublingTable[kValuesPerDoubling] PROGMEM {
-        133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u, 188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u
-    };
+  // 2^(7 + n/16) for n = 1..16, as published - see the file header for the 1 they lie
+  // below the formula.
+  static constexpr TopDoublingElementType kTopDoublingTable[kValuesPerDoubling] PROGMEM{
+      133u, 139u, 145u, 151u, 158u, 165u, 172u, 180u,
+      188u, 196u, 205u, 214u, 224u, 234u, 244u, 255u};
 
-    static TopDoublingElementType GetTopDoublingElement(byte index) {
-        TopDoublingElementType element;
-        memcpy_P(&element, &kTopDoublingTable[index], sizeof(TopDoublingElementType));
-        return element;
-    }
+  static TopDoublingElementType GetTopDoublingElement(byte index) {
+    TopDoublingElementType element;
+    memcpy_P(&element, &kTopDoublingTable[index], sizeof(TopDoublingElementType));
+    return element;
+  }
 
-    // The top doubling needs no shift, each one below it one bit more.
-    static constexpr byte ToShift(byte step) {
-        return static_cast<byte>((kNumberOfDoublings - 1u) - (step / kValuesPerDoubling));
-    }
+  // The top doubling needs no shift, each one below it one bit more.
+  static constexpr byte ToShift(byte step) {
+    return static_cast<byte>((kNumberOfDoublings - 1u) - (step / kValuesPerDoubling));
+  }
 
-    // About 1.0443^Step - 2^(1/16) per step - from 1 at step 0 to 255 at step 127.
-    static byte ToExponential(byte step) {
-        return static_cast<byte>(GetTopDoublingElement(step % kValuesPerDoubling) >> ToShift(step));
-    }
+  // About 1.0443^Step - 2^(1/16) per step - from 1 at step 0 to 255 at step 127.
+  static byte ToExponential(byte step) {
+    return static_cast<byte>(GetTopDoublingElement(step % kValuesPerDoubling) >> ToShift(step));
+  }
 
-    static constexpr byte ToStep(byte value_linear) { return static_cast<byte>(value_linear / 2u); }
+  static constexpr byte ToStep(byte value_linear) { return static_cast<byte>(value_linear / 2u); }
 
-  public:
-    /*! \brief Makes the curve, which holds no state of its own. */
-    constexpr GammaCorrection() { }
+ public:
+  /*! \brief Makes the curve, which holds no state of its own. */
+  constexpr GammaCorrection() {}
 
-    /*!
-     * \brief Returns the brightness for the LEDs that the linear setting `value_linear` stands for.
-     *
-     * 0 gives 0, every other setting a point of the curve: the setting is halved to one of 128
-     * steps, which give 1 to 255. So 1 to 31 all give 1, and 254 and 255 both give 255.
-     *
-     * \param[in] value_linear The brightness setting, 0 to 255.
-     * \return The brightness for the LEDs: 0 for a setting of 0, 1 to 255 for every other.
+  /*!
+   * \brief Returns the brightness for the LEDs that the linear setting `value_linear` stands for.
+   *
+   * 0 gives 0, every other setting a point of the curve: the setting is halved to one of 128
+   * steps, which give 1 to 255. So 1 to 31 all give 1, and 254 and 255 both give 255.
+   *
+   * \param[in] value_linear The brightness setting, 0 to 255.
+   * \return The brightness for the LEDs: 0 for a setting of 0, 1 to 255 for every other.
+   */
+  static byte CalcCorrectedValue(byte value_linear) {
+    /*
+     * 0 to 0, everything else onto the curve: see the file header for why 0 is answered
+     * apart rather than by subtracting 1 from every result, which would take 255 down to
+     * 254 as well.
      */
-    static byte CalcCorrectedValue(byte value_linear) {
-        /*
-         * 0 to 0, everything else onto the curve: see the file header for why 0 is answered
-         * apart rather than by subtracting 1 from every result, which would take 255 down to
-         * 254 as well.
-         */
-        if(value_linear == 0u) { return 0u; }
-        return ToExponential(ToStep(value_linear));
+    if (value_linear == 0u) {
+      return 0u;
     }
+    return ToExponential(ToStep(value_linear));
+  }
 };
 
 #endif  // WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_

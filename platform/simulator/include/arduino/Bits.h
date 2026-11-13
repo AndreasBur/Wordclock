@@ -15,6 +15,6 @@
  * \param[in] value The value.
  * \param[in] bit The number of the bit, counted from 0 at the least significant one.
  */
-#define bitRead(value, bit)     (((value) >> (bit)) & 0x01) // NOLINT(readability-identifier-naming)
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01)  // NOLINT(readability-identifier-naming)
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_BITS_H_

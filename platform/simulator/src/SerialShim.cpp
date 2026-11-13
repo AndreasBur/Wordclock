@@ -10,35 +10,36 @@
 /* reads the firmware's answers back into readable lines */
 #include "sim/MessageDecoder.h"
 
-char SerialShim::read()
-{
-    char first_char{' '};
+char SerialShim::read() {
+  char first_char{' '};
 
-    if(!send_buffer_.IsEmpty()) {
-        // The firmware's port is a byte wide, and what is typed into the console is
-        // ASCII; the cast says that rather than leaving it to the conversion.
-        first_char = static_cast<char>(send_buffer_.at(0).GetValue());
-        send_buffer_.Remove(0, 1);
-    }
+  if (!send_buffer_.IsEmpty()) {
+    // The firmware's port is a byte wide, and what is typed into the console is
+    // ASCII; the cast says that rather than leaving it to the conversion.
+    first_char = static_cast<char>(send_buffer_.at(0).GetValue());
+    send_buffer_.Remove(0, 1);
+  }
 
-    return first_char;
+  return first_char;
 }
 
-void SerialShim::SendInput()
-{
-    if(!IsAttached()) { return; }
+void SerialShim::SendInput() {
+  if (!IsAttached()) {
+    return;
+  }
 
-    if(send_buffer_.IsEmpty()) {
-        send_buffer_ = input_->GetValue() + _T("\n");
-    }
+  if (send_buffer_.IsEmpty()) {
+    send_buffer_ = input_->GetValue() + _T("\n");
+  }
 }
 
-void SerialShim::AppendOutput(const wxString& text)
-{
-    if(!IsAttached()) { return; }
+void SerialShim::AppendOutput(wxString const& text) {
+  if (!IsAttached()) {
+    return;
+  }
 
-    output_->AppendText(text);
-    output_line_ += text;
+  output_->AppendText(text);
+  output_line_ += text;
 }
 
 /*
@@ -48,25 +49,26 @@ void SerialShim::AppendOutput(const wxString& text)
  * matters when the protocol itself is in doubt. Anything the decoder does not recognise, such
  * as plain text, passes through untouched.
  */
-void SerialShim::FinishOutputLine()
-{
-    /*
-     * The browsers first, and outside the attached check: they are watching whether or not a
-     * window has handed its controls over, and an answer that reached one front end and not
-     * the other is the confusing half. AppendOutput() collects nothing before the controls
-     * are attached, though, so until then the line handed over is empty.
-     */
-    if(line_sink_ != nullptr) { line_sink_(ToFirmware(output_line_).data()); }
+void SerialShim::FinishOutputLine() {
+  /*
+   * The browsers first, and outside the attached check: they are watching whether or not a
+   * window has handed its controls over, and an answer that reached one front end and not
+   * the other is the confusing half. AppendOutput() collects nothing before the controls
+   * are attached, though, so until then the line handed over is empty.
+   */
+  if (line_sink_ != nullptr) {
+    line_sink_(ToFirmware(output_line_).data());
+  }
 
-    if(IsAttached()) {
-        output_->AppendText(_T("\n"));
-        output_->AppendText(MessageDecoder::Describe(output_line_));
-    }
+  if (IsAttached()) {
+    output_->AppendText(_T("\n"));
+    output_->AppendText(MessageDecoder::Describe(output_line_));
+  }
 
-    /*
-     * Cleared whether or not anything displayed it. It used to be cleared only on the way
-     * past the controls, so a run with none would have grown one line for the length of it -
-     * harmless while nothing else read the line, and not once a socket does.
-     */
-    output_line_.Clear();
+  /*
+   * Cleared whether or not anything displayed it. It used to be cleared only on the way
+   * past the controls, so a run with none would have grown one line for the length of it -
+   * harmless while nothing else read the line, and not once a socket does.
+   */
+  output_line_.Clear();
 }

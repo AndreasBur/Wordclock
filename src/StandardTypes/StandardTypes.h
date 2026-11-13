@@ -25,21 +25,21 @@
 #include <type_traits>
 // IWYU pragma: end_exports
 
-#define STD_ON                  1u /*!< A configuration switch that is on. */
-#define STD_OFF                 0u /*!< A configuration switch that is off. */
+#define STD_ON 1u  /*!< A configuration switch that is on. */
+#define STD_OFF 0u /*!< A configuration switch that is off. */
 
-#define STD_NULL_CHARACTER      '\0' /*!< The char that ends a string. */
+#define STD_NULL_CHARACTER '\0' /*!< The char that ends a string. */
 
 /*! \brief Inline assembler for the AVR that waits one cycle: `nop`. */
-#define STD_NOP_1               "nop      \n\t"
+#define STD_NOP_1 "nop      \n\t"
 /*! \brief Inline assembler for the AVR that waits two cycles: a jump to the next instruction. */
-#define STD_NOP_2               "rjmp .+0 \n\t"
+#define STD_NOP_2 "rjmp .+0 \n\t"
 /*! \brief Inline assembler for the AVR that waits 4 cycles. */
-#define STD_NOP_4               STD_NOP_2 STD_NOP_2
+#define STD_NOP_4 STD_NOP_2 STD_NOP_2
 /*! \brief Inline assembler for the AVR that waits 8 cycles. */
-#define STD_NOP_8               STD_NOP_4 STD_NOP_4
+#define STD_NOP_8 STD_NOP_4 STD_NOP_4
 /*! \brief Inline assembler for the AVR that waits 16 cycles. */
-#define STD_NOP_16              STD_NOP_8 STD_NOP_8
+#define STD_NOP_16 STD_NOP_8 STD_NOP_8
 
 /*!
  * \brief Uses `x` without effect, so that the compiler does not warn about an unused parameter.
@@ -63,8 +63,8 @@
 
 /*! \brief What a function returns that can fail. */
 enum StdReturnType {
-    kEOk = 0u,    /*!< It did what it was asked to. */
-    kENotOk = 1u  /*!< It did not; the function says what it then left as it was. */
+  kEOk = 0u,   /*!< It did what it was asked to. */
+  kENotOk = 1u /*!< It did not; the function says what it then left as it was. */
 };
 
 /*!
@@ -76,7 +76,8 @@ enum StdReturnType {
  * \pre `number` is not negative. A minus sign is not a digit, so it is not counted - where itoa()
  *      wrote one, the string is a character longer than this says.
  */
-template <typename T> uint8_t DigitsOfNumber(T number, unsigned base = 10);
+template <typename T>
+uint8_t DigitsOfNumber(T number, unsigned base = 10);
 
 /*!
  * \brief Returns an enumerator as the number it is stored as - to index an array with, count with
@@ -89,22 +90,22 @@ template <typename T> uint8_t DigitsOfNumber(T number, unsigned base = 10);
  * \return The enumerator's value, in the underlying type of its enum.
  */
 template <typename EnumType>
-constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value)
-{
-    return static_cast<std::underlying_type_t<EnumType>>(value);
+constexpr std::underlying_type_t<EnumType> ToUnderlying(EnumType value) {
+  return static_cast<std::underlying_type_t<EnumType>>(value);
 }
 
 template <typename T>
-uint8_t DigitsOfNumber(T number, unsigned base)
-{
-    uint8_t number_of_digits{0u};
+uint8_t DigitsOfNumber(T number, unsigned base) {
+  uint8_t number_of_digits{0u};
 
-    // Divided in T, not in the unsigned of `base`: a signed T would otherwise be converted to
-    // unsigned first.
-    do { number = static_cast<T>(number / static_cast<T>(base)); ++number_of_digits; }
-    while (number != T{0});
+  // Divided in T, not in the unsigned of `base`: a signed T would otherwise be converted to
+  // unsigned first.
+  do {
+    number = static_cast<T>(number / static_cast<T>(base));
+    ++number_of_digits;
+  } while (number != T{0});
 
-    return number_of_digits;
+  return number_of_digits;
 }
 
 #endif  // WORDCLOCK_SRC_STANDARDTYPES_STANDARDTYPES_H_

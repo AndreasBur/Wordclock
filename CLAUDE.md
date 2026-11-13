@@ -3,7 +3,8 @@
 ## Code conventions
 
 These are observed throughout the existing code — follow them rather than
-reformatting to a different taste.
+reformatting to a different taste. The layout itself is clang-format's: `.clang-format` is
+Google's style with `const` right of what it qualifies, at 100 columns.
 
 ### Prefer small functions
 
@@ -16,7 +17,7 @@ A helper of one expression lives in the class body in the header:
 
 ```cpp
 static constexpr ColorType DimmColor(ColorType color, byte brightness) {
-    return static_cast<ColorType>((static_cast<uint16_t>(color) * (brightness + 1u)) >> 8u);
+  return static_cast<ColorType>((static_cast<uint16_t>(color) * (brightness + 1u)) >> 8u);
 }
 ```
 
@@ -25,7 +26,7 @@ the body allows it — a helper calling a non-`constexpr` function (or `std::sqr
 stays plain `static`. The caller then reads as a pipeline:
 
 ```cpp
-const byte level = ToLevel(GetWeightedIntensity(GetIntensity(pixel)));
+byte const level = ToLevel(GetWeightedIntensity(GetIntensity(pixel)));
 ```
 
 ### Header and source

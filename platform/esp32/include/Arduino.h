@@ -35,7 +35,8 @@
  * include_next, for the reason given above.
  */
 #ifndef WORDCLOCK_CORE_ARDUINO_H
-# error "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."
+#error \
+    "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."
 #endif
 
 /*
@@ -45,16 +46,18 @@
  * directly, and offers to drop the include; taking that offer leaves the file resting on whatever
  * neighbour happens to include this header too.
  */
-#include WORDCLOCK_CORE_ARDUINO_H // IWYU pragma: export
+#include WORDCLOCK_CORE_ARDUINO_H  // IWYU pragma: export
 
 /*
  * Proof that the line above really brought the core in. Without it everything below still
  * parses, and the build fails much later on the first use of byte, in a firmware file that
  * has nothing to do with the cause.
  */
-static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not come in through WORDCLOCK_CORE_ARDUINO_H");
+static_assert(
+    sizeof(byte) == 1u,
+    "Arduino.h: the Arduino core's header did not come in through WORDCLOCK_CORE_ARDUINO_H");
 
-#include "WordclockSerial.h" // IWYU pragma: export
+#include "WordclockSerial.h"  // IWYU pragma: export
 
 /*!
  * \brief Defined, as 1, where this platform's Arduino.h was included rather than the core's.
@@ -63,7 +66,7 @@ static_assert(sizeof(byte) == 1u, "Arduino.h: the Arduino core's header did not 
  * refuses to build without it: the alternative failure is silent - everything compiles, the
  * firmware talks to the UART as before, and only the web console stays mute.
  */
-#define WORDCLOCK_ARDUINO_SHIM                          1
+#define WORDCLOCK_ARDUINO_SHIM 1
 
 /*! \brief The core's own serial port, reached after `Serial` has been bound to WordclockSerial. */
 namespace wordclock_platform {
@@ -82,7 +85,7 @@ inline Stream& HardwarePort() { return Serial; }
  */
 inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
 
-} // namespace wordclock_platform
+}  // namespace wordclock_platform
 
 /*
  * Undefined first, because the core defines Serial as a macro of its own - on this target
@@ -95,6 +98,6 @@ inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate)
  * \brief The serial port as the firmware reaches it: the one WordclockSerial, in place of the
  *        core's `Serial`.
  */
-#define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
+#define Serial WordclockSerial::GetInstance()  // NOLINT(readability-identifier-naming)
 
 #endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_ARDUINO_H_

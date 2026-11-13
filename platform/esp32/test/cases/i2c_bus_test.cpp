@@ -12,25 +12,23 @@ constexpr byte kPinSda{8u};
 constexpr byte kPinScl{9u};
 constexpr uint32_t kFastClockHz{400000u};
 
-void TestOpenHandsOverThePinsAndTheClock()
-{
-    Wire = TwoWire{};
-    Check(I2cBus::Open(kPinSda, kPinScl, kFastClockHz) == kEOk, "the bus opens");
-    Check((Wire.Sda == kPinSda) && (Wire.Scl == kPinScl) && (Wire.Clock == kFastClockHz),
-          "with the pins and the clock asked for");
+void TestOpenHandsOverThePinsAndTheClock() {
+  Wire = TwoWire{};
+  Check(I2cBus::Open(kPinSda, kPinScl, kFastClockHz) == kEOk, "the bus opens");
+  Check((Wire.Sda == kPinSda) && (Wire.Scl == kPinScl) && (Wire.Clock == kFastClockHz),
+        "with the pins and the clock asked for");
 }
 
-void TestARefusedBusIsNotOpen()
-{
-    Wire = TwoWire{};
-    Wire.BeginAnswer = false;
-    Check(I2cBus::Open(kPinSda, kPinScl, kFastClockHz) == kENotOk, "a bus Wire.begin() refused is not open");
+void TestARefusedBusIsNotOpen() {
+  Wire = TwoWire{};
+  Wire.BeginAnswer = false;
+  Check(I2cBus::Open(kPinSda, kPinScl, kFastClockHz) == kENotOk,
+        "a bus Wire.begin() refused is not open");
 }
-} // namespace
+}  // namespace
 
-int main()
-{
-    TestOpenHandsOverThePinsAndTheClock();
-    TestARefusedBusIsNotOpen();
-    return Report();
+int main() {
+  TestOpenHandsOverThePinsAndTheClock();
+  TestARefusedBusIsNotOpen();
+  return Report();
 }

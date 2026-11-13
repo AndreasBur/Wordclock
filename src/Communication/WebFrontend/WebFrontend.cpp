@@ -42,15 +42,14 @@ namespace {
  * theoretical - command 8 answers with the overlay text it was given, and an umlaut in that
  * text is exactly what the font tables carry umlauts for.
  */
-byte ToUtf8(byte latin1, char* target)
-{
-    if(latin1 < 0x80u) {
-        target[0u] = static_cast<char>(latin1);
-        return 1u;
-    }
-    target[0u] = static_cast<char>(0xC0u | (latin1 >> 6u));
-    target[1u] = static_cast<char>(0x80u | (latin1 & 0x3Fu));
-    return 2u;
+byte ToUtf8(byte latin1, char* target) {
+  if (latin1 < 0x80u) {
+    target[0u] = static_cast<char>(latin1);
+    return 1u;
+  }
+  target[0u] = static_cast<char>(0xC0u | (latin1 >> 6u));
+  target[1u] = static_cast<char>(0x80u | (latin1 & 0x3Fu));
+  return 2u;
 }
 
 /*
@@ -64,71 +63,84 @@ byte ToUtf8(byte latin1, char* target)
  * but it cuts both ways - the stream does not notice 256 bytes arriving at once either, and
  * one writer that behaves the same on both is worth more than a saved memcpy.
  */
-class ChunkWriter
-{
-  private:
-    static constexpr size_t kCapacity{256u};
+class ChunkWriter {
+ private:
+  static constexpr size_t kCapacity{256u};
 
-    WebResponseBody& body_;
-    char buffer_[kCapacity]{};
-    size_t used_{0u};
+  WebResponseBody& body_;
+  char buffer_[kCapacity]{};
+  size_t used_{0u};
 
-    void Flush() {
-        if(used_ == 0u) { return; }
-
-        body_.Write(buffer_, used_);
-        used_ = 0u;
+  void Flush() {
+    if (used_ == 0u) {
+      return;
     }
 
-  public:
-    explicit ChunkWriter(WebResponseBody& body) : body_(body) { }
+    body_.Write(buffer_, used_);
+    used_ = 0u;
+  }
 
-    void Put(char character) {
-        if(used_ == kCapacity) { Flush(); }
+ public:
+  explicit ChunkWriter(WebResponseBody& body) : body_(body) {}
 
-        buffer_[used_++] = character;
+  void Put(char character) {
+    if (used_ == kCapacity) {
+      Flush();
     }
 
-    void Put(const char* text) {
-        if(text == nullptr) { return; }
+    buffer_[used_++] = character;
+  }
 
-        for(const char* character = text; *character != '\0'; character++) { Put(*character); }
+  void Put(char const* text) {
+    if (text == nullptr) {
+      return;
     }
 
-    void PutNumber(uint16_t number) {
-        char digits[8]{};
-        /*
-         * Taken rather than dropped, and then used: it is the length, so the digits go out
-         * without a second walk to find their terminator. Negative is snprintf's encoding
-         * failure, which cannot happen for "%u" and is refused rather than trusted.
-         */
-        const int length = snprintf(digits, sizeof(digits), "%u", static_cast<unsigned>(number));
+    for (char const* character = text; *character != '\0'; character++) {
+      Put(*character);
+    }
+  }
 
-        if(length <= 0) { return; }
+  void PutNumber(uint16_t number) {
+    char digits[8]{};
+    /*
+     * Taken rather than dropped, and then used: it is the length, so the digits go out
+     * without a second walk to find their terminator. Negative is snprintf's encoding
+     * failure, which cannot happen for "%u" and is refused rather than trusted.
+     */
+    int const length = snprintf(digits, sizeof(digits), "%u", static_cast<unsigned>(number));
 
-        for(int index = 0; index < length; index++) { Put(digits[index]); }
+    if (length <= 0) {
+      return;
     }
 
-    // Escaped, because a label is data: a quote in one would otherwise produce a document
-    // the browser refuses whole, and that failure looks like a server fault.
-    void PutString(const char* text) {
-        Put('"');
-        for(const char* character = text; (text != nullptr) && (*character != '\0'); character++) {
-            if((*character == '"') || (*character == '\\')) { Put('\\'); }
-            Put(*character);
-        }
-        Put('"');
+    for (int index = 0; index < length; index++) {
+      Put(digits[index]);
     }
+  }
 
-    // Whatever ends a body on this backend - an empty chunk for one, handing the stream over
-    // for another.
-    void Finish() {
-        Flush();
-        body_.Finish();
+  // Escaped, because a label is data: a quote in one would otherwise produce a document
+  // the browser refuses whole, and that failure looks like a server fault.
+  void PutString(char const* text) {
+    Put('"');
+    for (char const* character = text; (text != nullptr) && (*character != '\0'); character++) {
+      if ((*character == '"') || (*character == '\\')) {
+        Put('\\');
+      }
+      Put(*character);
     }
+    Put('"');
+  }
+
+  // Whatever ends a body on this backend - an empty chunk for one, handing the stream over
+  // for another.
+  void Finish() {
+    Flush();
+    body_.Finish();
+  }
 };
 
-} // namespace
+}  // namespace
 
 namespace {
 /*
@@ -144,11 +156,11 @@ namespace {
  * address bar.
  */
 constexpr WebFrontend::AssetType kAssets[]{
-    {"/",                      kWebAppGzip,   kWebAppGzipSize,   "text/html",                 true},
-    {"/console",               kWebPageGzip,  kWebPageGzipSize,  "text/html",                 true},
-    {"/manifest.webmanifest",  kWebManifest,  kWebManifestSize,  "application/manifest+json", false},
-    {"/icon-192.png",          kWebIcon192,   kWebIcon192Size,   "image/png",                 false},
-    {"/icon-512.png",          kWebIcon512,   kWebIcon512Size,   "image/png",                 false},
+    {"/", kWebAppGzip, kWebAppGzipSize, "text/html", true},
+    {"/console", kWebPageGzip, kWebPageGzipSize, "text/html", true},
+    {"/manifest.webmanifest", kWebManifest, kWebManifestSize, "application/manifest+json", false},
+    {"/icon-192.png", kWebIcon192, kWebIcon192Size, "image/png", false},
+    {"/icon-512.png", kWebIcon512, kWebIcon512Size, "image/png", false},
 };
 
 /*
@@ -159,167 +171,184 @@ constexpr WebFrontend::AssetType kAssets[]{
 static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
               "WebFrontend::MaxAssets has to grow with the asset table");
 
-} // namespace
+}  // namespace
 
-byte WebFrontend::GetNumberOfAssets()
-{
-    return static_cast<byte>(sizeof(kAssets) / sizeof(kAssets[0]));
+byte WebFrontend::GetNumberOfAssets() {
+  return static_cast<byte>(sizeof(kAssets) / sizeof(kAssets[0]));
 }
 
-const WebFrontend::AssetType& WebFrontend::GetAsset(byte index)
-{
-    return kAssets[index];
-}
+WebFrontend::AssetType const& WebFrontend::GetAsset(byte index) { return kAssets[index]; }
 
-void WebFrontend::WriteCommands(WebResponseBody& body)
-{
-    ChunkWriter writer(body);
-    writer.Put('[');
+void WebFrontend::WriteCommands(WebResponseBody& body) {
+  ChunkWriter writer(body);
+  writer.Put('[');
 
-    for(byte index = 0u; index < MessageCatalog::GetNumberOfCommands(); index++) {
-        const MessageCatalog::CommandType& command = MessageCatalog::GetCommand(index);
+  for (byte index = 0u; index < MessageCatalog::GetNumberOfCommands(); index++) {
+    MessageCatalog::CommandType const& command = MessageCatalog::GetCommand(index);
 
-        if(index > 0u) { writer.Put(','); }
-        writer.Put("{\"number\":");
-        writer.PutNumber(command.number);
-        writer.Put(",\"label\":");
-        writer.PutString(command.label);
-        writer.Put(",\"options\":[");
+    if (index > 0u) {
+      writer.Put(',');
+    }
+    writer.Put("{\"number\":");
+    writer.PutNumber(command.number);
+    writer.Put(",\"label\":");
+    writer.PutString(command.label);
+    writer.Put(",\"options\":[");
 
-        for(byte option_index = 0u; option_index < command.number_of_options; option_index++) {
-            const MessageCatalog::OptionType& option = command.options[option_index];
+    for (byte option_index = 0u; option_index < command.number_of_options; option_index++) {
+      MessageCatalog::OptionType const& option = command.options[option_index];
 
-            if(option_index > 0u) { writer.Put(','); }
-            writer.Put("{\"short\":\"");
-            writer.Put(option.short_name);
-            writer.Put("\",\"label\":");
-            writer.PutString(option.label);
-            writer.Put(",\"type\":");
-            writer.PutNumber(static_cast<uint16_t>(option.argument));
-            writer.Put(",\"min\":");
-            writer.PutNumber(option.minimum);
-            writer.Put(",\"max\":");
-            writer.PutNumber(option.maximum);
+      if (option_index > 0u) {
+        writer.Put(',');
+      }
+      writer.Put("{\"short\":\"");
+      writer.Put(option.short_name);
+      writer.Put("\",\"label\":");
+      writer.PutString(option.label);
+      writer.Put(",\"type\":");
+      writer.PutNumber(static_cast<uint16_t>(option.argument));
+      writer.Put(",\"min\":");
+      writer.PutNumber(option.minimum);
+      writer.Put(",\"max\":");
+      writer.PutNumber(option.maximum);
 
-            /*
-             * Only where it is set, so the page's form stays as it was for every option
-             * that can be sent, and the read-only fields it must not offer are the ones
-             * that say so.
-             */
-            if(option.read_only) { writer.Put(",\"readonly\":true"); }
+      /*
+       * Only where it is set, so the page's form stays as it was for every option
+       * that can be sent, and the read-only fields it must not offer are the ones
+       * that say so.
+       */
+      if (option.read_only) {
+        writer.Put(",\"readonly\":true");
+      }
 
-            if((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
-                writer.Put(",\"values\":[");
-                for(byte name_index = 0u; name_index < option.number_of_value_names; name_index++) {
-                    if(name_index > 0u) { writer.Put(','); }
-                    writer.PutString(option.value_names[name_index]);
-                }
-                writer.Put(']');
-            }
-            writer.Put('}');
+      if ((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
+        writer.Put(",\"values\":[");
+        for (byte name_index = 0u; name_index < option.number_of_value_names; name_index++) {
+          if (name_index > 0u) {
+            writer.Put(',');
+          }
+          writer.PutString(option.value_names[name_index]);
         }
-        writer.Put("]}");
+        writer.Put(']');
+      }
+      writer.Put('}');
     }
+    writer.Put("]}");
+  }
 
-    writer.Put(']');
-    writer.Finish();
+  writer.Put(']');
+  writer.Finish();
 }
 
-void WebFrontend::WriteDisplay(WebResponseBody& body)
-{
-    const DisplayCharacters letters;
-    ChunkWriter writer(body);
+void WebFrontend::WriteDisplay(WebResponseBody& body) {
+  DisplayCharacters const letters;
+  ChunkWriter writer(body);
 
-    writer.Put("{\"columns\":");
-    writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
-    writer.Put(",\"rows\":");
-    writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
-    writer.Put(",\"letters\":\"");
+  writer.Put("{\"columns\":");
+  writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS);
+  writer.Put(",\"rows\":");
+  writer.PutNumber(DISPLAY_CHARACTERS_NUMBER_OF_ROWS);
+  writer.Put(",\"letters\":\"");
 
-    for(byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
-        char utf8[2u];
-        const byte length = ToUtf8(static_cast<byte>(letters.GetCharacter(index)), utf8);
+  for (byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
+    char utf8[2u];
+    byte const length = ToUtf8(static_cast<byte>(letters.GetCharacter(index)), utf8);
 
-        for(byte position = 0u; position < length; position++) { writer.Put(utf8[position]); }
+    for (byte position = 0u; position < length; position++) {
+      writer.Put(utf8[position]);
     }
+  }
 
-    writer.Put("\"}");
-    writer.Finish();
+  writer.Put("\"}");
+  writer.Finish();
 }
 
-void WebFrontend::InjectCommand(const char* text, size_t length)
-{
-    if((text == nullptr) || (length == 0u) || (length > WEB_FRONTEND_MAX_FRAME_LENGTH)) { return; }
+void WebFrontend::InjectCommand(char const* text, size_t length) {
+  if ((text == nullptr) || (length == 0u) || (length > WEB_FRONTEND_MAX_FRAME_LENGTH)) {
+    return;
+  }
 
-    WordclockSerial& port = WordclockSerial::GetInstance();
-    port.Inject(text, length);
+  WordclockSerial& port = WordclockSerial::GetInstance();
+  port.Inject(text, length);
 
-    if(text[length - 1u] != Communication::GetEndOfMessageChar()) {
-        const char terminator = Communication::GetEndOfMessageChar();
-        port.Inject(&terminator, 1u);
-    }
+  if (text[length - 1u] != Communication::GetEndOfMessageChar()) {
+    char const terminator = Communication::GetEndOfMessageChar();
+    port.Inject(&terminator, 1u);
+  }
 }
 
-void WebFrontend::BroadcastLine(const char* line)
-{
-    WebTransport& transport = WebTransport::GetInstance();
+void WebFrontend::BroadcastLine(char const* line) {
+  WebTransport& transport = WebTransport::GetInstance();
 
-    if(!transport.IsListening() || (line == nullptr)) { return; }
+  if (!transport.IsListening() || (line == nullptr)) {
+    return;
+  }
 
-    /*
-     * Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
-     * the worst case, so a line that is nothing but umlauts still fits and there is no
-     * truncation to expect. Sized from the producer's own line length rather than from a
-     * number of its own, because that is the buffer the line was assembled in.
-     *
-     * The bound is still checked. Nothing longer can arrive today, but this takes a plain
-     * pointer and the sink it is installed as is a function pointer - the day a second
-     * producer appears, an assumption written only in a comment is the one that gives.
-     */
-    char payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
-    size_t used{0u};
+  /*
+   * Widened rather than sent as it stands - see ToUtf8(). Two bytes per Latin-1 byte is
+   * the worst case, so a line that is nothing but umlauts still fits and there is no
+   * truncation to expect. Sized from the producer's own line length rather than from a
+   * number of its own, because that is the buffer the line was assembled in.
+   *
+   * The bound is still checked. Nothing longer can arrive today, but this takes a plain
+   * pointer and the sink it is installed as is a function pointer - the day a second
+   * producer appears, an assumption written only in a comment is the one that gives.
+   */
+  char payload[2u * WORDCLOCK_SERIAL_LINE_LENGTH];
+  size_t used{0u};
 
-    for(const char* character = line; (*character != '\0') && ((used + 2u) <= sizeof(payload)); character++) {
-        used += ToUtf8(static_cast<byte>(*character), &payload[used]);
-    }
+  for (char const* character = line; (*character != '\0') && ((used + 2u) <= sizeof(payload));
+       character++) {
+    used += ToUtf8(static_cast<byte>(*character), &payload[used]);
+  }
 
-    if(used == 0u) { return; }
+  if (used == 0u) {
+    return;
+  }
 
-    transport.SendText(payload, used);
+  transport.SendText(payload, used);
 }
 
-void WebFrontend::BroadcastFrame()
-{
-    WebTransport& transport = WebTransport::GetInstance();
+void WebFrontend::BroadcastFrame() {
+  WebTransport& transport = WebTransport::GetInstance();
 
-    if(!transport.IsListening()) { return; }
+  if (!transport.IsListening()) {
+    return;
+  }
 
-    const bool forced = force_frame_.exchange(false, std::memory_order_acq_rel);
+  bool const forced = force_frame_.exchange(false, std::memory_order_acq_rel);
 
-    if(!forced) {
-        if(frame_countdown_ > 0u) { frame_countdown_--; return; }
+  if (!forced) {
+    if (frame_countdown_ > 0u) {
+      frame_countdown_--;
+      return;
     }
-    frame_countdown_ = WEB_FRONTEND_FRAME_INTERVAL_TICKS - 1u;
+  }
+  frame_countdown_ = WEB_FRONTEND_FRAME_INTERVAL_TICKS - 1u;
 
-    /* Nothing to send to, so nothing is even gathered. */
-    if(!transport.HasClients()) { return; }
+  /* Nothing to send to, so nothing is even gathered. */
+  if (!transport.HasClients()) {
+    return;
+  }
 
-    byte frame[kFrameSize];
-    byte* target = frame;
-    const Pixels& strip = Pixels::GetInstance();
+  byte frame[kFrameSize];
+  byte* target = frame;
+  Pixels const& strip = Pixels::GetInstance();
 
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
-        const Pixel colour = strip.GetOutputPixel(index);
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_LEDS; index++) {
+    Pixel const colour = strip.GetOutputPixel(index);
 
-        *target++ = colour.GetGreen();
-        *target++ = colour.GetRed();
-        *target++ = colour.GetBlue();
-    }
+    *target++ = colour.GetGreen();
+    *target++ = colour.GetRed();
+    *target++ = colour.GetBlue();
+  }
 
-    if(!forced && (memcmp(frame, last_frame_, kFrameSize) == 0)) { return; }
-    memcpy(last_frame_, frame, kFrameSize);
+  if (!forced && (memcmp(frame, last_frame_, kFrameSize) == 0)) {
+    return;
+  }
+  memcpy(last_frame_, frame, kFrameSize);
 
-    transport.SendBinary(frame, kFrameSize);
+  transport.SendBinary(frame, kFrameSize);
 }
 
-#endif // (WEB_FRONTEND_SUPPORT == STD_ON)
+#endif  // (WEB_FRONTEND_SUPPORT == STD_ON)

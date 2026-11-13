@@ -18,46 +18,34 @@
 
 // The table the file block describes: one string per row, row 0 first, each with the null that
 // ends it - hence the + 1.
-const DisplayCharacters::DisplayCharactersTableElementType DisplayCharacters::kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM
-{
-    "ESKISTLF\xDCNF",
-    "ZEHNZWANZIG",
-    "DREIVIERTEL",
-    "TGNACHVORJM",
-    "HALBQZW\xD6LFP",
-    "ZWEINSIEBEN",
-    "KDREIRHF\xDCNF",
-    "ELFNEUNVIER",
-    "WACHTZEHNRS",
-    "BSECHSFMUHR"
-};
+DisplayCharacters::DisplayCharactersTableElementType const
+    DisplayCharacters::kDisplayCharactersTable[][DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS + 1] PROGMEM{
+        "ESKISTLF\xDCNF", "ZEHNZWANZIG",    "DREIVIERTEL", "TGNACHVORJM", "HALBQZW\xD6LFP",
+        "ZWEINSIEBEN",    "KDREIRHF\xDCNF", "ELFNEUNVIER", "WACHTZEHNRS", "BSECHSFMUHR"};
 
-StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& character)
-{
-    if(IsColumnAndRowValid(column, row)) {
-        character =  GetDisplayCharactersTableElement(column, row);
-        return kEOk;
-    } else {
-        return kENotOk;
-    }
+StdReturnType DisplayCharacters::GetCharacter(byte column, byte row, char& character) {
+  if (IsColumnAndRowValid(column, row)) {
+    character = GetDisplayCharactersTableElement(column, row);
+    return kEOk;
+  } else {
+    return kENotOk;
+  }
 }
 
-StdReturnType DisplayCharacters::GetCharacter(byte index, char& character)
-{
-    if(IsIndexValid(index)) {
-        character =  GetDisplayCharactersTableElement(index);
-        return kEOk;
-    } else {
-        return kENotOk;
-    }
+StdReturnType DisplayCharacters::GetCharacter(byte index, char& character) {
+  if (IsIndexValid(index)) {
+    character = GetDisplayCharactersTableElement(index);
+    return kEOk;
+  } else {
+    return kENotOk;
+  }
 }
 
-StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character)
-{
-    if(IsCharacterIdValid(character_id)) {
-        character =  GetDisplayCharactersTableElement(ToUnderlying(character_id));
-        return kEOk;
-    } else {
-        return kENotOk;
-    }
+StdReturnType DisplayCharacters::GetCharacter(CharacterIdType character_id, char& character) {
+  if (IsCharacterIdValid(character_id)) {
+    character = GetDisplayCharactersTableElement(ToUnderlying(character_id));
+    return kEOk;
+  } else {
+    return kENotOk;
+  }
 }

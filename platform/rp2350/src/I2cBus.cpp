@@ -23,12 +23,11 @@
  * setSDA()'s "already this pin" case, and begin() returns early on a bus that is running. Giving
  * one driver another pin without the other therefore does not fail here, it halts the chip.
  */
-StdReturnType I2cBus::Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz)
-{
-    Wire.setSDA(pin_sda);
-    Wire.setSCL(pin_scl);
+StdReturnType I2cBus::Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz) {
+  Wire.setSDA(pin_sda);
+  Wire.setSCL(pin_scl);
 
-    Wire.begin();
-    Wire.setClock(frequency_hz);
-    return kEOk;
+  Wire.begin();
+  Wire.setClock(frequency_hz);
+  return kEOk;
 }

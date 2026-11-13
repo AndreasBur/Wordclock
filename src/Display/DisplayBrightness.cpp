@@ -15,42 +15,50 @@
  * it - and it put a living room at 100 lx a sixth of a percent up a scale that ends at
  * the sensor's 65535, so the automatic held every indoor clock at its floor.
  */
-byte DisplayBrightness::CalcBrightnessAutomatic(byte brightness)
-{
-    const Illuminance& sensor = Illuminance::GetInstance();
+byte DisplayBrightness::CalcBrightnessAutomatic(byte brightness) {
+  Illuminance const& sensor = Illuminance::GetInstance();
 
-    if(brightness < kBrightnessAutomaticMinValue) { return brightness; }
+  if (brightness < kBrightnessAutomaticMinValue) {
+    return brightness;
+  }
 
-    return ToAutomaticLevel(brightness, ToIlluminanceFactor(sensor.GetIlluminance(),
-                                                            sensor.GetCalibrationValuesMinValue(),
-                                                            sensor.GetCalibrationValuesMaxValue()));
+  return ToAutomaticLevel(brightness, ToIlluminanceFactor(sensor.GetIlluminance(),
+                                                          sensor.GetCalibrationValuesMinValue(),
+                                                          sensor.GetCalibrationValuesMaxValue()));
 }
 
-byte DisplayBrightness::CalcConfiguredBrightness() const
-{
-    if(use_gamma_correction_) {
-        if(use_automatic_) { return CalcBrightnessAutomaticCorrected(); }
-        else { return CalcBrightnessCorrected(); }
+byte DisplayBrightness::CalcConfiguredBrightness() const {
+  if (use_gamma_correction_) {
+    if (use_automatic_) {
+      return CalcBrightnessAutomaticCorrected();
     } else {
-        if(use_automatic_) { return CalcBrightnessAutomatic(); }
-        else { return brightness_; }
+      return CalcBrightnessCorrected();
     }
+  } else {
+    if (use_automatic_) {
+      return CalcBrightnessAutomatic();
+    } else {
+      return brightness_;
+    }
+  }
 }
 
-void DisplayBrightness::ResetToDefaults()
-{
-    brightness_ = kBrightnessInitValue;
-    use_automatic_ = kUseAutomaticInitValue;
-    use_gamma_correction_ = kUseGammaCorrectionInitValue;
-    night_level_ = kFadeLevelFull;
+void DisplayBrightness::ResetToDefaults() {
+  brightness_ = kBrightnessInitValue;
+  use_automatic_ = kUseAutomaticInitValue;
+  use_gamma_correction_ = kUseGammaCorrectionInitValue;
+  night_level_ = kFadeLevelFull;
 }
 
-byte DisplayBrightness::CalcBrightness() const
-{
-    byte value = CalcConfiguredBrightness();
+byte DisplayBrightness::CalcBrightness() const {
+  byte value = CalcConfiguredBrightness();
 
-    if(night_level_ != kFadeLevelFull) { value = ScaleByLevel(value, night_level_); }
-    if(fade_level_ != kFadeLevelFull) { value = ScaleByLevel(value, fade_level_); }
+  if (night_level_ != kFadeLevelFull) {
+    value = ScaleByLevel(value, night_level_);
+  }
+  if (fade_level_ != kFadeLevelFull) {
+    value = ScaleByLevel(value, fade_level_);
+  }
 
-    return value;
+  return value;
 }

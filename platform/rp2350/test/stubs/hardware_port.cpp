@@ -18,8 +18,11 @@ Stream Serial;
  * the whole backend with it. Empty rather than recording, because a host has no port to drive
  * and what a case would ask about is the state PowerSwitch keeps.
  */
-void gpio_init(uint) { }
-void gpio_set_dir(uint, bool) { }
-void gpio_put(uint, bool) { }
+void gpio_init(uint) {}
+void gpio_set_dir(uint, bool) {}
+void gpio_put(uint, bool) {}
 
-char* itoa(int value, char* buffer, int) { snprintf(buffer, 12, "%d", value); return buffer; }
+char* itoa(int value, char* buffer, int) {
+  snprintf(buffer, 12, "%d", value);
+  return buffer;
+}

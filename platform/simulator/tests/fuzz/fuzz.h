@@ -24,35 +24,33 @@
 #include "RealTimeClock.h"
 #include "Scheduler.h"
 
-inline Scheduler& GetScheduler()
-{
-    static Scheduler scheduler;
-    return scheduler;
+inline Scheduler& GetScheduler() {
+  static Scheduler scheduler;
+  return scheduler;
 }
 
-inline ClockDateTime GetFixedDateTime()
-{
-    ClockDateTime date_time;
-    date_time.SetDateYear(2026u);
-    date_time.SetDateMonth(11u);
-    date_time.SetDateDay(6u);
-    date_time.SetTimeHour(14u);
-    date_time.SetTimeMinute(29u);
-    date_time.SetTimeSecond(50u);
-    return date_time;
+inline ClockDateTime GetFixedDateTime() {
+  ClockDateTime date_time;
+  date_time.SetDateYear(2026u);
+  date_time.SetDateMonth(11u);
+  date_time.SetDateDay(6u);
+  date_time.SetTimeHour(14u);
+  date_time.SetTimeMinute(29u);
+  date_time.SetTimeSecond(50u);
+  return date_time;
 }
 
-inline void StartFromANewClock()
-{
-    (void)Overlays::GetInstance().Abort();
-    (void)DisplayManager::GetInstance().AbortAnimation();
-    (void)Persistence::Reset();
-    RealTimeClock::GetInstance().SetDateTime(GetFixedDateTime());
+inline void StartFromANewClock() {
+  (void)Overlays::GetInstance().Abort();
+  (void)DisplayManager::GetInstance().AbortAnimation();
+  (void)Persistence::Reset();
+  RealTimeClock::GetInstance().SetDateTime(GetFixedDateTime());
 }
 
-inline void RunTicks(unsigned ticks)
-{
-    for(unsigned tick = 0u; tick < ticks; tick++) { GetScheduler().Task(); }
+inline void RunTicks(unsigned ticks) {
+  for (unsigned tick = 0u; tick < ticks; tick++) {
+    GetScheduler().Task();
+  }
 }
 
 /*
@@ -60,10 +58,11 @@ inline void RunTicks(unsigned ticks)
  * port in one tick and parses it in the next. Bounded by the input, because every tick in which
  * the port holds something reads at least one character of it.
  */
-inline void RunUntilThePortIsRead()
-{
-    while(Serial.available()) { RunTicks(1u); }
+inline void RunUntilThePortIsRead() {
+  while (Serial.available()) {
     RunTicks(1u);
+  }
+  RunTicks(1u);
 }
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_

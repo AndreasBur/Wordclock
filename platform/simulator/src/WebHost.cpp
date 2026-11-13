@@ -25,106 +25,113 @@
 // Local to this file, so Doxygen leaves it out.
 /*! \cond */
 #ifdef _WIN32
-# include <winsock2.h>
-# include <ws2tcpip.h>
-# define CLOSE_SOCKET closesocket
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define CLOSE_SOCKET closesocket
 // What send() takes its length as: Winsock an int, POSIX a size_t.
 using SendLengthType = int;
 #else
-# include <arpa/inet.h>
-# include <fcntl.h>
-# include <netinet/in.h>
-# include <netinet/tcp.h>
-# include <poll.h>
-# include <sys/socket.h>
-# include <sys/time.h>
-# include <unistd.h>
-# define CLOSE_SOCKET close
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h>
+#define CLOSE_SOCKET close
 using SendLengthType = size_t;
 #endif
 /*! \endcond */
 
-WebHost::WebHost()
-{
-    for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { clients_[slot] = kInvalidSocket; }
+WebHost::WebHost() {
+  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
+    clients_[slot] = kInvalidSocket;
+  }
 }
 
-WebHost& WebHost::GetInstance()
-{
-    static WebHost singleton_instance;
-    return singleton_instance;
+WebHost& WebHost::GetInstance() {
+  static WebHost singleton_instance;
+  return singleton_instance;
 }
 
-StdReturnType WebHost::Begin()
-{
+StdReturnType WebHost::Begin() {
 #ifdef _WIN32
-    WSADATA winsock_data;
-    if(WSAStartup(MAKEWORD(2, 2), &winsock_data) != 0) { return kENotOk; }
+  WSADATA winsock_data;
+  if (WSAStartup(MAKEWORD(2, 2), &winsock_data) != 0) {
+    return kENotOk;
+  }
 #endif
 
-    listener_ = OpenListener();
-    if(listener_ == kInvalidSocket) { return kENotOk; }
+  listener_ = OpenListener();
+  if (listener_ == kInvalidSocket) {
+    return kENotOk;
+  }
 
-    WordclockSerial::GetInstance().SetLineSink(SendLineToClients);
+  WordclockSerial::GetInstance().SetLineSink(SendLineToClients);
 
-    Serial.println("Web: http://localhost:8080/");
+  Serial.println("Web: http://localhost:8080/");
 
-    return kEOk;
+  return kEOk;
 }
 
-void WebHost::Task()
-{
-    if(listener_ == kInvalidSocket) { return; }
+void WebHost::Task() {
+  if (listener_ == kInvalidSocket) {
+    return;
+  }
 
-    AcceptClients();
-    for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-        if(clients_[slot] != kInvalidSocket) { ReadClient(slot); }
+  AcceptClients();
+  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
+    if (clients_[slot] != kInvalidSocket) {
+      ReadClient(slot);
     }
+  }
 }
 
-void WebHost::End()
-{
-    for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) { DropClient(slot); }
+void WebHost::End() {
+  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
+    DropClient(slot);
+  }
 
-    if(listener_ != kInvalidSocket) {
-        CLOSE_SOCKET(listener_);
-        listener_ = kInvalidSocket;
+  if (listener_ != kInvalidSocket) {
+    CLOSE_SOCKET(listener_);
+    listener_ = kInvalidSocket;
+  }
+}
+
+bool WebHost::IsListening() const { return listener_ != kInvalidSocket; }
+
+bool WebHost::HasClients() const {
+  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
+    if (clients_[slot] != kInvalidSocket) {
+      return true;
     }
+  }
+  return false;
 }
 
-bool WebHost::IsListening() const
-{
-    return listener_ != kInvalidSocket;
-}
+void WebHost::SendToEveryClient(bool is_binary, char const* payload, size_t length) {
+  std::string const frame = WebSocket::EncodeFrame(is_binary, payload, length);
 
-bool WebHost::HasClients() const
-{
-    for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-        if(clients_[slot] != kInvalidSocket) { return true; }
+  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
+    if (clients_[slot] != kInvalidSocket) {
+      SendAll(clients_[slot], frame.data(), frame.size());
     }
-    return false;
+  }
 }
 
-void WebHost::SendToEveryClient(bool is_binary, const char* payload, size_t length)
-{
-    const std::string frame = WebSocket::EncodeFrame(is_binary, payload, length);
+void WebHost::SendResponse(SocketType socket, char const* status, char const* content_type,
+                           char const* body, size_t length, bool is_gzipped) {
+  char header[256];
+  int const written = snprintf(
+      header, sizeof(header),
+      "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %zu\r\n%sConnection: close\r\n\r\n",
+      status, content_type, length, is_gzipped ? "Content-Encoding: gzip\r\n" : "");
 
-    for(size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-        if(clients_[slot] != kInvalidSocket) { SendAll(clients_[slot], frame.data(), frame.size()); }
-    }
-}
-
-void WebHost::SendResponse(SocketType socket, const char* status, const char* content_type,
-                           const char* body, size_t length, bool is_gzipped)
-{
-    char header[256];
-    const int written = snprintf(header, sizeof(header),
-                                 "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %zu\r\n%sConnection: close\r\n\r\n",
-                                 status, content_type, length,
-                                 is_gzipped ? "Content-Encoding: gzip\r\n" : "");
-
-    if(!SendAll(socket, header, static_cast<size_t>(written))) { return; }
-    SendAll(socket, body, length);
+  if (!SendAll(socket, header, static_cast<size_t>(written))) {
+    return;
+  }
+  SendAll(socket, body, length);
 }
 
 /*
@@ -132,21 +139,22 @@ void WebHost::SendResponse(SocketType socket, const char* status, const char* co
  * is a free slot for it, and closes every other one. A connection that arrives with every slot
  * taken is closed unread.
  */
-void WebHost::AcceptClients()
-{
-    for(;;) {
-        const SocketType accepted = accept(listener_, nullptr, nullptr);
-        if(accepted == kInvalidSocket) { return; }
-
-        const size_t slot = FindFreeSlot();
-        if((slot < WEB_HOST_MAX_CLIENTS) && ServeConnection(accepted)) {
-            SetNonBlocking(accepted);
-            clients_[slot] = accepted;
-            pending_[slot].clear();
-        } else {
-            CLOSE_SOCKET(accepted);
-        }
+void WebHost::AcceptClients() {
+  for (;;) {
+    SocketType const accepted = accept(listener_, nullptr, nullptr);
+    if (accepted == kInvalidSocket) {
+      return;
     }
+
+    size_t const slot = FindFreeSlot();
+    if ((slot < WEB_HOST_MAX_CLIENTS) && ServeConnection(accepted)) {
+      SetNonBlocking(accepted);
+      clients_[slot] = accepted;
+      pending_[slot].clear();
+    } else {
+      CLOSE_SOCKET(accepted);
+    }
+  }
 }
 
 /*
@@ -154,42 +162,53 @@ void WebHost::AcceptClients()
  * bytes until a frame is complete; a closed connection or a close frame drops the client. A
  * recv() that fails, or would block, leaves the client as it is.
  */
-void WebHost::ReadClient(size_t slot)
-{
-    char chunk[kFrameChunkLength];
-    const int read = static_cast<int>(recv(clients_[slot], chunk, sizeof(chunk), 0));
-    uint8_t opcode{0u};
-    std::string payload;
+void WebHost::ReadClient(size_t slot) {
+  char chunk[kFrameChunkLength];
+  int const read = static_cast<int>(recv(clients_[slot], chunk, sizeof(chunk), 0));
+  uint8_t opcode{0u};
+  std::string payload;
 
-    if(read == 0) { DropClient(slot); return; }
-    if(read > 0) { pending_[slot].append(chunk, static_cast<size_t>(read)); }
+  if (read == 0) {
+    DropClient(slot);
+    return;
+  }
+  if (read > 0) {
+    pending_[slot].append(chunk, static_cast<size_t>(read));
+  }
 
-    while(WebSocket::DecodeFrame(pending_[slot], opcode, payload) == kEOk) {
-        if(opcode == WebSocket::kCloseOpcode) { DropClient(slot); return; }
-        if(opcode == WebSocket::kTextOpcode)  { WebFrontend::InjectCommand(payload.data(), payload.size()); }
+  while (WebSocket::DecodeFrame(pending_[slot], opcode, payload) == kEOk) {
+    if (opcode == WebSocket::kCloseOpcode) {
+      DropClient(slot);
+      return;
     }
+    if (opcode == WebSocket::kTextOpcode) {
+      WebFrontend::InjectCommand(payload.data(), payload.size());
+    }
+  }
 }
 
 // Returns the first slot without a client, or WEB_HOST_MAX_CLIENTS when all are taken.
-size_t WebHost::FindFreeSlot() const
-{
-    size_t slot{0u};
+size_t WebHost::FindFreeSlot() const {
+  size_t slot{0u};
 
-    while((slot < WEB_HOST_MAX_CLIENTS) && (clients_[slot] != kInvalidSocket)) { slot++; }
-    return slot;
+  while ((slot < WEB_HOST_MAX_CLIENTS) && (clients_[slot] != kInvalidSocket)) {
+    slot++;
+  }
+  return slot;
 }
 
 /*
  * Closes a web socket. Frees the slot and forgets what the client sent that was not yet a
  * whole frame. An empty slot is left alone, so that End() may call this on every one.
  */
-void WebHost::DropClient(size_t slot)
-{
-    if(clients_[slot] == kInvalidSocket) { return; }
+void WebHost::DropClient(size_t slot) {
+  if (clients_[slot] == kInvalidSocket) {
+    return;
+  }
 
-    CLOSE_SOCKET(clients_[slot]);
-    clients_[slot] = kInvalidSocket;
-    pending_[slot].clear();
+  CLOSE_SOCKET(clients_[slot]);
+  clients_[slot] = kInvalidSocket;
+  pending_[slot].clear();
 }
 
 /*
@@ -198,20 +217,21 @@ void WebHost::DropClient(size_t slot)
  * every other request fits in, so an update is drained before it is answered. An update that
  * announces no body is answered as any other request, and there is no route for it there.
  */
-bool WebHost::ServeConnection(SocketType socket)
-{
-    SetBlocking(socket);
-    SetReceiveTimeout(socket, kRequestTimeoutMs);
-    const std::string request = ReadRequest(socket);
-    if(request.empty()) { return false; }
+bool WebHost::ServeConnection(SocketType socket) {
+  SetBlocking(socket);
+  SetReceiveTimeout(socket, kRequestTimeoutMs);
+  std::string const request = ReadRequest(socket);
+  if (request.empty()) {
+    return false;
+  }
 
-    const size_t announced = IsUpdateRequest(request) ? GetAnnouncedLength(request) : 0u;
-    if(announced > 0u) {
-        SetReceiveTimeout(socket, kBodyTimeoutMs);
-        AnswerUpdate(socket, DrainBody(socket, GetArrivedBodyLength(request), announced));
-        return false;
-    }
-    return AnswerRequest(socket, request);
+  size_t const announced = IsUpdateRequest(request) ? GetAnnouncedLength(request) : 0u;
+  if (announced > 0u) {
+    SetReceiveTimeout(socket, kBodyTimeoutMs);
+    AnswerUpdate(socket, DrainBody(socket, GetArrivedBodyLength(request), announced));
+    return false;
+  }
+  return AnswerRequest(socket, request);
 }
 
 /*
@@ -220,33 +240,43 @@ bool WebHost::ServeConnection(SocketType socket)
  * serves the assets, and gives every other path a 404. A request without a path, or a
  * handshake without a key, is closed unanswered.
  */
-bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
-{
-    std::string path;
-    std::string answer;
+bool WebHost::AnswerRequest(SocketType socket, std::string const& request) {
+  std::string path;
+  std::string answer;
 
-    if(GetPath(request, path) != kEOk) { return false; }
-
-    if(path == kWebSocketPath) {
-        if(WebSocket::GetHandshakeAnswer(request, answer) != kEOk) { return false; }
-        if(!SendAll(socket, answer.data(), answer.size())) { return false; }
-        WebFrontend::GetInstance().OnClientOpened();
-        return true;
-    }
-
-    if((path == "/commands") || (path == "/display")) {
-        WebResponseBody body(socket, "application/json");
-
-        if(path == "/commands") { WebFrontend::WriteCommands(body); }
-        else                    { WebFrontend::WriteDisplay(body); }
-        return false;
-    }
-
-    if(SendAsset(socket, path) == kEOk) { return false; }
-
-    static constexpr char kNotFound[]{"no such route on the simulator\n"};
-    SendResponse(socket, "404 Not Found", "text/plain", kNotFound, sizeof(kNotFound) - 1u, false);
+  if (GetPath(request, path) != kEOk) {
     return false;
+  }
+
+  if (path == kWebSocketPath) {
+    if (WebSocket::GetHandshakeAnswer(request, answer) != kEOk) {
+      return false;
+    }
+    if (!SendAll(socket, answer.data(), answer.size())) {
+      return false;
+    }
+    WebFrontend::GetInstance().OnClientOpened();
+    return true;
+  }
+
+  if ((path == "/commands") || (path == "/display")) {
+    WebResponseBody body(socket, "application/json");
+
+    if (path == "/commands") {
+      WebFrontend::WriteCommands(body);
+    } else {
+      WebFrontend::WriteDisplay(body);
+    }
+    return false;
+  }
+
+  if (SendAsset(socket, path) == kEOk) {
+    return false;
+  }
+
+  static constexpr char kNotFound[]{"no such route on the simulator\n"};
+  SendResponse(socket, "404 Not Found", "text/plain", kNotFound, sizeof(kNotFound) - 1u, false);
+  return false;
 }
 
 /*
@@ -260,72 +290,73 @@ bool WebHost::AnswerRequest(SocketType socket, const std::string& request)
  * Refused below a size no real image is, so both answers are reachable: pick a small file to
  * see the failing path, a release image to see the other.
  */
-void WebHost::AnswerUpdate(SocketType socket, size_t received)
-{
-    static constexpr size_t kSmallestPlausibleImage{size_t{64u} * 1024u};
+void WebHost::AnswerUpdate(SocketType socket, size_t received) {
+  static constexpr size_t kSmallestPlausibleImage{size_t{64u} * 1024u};
 
-    if(received >= kSmallestPlausibleImage) {
-        static constexpr char kAccepted[]{"{\"ok\":true}"};
+  if (received >= kSmallestPlausibleImage) {
+    static constexpr char kAccepted[]{"{\"ok\":true}"};
 
-        Serial.print("Web: update of ");
-        Serial.print(static_cast<int>(received / 1024u));
-        Serial.println(" kB accepted - nothing was written, this is the simulator");
-        SendResponse(socket, "200 OK", "application/json", kAccepted, sizeof(kAccepted) - 1u, false);
-        return;
-    }
+    Serial.print("Web: update of ");
+    Serial.print(static_cast<int>(received / 1024u));
+    Serial.println(" kB accepted - nothing was written, this is the simulator");
+    SendResponse(socket, "200 OK", "application/json", kAccepted, sizeof(kAccepted) - 1u, false);
+    return;
+  }
 
-    char refused[160];
-    const int written = snprintf(refused, sizeof(refused),
-                                 "{\"ok\":false,\"error\":\"%zu bytes is too small to be a firmware image\"}",
-                                 received);
+  char refused[160];
+  int const written = snprintf(
+      refused, sizeof(refused),
+      "{\"ok\":false,\"error\":\"%zu bytes is too small to be a firmware image\"}", received);
 
-    SendResponse(socket, "400 Bad Request", "application/json", refused, static_cast<size_t>(written), false);
+  SendResponse(socket, "400 Bad Request", "application/json", refused, static_cast<size_t>(written),
+               false);
 }
 
 // Sends the embedded file served on `path`; kENotOk, with nothing sent, if no file is served
 // there.
-StdReturnType WebHost::SendAsset(SocketType socket, const std::string& path)
-{
-    for(byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
-        const WebFrontend::AssetType& asset = WebFrontend::GetAsset(index);
+StdReturnType WebHost::SendAsset(SocketType socket, std::string const& path) {
+  for (byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
+    WebFrontend::AssetType const& asset = WebFrontend::GetAsset(index);
 
-        if(path == asset.path) {
-            SendResponse(socket, "200 OK", asset.content_type,
-                         reinterpret_cast<const char*>(asset.bytes), asset.size, asset.is_gzipped);
-            return kEOk;
-        }
+    if (path == asset.path) {
+      SendResponse(socket, "200 OK", asset.content_type, reinterpret_cast<char const*>(asset.bytes),
+                   asset.size, asset.is_gzipped);
+      return kEOk;
     }
-    return kENotOk;
+  }
+  return kENotOk;
 }
 
 // Opens a listening socket on loopback, or returns kInvalidSocket. Loopback only, for the
 // reason Begin() gives.
-WebHost::SocketType WebHost::OpenListener()
-{
-    const SocketType socket = ::socket(AF_INET, SOCK_STREAM, 0);
-    if(socket == kInvalidSocket) { return kInvalidSocket; }
+WebHost::SocketType WebHost::OpenListener() {
+  SocketType const socket = ::socket(AF_INET, SOCK_STREAM, 0);
+  if (socket == kInvalidSocket) {
+    return kInvalidSocket;
+  }
 
-    // So a restart does not have to wait out the last connection's TIME_WAIT, which is a
-    // minute of "port already in use" for a program somebody restarts constantly.
-    int reuse{1};
-    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&reuse), sizeof(reuse));
+  // So a restart does not have to wait out the last connection's TIME_WAIT, which is a
+  // minute of "port already in use" for a program somebody restarts constantly.
+  int reuse{1};
+  setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&reuse),
+             sizeof(reuse));
 
-    sockaddr_in address{};
-    address.sin_family = AF_INET;
-    address.sin_port = htons(WEB_HOST_PORT);
-    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+  sockaddr_in address{};
+  address.sin_family = AF_INET;
+  address.sin_port = htons(WEB_HOST_PORT);
+  address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    if(bind(socket, reinterpret_cast<sockaddr*>(&address), sizeof(address)) != 0) {
-        CLOSE_SOCKET(socket);
-        Serial.println("Web: port 8080 is taken, the window runs without a browser");
-        return kInvalidSocket;
-    }
-    if(listen(socket, kBacklog) != 0) {
-        CLOSE_SOCKET(socket);
-        return kInvalidSocket;
-    }
-    SetNonBlocking(socket);
-    return socket;
+  if (bind(socket, reinterpret_cast<sockaddr*>(&address), sizeof(address)) != 0) {
+    CLOSE_SOCKET(socket);
+    Serial.println("Web: port 8080 is taken, the window runs without a browser");
+    return kInvalidSocket;
+  }
+  if (listen(socket, kBacklog) != 0) {
+    CLOSE_SOCKET(socket);
+    return kInvalidSocket;
+  }
+  SetNonBlocking(socket);
+  return socket;
 }
 
 /*
@@ -339,18 +370,19 @@ WebHost::SocketType WebHost::OpenListener()
  * browser closed it. The receive timeout set before this call is what ends the wait; what has
  * arrived by then is all there is.
  */
-std::string WebHost::ReadRequest(SocketType socket)
-{
-    std::string request;
-    char chunk[kRequestChunkLength];
+std::string WebHost::ReadRequest(SocketType socket) {
+  std::string request;
+  char chunk[kRequestChunkLength];
 
-    while(request.find("\r\n\r\n") == std::string::npos) {
-        const int read = static_cast<int>(recv(socket, chunk, sizeof(chunk), 0));
+  while (request.find("\r\n\r\n") == std::string::npos) {
+    int const read = static_cast<int>(recv(socket, chunk, sizeof(chunk), 0));
 
-        if(read <= 0) { break; }
-        request.append(chunk, static_cast<size_t>(read));
+    if (read <= 0) {
+      break;
     }
-    return request;
+    request.append(chunk, static_cast<size_t>(read));
+  }
+  return request;
 }
 
 /*
@@ -358,22 +390,23 @@ std::string WebHost::ReadRequest(SocketType socket)
  * line, a query string included. kENotOk if there are no two spaces; `path` is then left as
  * it was.
  */
-StdReturnType WebHost::GetPath(const std::string& request, std::string& path)
-{
-    const size_t start = request.find(' ');
-    const size_t end = (start == std::string::npos) ? std::string::npos : request.find(' ', start + 1u);
+StdReturnType WebHost::GetPath(std::string const& request, std::string& path) {
+  size_t const start = request.find(' ');
+  size_t const end =
+      (start == std::string::npos) ? std::string::npos : request.find(' ', start + 1u);
 
-    if(end == std::string::npos) { return kENotOk; }
+  if (end == std::string::npos) {
+    return kENotOk;
+  }
 
-    path = request.substr(start + 1u, end - start - 1u);
-    return kEOk;
+  path = request.substr(start + 1u, end - start - 1u);
+  return kEOk;
 }
 
 // Tells POST /update from every other request. Asked of the route and not only of the header,
 // so that a body on any other request is not mistaken for an image.
-bool WebHost::IsUpdateRequest(const std::string& request)
-{
-    return request.compare(0u, sizeof(kUpdateRequestLine) - 1u, kUpdateRequestLine) == 0;
+bool WebHost::IsUpdateRequest(std::string const& request) {
+  return request.compare(0u, sizeof(kUpdateRequestLine) - 1u, kUpdateRequestLine) == 0;
 }
 
 /*
@@ -381,23 +414,25 @@ bool WebHost::IsUpdateRequest(const std::string& request)
  * follows the headers. So a body can be read to its end rather than to whatever arrived in the
  * first packet.
  */
-size_t WebHost::GetAnnouncedLength(const std::string& request)
-{
-    std::string lowered(request);
-    for(char& character : lowered) { character = static_cast<char>(tolower(static_cast<unsigned char>(character))); }
+size_t WebHost::GetAnnouncedLength(std::string const& request) {
+  std::string lowered(request);
+  for (char& character : lowered) {
+    character = static_cast<char>(tolower(static_cast<unsigned char>(character)));
+  }
 
-    const size_t found = lowered.find(kLengthHeader);
-    if(found == std::string::npos) { return 0u; }
+  size_t const found = lowered.find(kLengthHeader);
+  if (found == std::string::npos) {
+    return 0u;
+  }
 
-    return static_cast<size_t>(strtoul(&request[found + sizeof(kLengthHeader) - 1u], nullptr, 10));
+  return static_cast<size_t>(strtoul(&request[found + sizeof(kLengthHeader) - 1u], nullptr, 10));
 }
 
 // Returns how much of the body came along in the packets that carried the headers: the bytes
 // past the blank line, or 0 when the headers never ended.
-size_t WebHost::GetArrivedBodyLength(const std::string& request)
-{
-    const size_t header_end = request.find("\r\n\r\n");
-    return (header_end == std::string::npos) ? 0u : (request.size() - header_end - 4u);
+size_t WebHost::GetArrivedBodyLength(std::string const& request) {
+  size_t const header_end = request.find("\r\n\r\n");
+  return (header_end == std::string::npos) ? 0u : (request.size() - header_end - 4u);
 }
 
 /*
@@ -408,27 +443,27 @@ size_t WebHost::GetArrivedBodyLength(const std::string& request)
  * forwarded port, and cutting it short answers "too small" for an image that was not - while
  * one that announced more than it sends must still not hold the tick for good.
  */
-size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced)
-{
-    char chunk[kRequestChunkLength];
+size_t WebHost::DrainBody(SocketType socket, size_t received, size_t announced) {
+  char chunk[kRequestChunkLength];
 
-    while(received < announced) {
-        const int read = static_cast<int>(recv(socket, chunk, sizeof(chunk), 0));
+  while (received < announced) {
+    int const read = static_cast<int>(recv(socket, chunk, sizeof(chunk), 0));
 
-        if(read <= 0) { break; }
-        received += static_cast<size_t>(read);
+    if (read <= 0) {
+      break;
     }
-    return received;
+    received += static_cast<size_t>(read);
+  }
+  return received;
 }
 
 // Lets a socket return at once, so that polling it from the tick never stops the firmware.
-void WebHost::SetNonBlocking(SocketType socket)
-{
+void WebHost::SetNonBlocking(SocketType socket) {
 #ifdef _WIN32
-    u_long mode{1u};
-    ioctlsocket(socket, FIONBIO, &mode);
+  u_long mode{1u};
+  ioctlsocket(socket, FIONBIO, &mode);
 #else
-    fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) | O_NONBLOCK);
+  fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) | O_NONBLOCK);
 #endif
 }
 
@@ -440,13 +475,12 @@ void WebHost::SetNonBlocking(SocketType socket)
  * socket heeds, would not have applied there at all. Said on both platforms, so that both read
  * the same way.
  */
-void WebHost::SetBlocking(SocketType socket)
-{
+void WebHost::SetBlocking(SocketType socket) {
 #ifdef _WIN32
-    u_long mode{0u};
-    ioctlsocket(socket, FIONBIO, &mode);
+  u_long mode{0u};
+  ioctlsocket(socket, FIONBIO, &mode);
 #else
-    fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) & ~O_NONBLOCK);
+  fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) & ~O_NONBLOCK);
 #endif
 }
 
@@ -455,16 +489,16 @@ void WebHost::SetBlocking(SocketType socket)
  * socket rather than a select() before every recv(): the read loops already end on a recv()
  * that returns nothing, so they need no change to end on one that waited long enough.
  */
-void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
-{
+void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds) {
 #ifdef _WIN32
-    const DWORD timeout{milliseconds};
+  const DWORD timeout{milliseconds};
 #else
-    timeval timeout{};
-    timeout.tv_sec = static_cast<time_t>(milliseconds / 1000u);
-    timeout.tv_usec = static_cast<suseconds_t>((milliseconds % 1000u) * 1000u);
+  timeval timeout{};
+  timeout.tv_sec = static_cast<time_t>(milliseconds / 1000u);
+  timeout.tv_usec = static_cast<suseconds_t>((milliseconds % 1000u) * 1000u);
 #endif
-    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
+  setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char const*>(&timeout),
+             sizeof(timeout));
 }
 
 /*
@@ -474,35 +508,38 @@ void WebHost::SetReceiveTimeout(SocketType socket, unsigned milliseconds)
  * an observation rather than an assumption. A send that would block is retried, except on
  * Windows, where it counts as broken and leaves what was already sent.
  */
-bool WebHost::SendAll(SocketType socket, const char* data, size_t length)
-{
-    size_t sent{0u};
+bool WebHost::SendAll(SocketType socket, char const* data, size_t length) {
+  size_t sent{0u};
 
-    while(sent < length) {
-        const int written = static_cast<int>(send(socket, &data[sent], static_cast<SendLengthType>(length - sent), 0));
+  while (sent < length) {
+    int const written =
+        static_cast<int>(send(socket, &data[sent], static_cast<SendLengthType>(length - sent), 0));
 
-        if(written > 0) { sent += static_cast<size_t>(written); continue; }
-#ifndef _WIN32
-        if((written < 0) && ((errno == EAGAIN) || (errno == EWOULDBLOCK))) { continue; }
-#endif
-        return false;
+    if (written > 0) {
+      sent += static_cast<size_t>(written);
+      continue;
     }
-    return true;
+#ifndef _WIN32
+    if ((written < 0) && ((errno == EAGAIN) || (errno == EWOULDBLOCK))) {
+      continue;
+    }
+#endif
+    return false;
+  }
+  return true;
 }
 
 // Hands a finished output line to the pages. Static because SerialShim takes a plain function
 // pointer.
-void WebHost::SendLineToClients(const char* line)
-{
-    WebFrontend::GetInstance().BroadcastLine(line);
+void WebHost::SendLineToClients(char const* line) {
+  WebFrontend::GetInstance().BroadcastLine(line);
 }
 
 /* The simulator's half of the contract WebFrontend.h states, in terms of the host above. */
 
-WebTransport& WebTransport::GetInstance()
-{
-    static WebTransport singleton_instance;
-    return singleton_instance;
+WebTransport& WebTransport::GetInstance() {
+  static WebTransport singleton_instance;
+  return singleton_instance;
 }
 
 /*
@@ -515,14 +552,12 @@ WebTransport& WebTransport::GetInstance()
 bool WebTransport::IsListening() const { return WebHost::GetInstance().IsListening(); }
 bool WebTransport::HasClients() const { return WebHost::GetInstance().HasClients(); }
 
-void WebTransport::SendText(const char* text, size_t length)
-{
-    WebHost::GetInstance().SendToEveryClient(false, text, length);
+void WebTransport::SendText(char const* text, size_t length) {
+  WebHost::GetInstance().SendToEveryClient(false, text, length);
 }
 
-void WebTransport::SendBinary(const byte* bytes, size_t length)
-{
-    WebHost::GetInstance().SendToEveryClient(true, reinterpret_cast<const char*>(bytes), length);
+void WebTransport::SendBinary(byte const* bytes, size_t length) {
+  WebHost::GetInstance().SendToEveryClient(true, reinterpret_cast<char const*>(bytes), length);
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
@@ -532,19 +567,14 @@ void WebTransport::SendBinary(const byte* bytes, size_t length)
  * what lets the browser show a progress that ends.
  */
 
-WebResponseBody::WebResponseBody(int socket, const char* content_type)
-    : socket_(socket), content_type_(content_type)
-{
+WebResponseBody::WebResponseBody(int socket, char const* content_type)
+    : socket_(socket), content_type_(content_type) {}
+
+void WebResponseBody::Write(char const* data, size_t length) { collected_.append(data, length); }
+
+void WebResponseBody::Finish() {
+  WebHost::SendResponse(socket_, "200 OK", content_type_, collected_.data(), collected_.size(),
+                        false);
 }
 
-void WebResponseBody::Write(const char* data, size_t length)
-{
-    collected_.append(data, length);
-}
-
-void WebResponseBody::Finish()
-{
-    WebHost::SendResponse(socket_, "200 OK", content_type_, collected_.data(), collected_.size(), false);
-}
-
-#endif // (WEB_FRONTEND_SUPPORT == STD_ON)
+#endif  // (WEB_FRONTEND_SUPPORT == STD_ON)

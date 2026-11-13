@@ -29,7 +29,7 @@
  * and bridges the high side MOSFET when it is left off - so the firmware has to answer for a clock
  * that has none.
  */
-#define POWER_SWITCH_IS_FITTED                          STD_ON
+#define POWER_SWITCH_IS_FITTED STD_ON
 
 /*!
  * \brief The switch in the strip's 5 V supply.
@@ -41,49 +41,48 @@
  * The simulator has no supply to switch. What is left is a flag, which starts on and which the
  * two switches set.
  */
-class PowerSwitch
-{
-  private:
-    bool supply_on_{true};
+class PowerSwitch {
+ private:
+  bool supply_on_{true};
 
-    PowerSwitch() { }
-    ~PowerSwitch() = default;
+  PowerSwitch() {}
+  ~PowerSwitch() = default;
 
-  public:
-    /*! \brief Returns the one switch. */
-    static PowerSwitch& GetInstance() {
-        static PowerSwitch singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one switch. */
+  static PowerSwitch& GetInstance() {
+    static PowerSwitch singleton_instance;
+    return singleton_instance;
+  }
 
-    /*! \brief Returns whether the board has the switch, as POWER_SWITCH_IS_FITTED says. */
-    static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
+  /*! \brief Returns whether the board has the switch, as POWER_SWITCH_IS_FITTED says. */
+  static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
 
-    /*!
-     * \brief Returns whether the strip's supply is on; always true where no switch is fitted.
-     *
-     * In the simulator, the flag the two switches set, which starts true.
-     *
-     * \return True while the supply is on.
-     */
-    bool IsSupplyOn() const { return supply_on_; }
+  /*!
+   * \brief Returns whether the strip's supply is on; always true where no switch is fitted.
+   *
+   * In the simulator, the flag the two switches set, which starts true.
+   *
+   * \return True while the supply is on.
+   */
+  bool IsSupplyOn() const { return supply_on_; }
 
-    /*!
-     * \brief Sets the switch up and switches the supply on.
-     *
-     * The application calls it once at start, before the strip's data line is claimed.
-     *
-     * Nothing to set up: there is no port to make an output, and the supply already reads on. It
-     * exists so that the call in the application's start-up is the same one on every backend. It
-     * does nothing, so a supply switched off before it stays off.
-     */
-    void Init() { }
+  /*!
+   * \brief Sets the switch up and switches the supply on.
+   *
+   * The application calls it once at start, before the strip's data line is claimed.
+   *
+   * Nothing to set up: there is no port to make an output, and the supply already reads on. It
+   * exists so that the call in the application's start-up is the same one on every backend. It
+   * does nothing, so a supply switched off before it stays off.
+   */
+  void Init() {}
 
-    /*! \brief Switches the strip's supply on. */
-    void SwitchSupplyOn() { supply_on_ = true; }
+  /*! \brief Switches the strip's supply on. */
+  void SwitchSupplyOn() { supply_on_ = true; }
 
-    /*! \brief Switches the strip's supply off. */
-    void SwitchSupplyOff() { supply_on_ = false; }
+  /*! \brief Switches the strip's supply off. */
+  void SwitchSupplyOff() { supply_on_ = false; }
 };
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_POWERSWITCH_H_

@@ -18,9 +18,9 @@
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKCONFIGURATION_H_
 
 #if defined(__has_include)
-# if __has_include("WordclockSecrets.h")
-#  include "WordclockSecrets.h"
-# endif
+#if __has_include("WordclockSecrets.h")
+#include "WordclockSecrets.h"
+#endif
 #endif
 
 /*!
@@ -34,14 +34,14 @@
  * System::ReconnectNetwork() asks only for this, not for a stored network; see the warning there.
  */
 #ifndef WORDCLOCK_WIFI_SSID
-# define WORDCLOCK_WIFI_SSID                    ""
+#define WORDCLOCK_WIFI_SSID ""
 #endif
 
 /*!
  * \brief The pass phrase the clock joins with while none is stored; empty for an open network.
  */
 #ifndef WORDCLOCK_WIFI_PASSWORD
-# define WORDCLOCK_WIFI_PASSWORD                ""
+#define WORDCLOCK_WIFI_PASSWORD ""
 #endif
 
 /*!
@@ -51,12 +51,12 @@
  * one is unreachable the second one still gets the display right.
  */
 #ifndef WORDCLOCK_NTP_SERVER_PRIMARY
-# define WORDCLOCK_NTP_SERVER_PRIMARY           "pool.ntp.org"
+#define WORDCLOCK_NTP_SERVER_PRIMARY "pool.ntp.org"
 #endif
 
 /*! \brief The second time server SNTP asks, for when the first one is unreachable. */
 #ifndef WORDCLOCK_NTP_SERVER_SECONDARY
-# define WORDCLOCK_NTP_SERVER_SECONDARY         "time.cloudflare.com"
+#define WORDCLOCK_NTP_SERVER_SECONDARY "time.cloudflare.com"
 #endif
 
 /*!
@@ -67,12 +67,12 @@
  * October.
  */
 #ifndef WORDCLOCK_TIMEZONE
-# define WORDCLOCK_TIMEZONE                     "CET-1CEST,M3.5.0,M10.5.0/3"
+#define WORDCLOCK_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #endif
 
 /*! \brief The baud rate of the serial console. */
 #ifndef WORDCLOCK_SERIAL_BAUDRATE
-# define WORDCLOCK_SERIAL_BAUDRATE              115200
+#define WORDCLOCK_SERIAL_BAUDRATE 115200
 #endif
 
 /*!
@@ -83,7 +83,7 @@
  * more than the rest of the controller draws. A clock notices the one and not the other.
  */
 #ifndef WORDCLOCK_WIFI_MODEM_SLEEP
-# define WORDCLOCK_WIFI_MODEM_SLEEP             true
+#define WORDCLOCK_WIFI_MODEM_SLEEP true
 #endif
 
 #endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKCONFIGURATION_H_

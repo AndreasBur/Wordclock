@@ -11,7 +11,7 @@
 
 namespace {
 Display& GetDisplay() { return Display::GetInstance(); }
-}
+}  // namespace
 
 /*
  * One hue as a colour, at full saturation and full value - the outside edge of the
@@ -27,21 +27,26 @@ Display& GetDisplay() { return Display::GetInstance(); }
  * but a constexpr function has to be in the header for its callers to see, and nothing needs
  * this one before the clock runs.
  */
-Pixel ColorCycle::ToColour(HueType hue)
-{
-    const uint16_t scaled = static_cast<uint16_t>(hue) * kNumberOfSegments;
-    const byte segment = static_cast<byte>(scaled >> 8u);
-    const byte rising = static_cast<byte>(scaled & 0xFFu);
-    const byte falling = static_cast<byte>(kFullChannel - rising);
+Pixel ColorCycle::ToColour(HueType hue) {
+  uint16_t const scaled = static_cast<uint16_t>(hue) * kNumberOfSegments;
+  byte const segment = static_cast<byte>(scaled >> 8u);
+  byte const rising = static_cast<byte>(scaled & 0xFFu);
+  byte const falling = static_cast<byte>(kFullChannel - rising);
 
-    switch(segment) {
-        case 0u  : return Pixel(kFullChannel, rising,      0u);
-        case 1u  : return Pixel(falling,     kFullChannel, 0u);
-        case 2u  : return Pixel(0u,          kFullChannel, rising);
-        case 3u  : return Pixel(0u,          falling,     kFullChannel);
-        case 4u  : return Pixel(rising,      0u,          kFullChannel);
-        default  : return Pixel(kFullChannel, 0u,          falling);
-    }
+  switch (segment) {
+    case 0u:
+      return Pixel(kFullChannel, rising, 0u);
+    case 1u:
+      return Pixel(falling, kFullChannel, 0u);
+    case 2u:
+      return Pixel(0u, kFullChannel, rising);
+    case 3u:
+      return Pixel(0u, falling, kFullChannel);
+    case 4u:
+      return Pixel(rising, 0u, kFullChannel);
+    default:
+      return Pixel(kFullChannel, 0u, falling);
+  }
 }
 
 /*
@@ -50,31 +55,32 @@ Pixel ColorCycle::ToColour(HueType hue)
  * for a buffer that has settled before it drops the rail. A cycle running through the
  * night would hold that wait open and spend the current the switch exists to save.
  */
-bool ColorCycle::IsDisplayShowingAnything()
-{
-    return GetDisplay().IsEnabled();
-}
+bool ColorCycle::IsDisplayShowingAnything() { return GetDisplay().IsEnabled(); }
 
-void ColorCycle::SetIsActive(bool is_active)
-{
-    is_active_ = is_active;
+void ColorCycle::SetIsActive(bool is_active) {
+  is_active_ = is_active;
 
-    if(is_active_) { GetDisplay().SetColorCycle(ToColour(hue_)); }
-    else         { GetDisplay().ClearColorCycle(); }
-}
-
-void ColorCycle::ResetToDefaults()
-{
-    SetTaskCycle(kTaskCycleInitValue);
-    hue_ = kHueInitValue;
-    SetIsActive(kIsActiveInitValue);
-}
-
-void ColorCycle::Task()
-{
-    if(!is_active_) { return; }
-    if(!IsDisplayShowingAnything()) { return; }
-
-    hue_++;
+  if (is_active_) {
     GetDisplay().SetColorCycle(ToColour(hue_));
+  } else {
+    GetDisplay().ClearColorCycle();
+  }
+}
+
+void ColorCycle::ResetToDefaults() {
+  SetTaskCycle(kTaskCycleInitValue);
+  hue_ = kHueInitValue;
+  SetIsActive(kIsActiveInitValue);
+}
+
+void ColorCycle::Task() {
+  if (!is_active_) {
+    return;
+  }
+  if (!IsDisplayShowingAnything()) {
+    return;
+  }
+
+  hue_++;
+  GetDisplay().SetColorCycle(ToColour(hue_));
 }

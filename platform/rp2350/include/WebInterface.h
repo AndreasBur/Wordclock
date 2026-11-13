@@ -35,14 +35,14 @@
  * long and its server is told the same number.
  */
 /*! \brief The TCP port the server listens on, and the one mDNS announces. */
-#define WEB_INTERFACE_PORT                              80u
+#define WEB_INTERFACE_PORT 80u
 
 /*!
  * \brief The host name the clock announces over mDNS, reached as `wordclock.local`.
  *
  * What the clock answers to on the local network, so no address has to be looked up.
  */
-#define WEB_INTERFACE_HOSTNAME                          "wordclock"
+#define WEB_INTERFACE_HOSTNAME "wordclock"
 
 /*!
  * \brief The web server of the RP2350: the pages, the command catalog, the panel's letters, the
@@ -71,60 +71,59 @@
  * The web socket asks for the password at its handshake, as every route does; a refused one is
  * answered with 401 by the library.
  */
-class WebInterface
-{
-  private:
-    /*
-     * Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
-     * owns it, counts it and broadcasts to it, so a second copy could only ever disagree with
-     * the first - and the frame bookkeeping that used to sit beside it is WebFrontend's now,
-     * a rate limit and a comparison being the same on any backend.
-     */
-    WebInterface() { }
-    ~WebInterface() = default;
+class WebInterface {
+ private:
+  /*
+   * Nothing is kept here at all any more. The list of clients never was - AsyncWebSocket
+   * owns it, counts it and broadcasts to it, so a second copy could only ever disagree with
+   * the first - and the frame bookkeeping that used to sit beside it is WebFrontend's now,
+   * a rate limit and a comparison being the same on any backend.
+   */
+  WebInterface() {}
+  ~WebInterface() = default;
 
-  public:
-    /*! \brief Returns the one web interface. */
-    static WebInterface& GetInstance() {
-        static WebInterface singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one web interface. */
+  static WebInterface& GetInstance() {
+    static WebInterface singleton_instance;
+    return singleton_instance;
+  }
 
-    /*!
-     * \brief Starts the server, registers its routes, and takes over the finished output lines.
-     *
-     * Safe to call before the network is up: the server listens on whatever address arrives later.
-     * The line sink is installed only once the server has begun, so a line printed during startup
-     * cannot reach a half-built server.
-     *
-     * It then announces WEB_INTERFACE_HOSTNAME over mDNS and prints the host name it is reached
-     * at, or prints that mDNS is unavailable; that is not a failure, as the address still works.
-     *
-     * \return Always kEOk on the RP2350: ESPAsyncWebServer's begin() answers nothing, so a server
-     *         that does not start shows up as a page that never answers rather than as kENotOk.
-     */
-    StdReturnType Begin();
+  /*!
+   * \brief Starts the server, registers its routes, and takes over the finished output lines.
+   *
+   * Safe to call before the network is up: the server listens on whatever address arrives later.
+   * The line sink is installed only once the server has begun, so a line printed during startup
+   * cannot reach a half-built server.
+   *
+   * It then announces WEB_INTERFACE_HOSTNAME over mDNS and prints the host name it is reached
+   * at, or prints that mDNS is unavailable; that is not a failure, as the address still works.
+   *
+   * \return Always kEOk on the RP2350: ESPAsyncWebServer's begin() answers nothing, so a server
+   *         that does not start shows up as a page that never answers rather than as kENotOk.
+   */
+  StdReturnType Begin();
 
-    /*!
-     * \copydoc WebFrontend::BroadcastLine(const char*)
-     *
-     * \note On the RP2350 a line also comes through here from the web server's callbacks, which
-     *       print the reason when they refuse an update; it is then sent from lwIP's context.
-     */
-    void BroadcastLine(const char* line);
+  /*!
+   * \copydoc WebFrontend::BroadcastLine(const char*)
+   *
+   * \note On the RP2350 a line also comes through here from the web server's callbacks, which print
+   *       the reason when they refuse an update; it is then sent from lwIP's context.
+   */
+  void BroadcastLine(char const* line);
 
-    /*! \copydoc WebFrontend::BroadcastFrame() */
-    void BroadcastFrame();
+  /*! \copydoc WebFrontend::BroadcastFrame() */
+  void BroadcastFrame();
 
-    // An instance method like the rest of this interface, for the reason WebInterface.cpp gives.
-    /*!
-     * \copydoc WebFrontend::OnClientOpened()
-     *
-     * On the RP2350 the socket's event handler calls it on a handshake, from lwIP's context. Only
-     * the force flag is touched from there; who is connected is the socket's own business.
-     */
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void OnClientOpened() { WebFrontend::GetInstance().OnClientOpened(); }
+  // An instance method like the rest of this interface, for the reason WebInterface.cpp gives.
+  /*!
+   * \copydoc WebFrontend::OnClientOpened()
+   *
+   * On the RP2350 the socket's event handler calls it on a handshake, from lwIP's context. Only
+   * the force flag is touched from there; who is connected is the socket's own business.
+   */
+  // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+  void OnClientOpened() { WebFrontend::GetInstance().OnClientOpened(); }
 };
 
 #endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBINTERFACE_H_

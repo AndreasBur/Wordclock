@@ -12,10 +12,12 @@
  * when a setting changed, not per tick - and it would keep a handle alive across a reconfiguration.
  */
 
+// clang-format off
 /* Ahead of Storage.h, which pulls in the Arduino.h that binds Serial to a macro. */
 #include <Preferences.h>
 
 #include "Storage.h"
+// clang-format on
 
 /*
  * Instance methods, though some of them read no member: they are the interface the
@@ -25,53 +27,66 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-StdReturnType Storage::Read(byte* buffer, size_t size) const
-{
-    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+StdReturnType Storage::Read(byte* buffer, size_t size) const {
+  if ((buffer == nullptr) || (size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
 
-    Preferences store;
-    if(!store.begin(STORAGE_NAMESPACE, true)) { return kENotOk; }
+  Preferences store;
+  if (!store.begin(STORAGE_NAMESPACE, true)) {
+    return kENotOk;
+  }
 
-    const size_t stored_size = store.getBytesLength(STORAGE_KEY);
-    if(stored_size != size) {
-        store.end();
-        return kENotOk;
-    }
-
-    const size_t read = store.getBytes(STORAGE_KEY, buffer, size);
+  size_t const stored_size = store.getBytesLength(STORAGE_KEY);
+  if (stored_size != size) {
     store.end();
+    return kENotOk;
+  }
 
-    if(read != size) { return kENotOk; }
+  size_t const read = store.getBytes(STORAGE_KEY, buffer, size);
+  store.end();
 
-    return kEOk;
+  if (read != size) {
+    return kENotOk;
+  }
+
+  return kEOk;
 }
 
-StdReturnType Storage::Write(const byte* buffer, size_t size)
-{
-    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
+StdReturnType Storage::Write(byte const* buffer, size_t size) {
+  if ((buffer == nullptr) || (size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
 
-    Preferences store;
-    if(!store.begin(STORAGE_NAMESPACE, false)) { return kENotOk; }
+  Preferences store;
+  if (!store.begin(STORAGE_NAMESPACE, false)) {
+    return kENotOk;
+  }
 
-    const size_t written = store.putBytes(STORAGE_KEY, buffer, size);
-    store.end();
+  size_t const written = store.putBytes(STORAGE_KEY, buffer, size);
+  store.end();
 
-    if(written != size) { return kENotOk; }
+  if (written != size) {
+    return kENotOk;
+  }
 
-    return kEOk;
+  return kEOk;
 }
 
-StdReturnType Storage::Clear()
-{
-    Preferences store;
-    if(!store.begin(STORAGE_NAMESPACE, false)) { return kENotOk; }
+StdReturnType Storage::Clear() {
+  Preferences store;
+  if (!store.begin(STORAGE_NAMESPACE, false)) {
+    return kENotOk;
+  }
 
-    const bool was_removed = store.remove(STORAGE_KEY);
-    const bool was_empty = !store.isKey(STORAGE_KEY);
-    store.end();
+  bool const was_removed = store.remove(STORAGE_KEY);
+  bool const was_empty = !store.isKey(STORAGE_KEY);
+  store.end();
 
-    if(!was_removed && !was_empty) { return kENotOk; }
+  if (!was_removed && !was_empty) {
+    return kENotOk;
+  }
 
-    return kEOk;
+  return kEOk;
 }
 // NOLINTEND(readability-convert-member-functions-to-static)

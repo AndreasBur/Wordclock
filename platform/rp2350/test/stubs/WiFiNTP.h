@@ -8,8 +8,8 @@
  * matters on this core: before the link there is nothing to resolve the names over.
  */
 struct NTPClassStub {
-    int Started = 0;
-    void begin(const char*, const char*, int = 3600) { Started++; }
+  int Started = 0;
+  void begin(char const*, char const*, int = 3600) { Started++; }
 };
 extern NTPClassStub NTP;
 // NOLINTEND(readability-identifier-naming)

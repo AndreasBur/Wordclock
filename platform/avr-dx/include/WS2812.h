@@ -45,21 +45,21 @@
  *
  * \note No code reads it: the pin is the one LUT0's output comes out on, not a number passed down.
  */
-#define WS2812_DATA_PIN                                 3u
+#define WS2812_DATA_PIN 3u
 
 /*!
  * \brief The width of the pulse of a zero bit, in nanoseconds, from the data sheet.
  *
  * Only the short pulse is critical: a zero that grows past about 550 ns is read as a one.
  */
-#define WS2812_ZERO_PULSE_DURATION_NS                   350u
+#define WS2812_ZERO_PULSE_DURATION_NS 350u
 /*! \brief The width of the pulse of a one bit, in nanoseconds, from the data sheet. */
-#define WS2812_ONE_PULSE_DURATION_NS                    900u
+#define WS2812_ONE_PULSE_DURATION_NS 900u
 /*! \brief The longest pulse the strip still reads as a zero, in nanoseconds. */
-#define WS2812_ZERO_PULSE_MAX_DURATION_NS               550u
+#define WS2812_ZERO_PULSE_MAX_DURATION_NS 550u
 
 /*! \brief The bit rate of the strip, one bit per 1.25 us; the strip's rate, not a choice. */
-#define WS2812_BIT_RATE_HZ                              800000uL
+#define WS2812_BIT_RATE_HZ 800000uL
 
 /*!
  * \brief How long the line has to rest before the strip latches what it was sent, in microseconds.
@@ -67,7 +67,7 @@
  * The gap between two bytes has to stay below this, or the frame is torn in half - which is the one
  * budget every interrupt handler in this backend is measured against. No code reads it.
  */
-#define WS2812_RESET_DURATION_US                        50u
+#define WS2812_RESET_DURATION_US 50u
 
 /*!
  * \brief The strip's transmitter: USART0, two one-shot timers and a look-up table, fed byte by byte
@@ -76,72 +76,71 @@
  * There is one instance, GetInstance(). Init() builds the transmitter, Send() starts a frame, and
  * IsBusy() tells whether the last one is still on the wire.
  */
-class WS2812
-{
-  private:
-    WS2812() { }
-    ~WS2812() = default;
+class WS2812 {
+ private:
+  WS2812() {}
+  ~WS2812() = default;
 
-    static void InitUsart();
-    static void InitEventSystem();
-    static void InitOneShotTimers();
-    static void InitLookUpTable();
+  static void InitUsart();
+  static void InitEventSystem();
+  static void InitOneShotTimers();
+  static void InitLookUpTable();
 
-  public:
-    /*! \brief Returns the one transmitter. */
-    static WS2812& GetInstance() {
-        static WS2812 singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one transmitter. */
+  static WS2812& GetInstance() {
+    static WS2812 singleton_instance;
+    return singleton_instance;
+  }
 
-    /*!
-     * \brief Builds the transmitter out of USART, event system, timers and look-up table.
-     *
-     * It puts USART0 into SPI host mode at WS2812_BIT_RATE_HZ, most significant bit first, with
-     * TXD on PA0 and XCK on PA2 as outputs. Event channel 0 carries XCK to TCB1 and TCB2, which
-     * are single-shot timers on the peripheral clock, armed with the zero and the one pulse. LUT0
-     * muxes the two pulses with TXD onto its output pin. The order matters in one place only: the
-     * look-up table is enabled last, so that it never drives the strip from inputs whose timers are
-     * not yet running.
-     *
-     * Then it raises the interrupt that feeds the bytes, `USART0_DRE`, to the elevated level
-     * `CPUINT.LVL1VEC`, so that it runs ahead of the console's handlers and of every other one.
-     */
-    void Init();
+  /*!
+   * \brief Builds the transmitter out of USART, event system, timers and look-up table.
+   *
+   * It puts USART0 into SPI host mode at WS2812_BIT_RATE_HZ, most significant bit first, with
+   * TXD on PA0 and XCK on PA2 as outputs. Event channel 0 carries XCK to TCB1 and TCB2, which
+   * are single-shot timers on the peripheral clock, armed with the zero and the one pulse. LUT0
+   * muxes the two pulses with TXD onto its output pin. The order matters in one place only: the
+   * look-up table is enabled last, so that it never drives the strip from inputs whose timers are
+   * not yet running.
+   *
+   * Then it raises the interrupt that feeds the bytes, `USART0_DRE`, to the elevated level
+   * `CPUINT.LVL1VEC`, so that it runs ahead of the console's handlers and of every other one.
+   */
+  void Init();
 
-    /*!
-     * \brief Returns whether a frame is still going out.
-     *
-     * A frame started while one is running would interleave two of them, which is why Send() asks
-     * this first. Both halves are needed: the queue can be empty while the last byte is still in
-     * the shift register, and starting a frame then would run the two together without the reset
-     * gap between them. So it is busy while bytes of the frame are left to feed, and until the
-     * USART's transmit complete flag `TXCIF`, which Send() clears, is set again. Before the first
-     * frame it is not busy: `TXCIF` is clear after reset, and there is no transmission to wait for.
-     *
-     * \return True while a frame is going out.
-     * \note Not busy does not mean the strip has latched the frame: nothing here waits
-     *       WS2812_RESET_DURATION_US after the last byte. A caller that sends at most one frame per
-     *       tick, as Pixels does, keeps the frames apart.
-     */
-    bool IsBusy() const;
+  /*!
+   * \brief Returns whether a frame is still going out.
+   *
+   * A frame started while one is running would interleave two of them, which is why Send() asks
+   * this first. Both halves are needed: the queue can be empty while the last byte is still in
+   * the shift register, and starting a frame then would run the two together without the reset
+   * gap between them. So it is busy while bytes of the frame are left to feed, and until the
+   * USART's transmit complete flag `TXCIF`, which Send() clears, is set again. Before the first
+   * frame it is not busy: `TXCIF` is clear after reset, and there is no transmission to wait for.
+   *
+   * \return True while a frame is going out.
+   * \note Not busy does not mean the strip has latched the frame: nothing here waits
+   *       WS2812_RESET_DURATION_US after the last byte. A caller that sends at most one frame per
+   *       tick, as Pixels does, keeps the frames apart.
+   */
+  bool IsBusy() const;
 
-    /*!
-     * \brief Starts sending one frame to the strip.
-     *
-     * Hands the frame over and returns as soon as the first byte is on its way; the rest follows
-     * from the interrupt, one byte per empty data register, which takes about 3.3 ms for a full
-     * display. The caller is free in the meantime, and has to be - the tick this runs in also has
-     * a clock to keep.
-     *
-     * \param[in] frame The bytes, in the order the strip takes them.
-     * \param[in] length The number of bytes.
-     * \return kEOk, or kENotOk if `frame` is `nullptr`, `length` is 0 or IsBusy() is true; nothing
-     *         is then sent, and a frame on the wire goes on.
-     * \pre `frame` outlives the transmission, which is why the caller keeps it rather than passing
-     *      a temporary, and does not change until IsBusy() is false.
-     */
-    StdReturnType Send(const byte* frame, uint16_t length);
+  /*!
+   * \brief Starts sending one frame to the strip.
+   *
+   * Hands the frame over and returns as soon as the first byte is on its way; the rest follows
+   * from the interrupt, one byte per empty data register, which takes about 3.3 ms for a full
+   * display. The caller is free in the meantime, and has to be - the tick this runs in also has
+   * a clock to keep.
+   *
+   * \param[in] frame The bytes, in the order the strip takes them.
+   * \param[in] length The number of bytes.
+   * \return kEOk, or kENotOk if `frame` is `nullptr`, `length` is 0 or IsBusy() is true; nothing is
+   *         then sent, and a frame on the wire goes on.
+   * \pre `frame` outlives the transmission, which is why the caller keeps it rather than passing a
+   *      temporary, and does not change until IsBusy() is false.
+   */
+  StdReturnType Send(byte const* frame, uint16_t length);
 };
 
 #endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_

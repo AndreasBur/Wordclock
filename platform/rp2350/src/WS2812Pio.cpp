@@ -14,6 +14,7 @@
  * datasheet without reassembling anything.
  */
 
+// clang-format off
 /* Ahead of WS2812Pio.h, which reaches Arduino.h and its Serial macro. */
 #include <hardware/clocks.h>
 #include <hardware/dma.h>
@@ -21,6 +22,7 @@
 
 #include "Arduino.h"
 #include "WS2812Pio.h"
+// clang-format on
 
 namespace {
 /*
@@ -64,97 +66,104 @@ constexpr uint kStateMachine{WS2812_PIO_STATE_MACHINE_INDEX};
 
 PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
 
-} // namespace
+}  // namespace
 
-void WS2812Pio::Init(uint8_t pin)
-{
-    if(is_ready_) { return; }
+void WS2812Pio::Init(uint8_t pin) {
+  if (is_ready_) {
+    return;
+  }
 
-    PIO block = Block();
+  PIO block = Block();
 
-    // pio_sm_claim() panics on a state machine that is claimed already, so it is asked first.
-    if(pio_sm_is_claimed(block, kStateMachine)) {
-        Serial.println(F("Pixels: the PIO state machine is claimed already"));
-        return;
-    }
-    pio_sm_claim(block, kStateMachine);
+  // pio_sm_claim() panics on a state machine that is claimed already, so it is asked first.
+  if (pio_sm_is_claimed(block, kStateMachine)) {
+    Serial.println(F("Pixels: the PIO state machine is claimed already"));
+    return;
+  }
+  pio_sm_claim(block, kStateMachine);
 
-    pio_program_t program{};
-    program.instructions = kInstructions;
-    program.length = kInstructionCount;
-    /*
-     * Anywhere the loader finds room, rather than a fixed address: nothing else in this
-     * firmware uses the block, but a fixed origin is a conflict waiting for the first
-     * library that does.
-     */
-    program.origin = -1;
+  pio_program_t program{};
+  program.instructions = kInstructions;
+  program.length = kInstructionCount;
+  /*
+   * Anywhere the loader finds room, rather than a fixed address: nothing else in this
+   * firmware uses the block, but a fixed origin is a conflict waiting for the first
+   * library that does.
+   */
+  program.origin = -1;
 
-    const int offset = pio_add_program(block, &program);
-    if(offset < 0) {
-        pio_sm_unclaim(block, kStateMachine);
-        Serial.println(F("Pixels: no room for the PIO program"));
-        return;
-    }
+  int const offset = pio_add_program(block, &program);
+  if (offset < 0) {
+    pio_sm_unclaim(block, kStateMachine);
+    Serial.println(F("Pixels: no room for the PIO program"));
+    return;
+  }
 
-    dma_channel_ = dma_claim_unused_channel(false);
-    if(dma_channel_ < 0) {
-        // Given back, so that a call that gave up holds nothing that another one would need.
-        pio_remove_program(block, &program, static_cast<uint>(offset));
-        pio_sm_unclaim(block, kStateMachine);
-        Serial.println(F("Pixels: no free DMA channel"));
-        return;
-    }
+  dma_channel_ = dma_claim_unused_channel(false);
+  if (dma_channel_ < 0) {
+    // Given back, so that a call that gave up holds nothing that another one would need.
+    pio_remove_program(block, &program, static_cast<uint>(offset));
+    pio_sm_unclaim(block, kStateMachine);
+    Serial.println(F("Pixels: no free DMA channel"));
+    return;
+  }
 
-    pio_sm_config config = pio_get_default_sm_config();
-    // Not negative any more: a negative offset returned above.
-    const uint program_offset{static_cast<uint>(offset)};
-    sm_config_set_wrap(&config, program_offset + kWrapTargetOffset, program_offset + kWrapOffset);
-    // One bit, not optional and not a direction: every instruction carries it, which is
-    // what lets the four of them above describe the whole waveform.
-    sm_config_set_sideset(&config, 1, false, false);
-    sm_config_set_sideset_pins(&config, pin);
-    // Shifting left, so the most significant bit leaves first - the WS2812's order - and
-    // pulling automatically every 24 bits, which is one LED.
-    sm_config_set_out_shift(&config, false, true, kBitsPerPixel);
-    // The receive side is never read here, so its four words are worth more as depth on
-    // the side DMA fills.
-    sm_config_set_fifo_join(&config, PIO_FIFO_JOIN_TX);
-    sm_config_set_clkdiv(&config, static_cast<float>(clock_get_hz(clk_sys)) / static_cast<float>(kStateMachineClockHz));
+  pio_sm_config config = pio_get_default_sm_config();
+  // Not negative any more: a negative offset returned above.
+  uint const program_offset{static_cast<uint>(offset)};
+  sm_config_set_wrap(&config, program_offset + kWrapTargetOffset, program_offset + kWrapOffset);
+  // One bit, not optional and not a direction: every instruction carries it, which is
+  // what lets the four of them above describe the whole waveform.
+  sm_config_set_sideset(&config, 1, false, false);
+  sm_config_set_sideset_pins(&config, pin);
+  // Shifting left, so the most significant bit leaves first - the WS2812's order - and
+  // pulling automatically every 24 bits, which is one LED.
+  sm_config_set_out_shift(&config, false, true, kBitsPerPixel);
+  // The receive side is never read here, so its four words are worth more as depth on
+  // the side DMA fills.
+  sm_config_set_fifo_join(&config, PIO_FIFO_JOIN_TX);
+  sm_config_set_clkdiv(&config, static_cast<float>(clock_get_hz(clk_sys)) /
+                                    static_cast<float>(kStateMachineClockHz));
 
-    pio_gpio_init(block, pin);
-    pio_sm_set_consecutive_pindirs(block, kStateMachine, pin, 1, true);
-    pio_sm_init(block, kStateMachine, program_offset, &config);
-    pio_sm_set_enabled(block, kStateMachine, true);
+  pio_gpio_init(block, pin);
+  pio_sm_set_consecutive_pindirs(block, kStateMachine, pin, 1, true);
+  pio_sm_init(block, kStateMachine, program_offset, &config);
+  pio_sm_set_enabled(block, kStateMachine, true);
 
-    is_ready_ = true;
+  is_ready_ = true;
 }
 
-bool WS2812Pio::IsBusy() const
-{
-    if(!is_ready_) { return false; }
+bool WS2812Pio::IsBusy() const {
+  if (!is_ready_) {
+    return false;
+  }
 
-    return dma_channel_is_busy(static_cast<uint>(dma_channel_));
+  return dma_channel_is_busy(static_cast<uint>(dma_channel_));
 }
 
 // Not const, though nothing here writes a member: it drives the hardware, and a const
 // would say it changes nothing.
 // NOLINTBEGIN(readability-make-member-function-const)
-StdReturnType WS2812Pio::Transmit(const WordType* frame, size_t count)
-{
-    if(!is_ready_ || (frame == nullptr) || (count == 0u)) { return kENotOk; }
-    if(IsBusy()) { return kENotOk; }
+StdReturnType WS2812Pio::Transmit(WordType const* frame, size_t count) {
+  if (!is_ready_ || (frame == nullptr) || (count == 0u)) {
+    return kENotOk;
+  }
+  if (IsBusy()) {
+    return kENotOk;
+  }
 
-    dma_channel_config configuration = dma_channel_get_default_config(static_cast<uint>(dma_channel_));
-    channel_config_set_transfer_data_size(&configuration, DMA_SIZE_32);
-    channel_config_set_read_increment(&configuration, true);
-    channel_config_set_write_increment(&configuration, false);
-    // Paced by the state machine's appetite rather than free-running, so the FIFO is
-    // refilled as it empties instead of being overrun in the first microsecond.
-    channel_config_set_dreq(&configuration, pio_get_dreq(Block(), kStateMachine, true));
+  dma_channel_config configuration =
+      dma_channel_get_default_config(static_cast<uint>(dma_channel_));
+  channel_config_set_transfer_data_size(&configuration, DMA_SIZE_32);
+  channel_config_set_read_increment(&configuration, true);
+  channel_config_set_write_increment(&configuration, false);
+  // Paced by the state machine's appetite rather than free-running, so the FIFO is
+  // refilled as it empties instead of being overrun in the first microsecond.
+  channel_config_set_dreq(&configuration, pio_get_dreq(Block(), kStateMachine, true));
 
-    dma_channel_configure(static_cast<uint>(dma_channel_), &configuration,
-                          &Block()->txf[kStateMachine], frame, static_cast<uint>(count), true);
+  dma_channel_configure(static_cast<uint>(dma_channel_), &configuration,
+                        &Block()->txf[kStateMachine], frame, static_cast<uint>(count), true);
 
-    return kEOk;
+  return kEOk;
 }
 // NOLINTEND(readability-make-member-function-const)
