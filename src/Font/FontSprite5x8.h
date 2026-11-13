@@ -6,8 +6,8 @@
  * \brief The Sprite font, 5 columns by 8 rows.
  */
 
-#ifndef _FONT_SPRITE_5X8_H_
-#define _FONT_SPRITE_5X8_H_
+#ifndef WORDCLOCK_SRC_FONT_FONTSPRITE5X8_H_
+#define WORDCLOCK_SRC_FONT_FONTSPRITE5X8_H_
 
 #include "Arduino.h"
 #include "Font.h"
@@ -61,4 +61,4 @@ class FontSprite5x8 : public Font<FontCharVertical<byte, FONT_SPRITE_5X8_WIDTH>,
     static const FontTableType& GetFontTable() { return kFontTable; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_FONT_FONTSPRITE5X8_H_

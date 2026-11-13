@@ -14,8 +14,8 @@
  * confused with.
  */
 
-#ifndef _TEMPERATURE_H_
-#define _TEMPERATURE_H_
+#ifndef WORDCLOCK_SRC_TEMPERATURE_TEMPERATURE_H_
+#define WORDCLOCK_SRC_TEMPERATURE_TEMPERATURE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -157,4 +157,4 @@ class Temperature
     void Task() { sensor_.Task(); }
 };
 
-#endif // _TEMPERATURE_H_
+#endif  // WORDCLOCK_SRC_TEMPERATURE_TEMPERATURE_H_

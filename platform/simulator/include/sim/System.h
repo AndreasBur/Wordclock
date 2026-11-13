@@ -17,8 +17,8 @@
  * need a network.
  */
 
-#ifndef _SYSTEM_H_
-#define _SYSTEM_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SYSTEM_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SYSTEM_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -191,4 +191,4 @@ class System
     // NOLINTEND(readability-convert-member-functions-to-static)
 };
 
-#endif // _SYSTEM_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SYSTEM_H_

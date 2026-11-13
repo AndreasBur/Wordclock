@@ -6,8 +6,8 @@
  * \brief The serial port's task, which collects a line and hands it to the command parser.
  */
 
-#ifndef _COMMUNICATION_H_
-#define _COMMUNICATION_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_COMMUNICATION_H_
+#define WORDCLOCK_SRC_COMMUNICATION_COMMUNICATION_H_
 
 #include "Arduino.h"
 #include "Message.h"
@@ -89,4 +89,4 @@ class Communication
     bool IsMessageComplete() const { return state_ == StateType::kMessageComplete; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_COMMUNICATION_H_

@@ -6,8 +6,6 @@
  * \brief Puts a serial message together from a command and its options.
  */
 
-#define _MESSAGE_BUILDER_SOURCE_
-
 #include "sim/MessageBuilder.h"
 #include "sim/SerialShim.h"
 

@@ -6,8 +6,6 @@
  * \brief How the brightness setting becomes the level the LEDs are driven with.
  */
 
-#define _DISPLAY_BRIGHTNESS_SOURCE_
-
 #include "DisplayBrightness.h"
 
 /*

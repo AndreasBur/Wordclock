@@ -25,8 +25,8 @@
  * the two-wire bus on PORTF.
  */
 
-#ifndef _POWER_SWITCH_H_
-#define _POWER_SWITCH_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_POWERSWITCH_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_POWERSWITCH_H_
 
 #include "StandardTypes.h"
 
@@ -130,4 +130,4 @@ class PowerSwitch
     void SwitchSupplyOff() { DriveSupply(false); supply_on_ = false; }
 };
 
-#endif // _POWER_SWITCH_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_POWERSWITCH_H_

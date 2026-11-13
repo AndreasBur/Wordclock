@@ -6,8 +6,6 @@
  * \brief How a reading is written as text.
  */
 
-#define _TEMPERATURE_SOURCE_
-
 #include "Temperature.h"
 
 // Both public forms come through here, so the digits cannot drift apart between what

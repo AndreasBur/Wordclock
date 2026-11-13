@@ -6,8 +6,8 @@
  * \brief The error codes and API ids of an error answer, and how it is sent.
  */
 
-#ifndef _ERROR_MESSAGE_H_
-#define _ERROR_MESSAGE_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_ERRORMESSAGE_H_
+#define WORDCLOCK_SRC_COMMUNICATION_ERRORMESSAGE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -181,4 +181,4 @@ class ErrorMessage
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_ERRORMESSAGE_H_

@@ -6,8 +6,8 @@
  * \brief The base of the overlays, with the idle and show states they share.
  */
 
-#ifndef _OVERLAY_H_
-#define _OVERLAY_H_
+#ifndef WORDCLOCK_SRC_OVERLAY_OVERLAY_H_
+#define WORDCLOCK_SRC_OVERLAY_OVERLAY_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -484,4 +484,4 @@ template <typename Derived> class Overlay
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_OVERLAY_OVERLAY_H_

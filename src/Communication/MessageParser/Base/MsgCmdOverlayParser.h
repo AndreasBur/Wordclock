@@ -6,8 +6,8 @@
  * \brief The parser the date, temperature and text overlay commands share.
  */
 
-#ifndef _MSG_CMD_OVERLAY_PARSER_H_
-#define _MSG_CMD_OVERLAY_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDOVERLAYPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDOVERLAYPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -180,4 +180,4 @@ template <typename Derived> class MsgCmdOverlayParser
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDOVERLAYPARSER_H_

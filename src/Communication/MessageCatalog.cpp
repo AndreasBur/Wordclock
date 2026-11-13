@@ -8,8 +8,6 @@
  * See the header on why this table is here and what it mirrors.
  */
 
-#define _MESSAGE_CATALOG_SOURCE_
-
 #include "MessageCatalog.h"
 #include "StandardTypes.h"
 // The command numbers are taken from here rather than copied, so they cannot fall behind

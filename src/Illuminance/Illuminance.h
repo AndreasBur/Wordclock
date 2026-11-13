@@ -13,8 +13,8 @@
  * platform's BH1750.h.
  */
 
-#ifndef _ILLUMINANCE_H_
-#define _ILLUMINANCE_H_
+#ifndef WORDCLOCK_SRC_ILLUMINANCE_ILLUMINANCE_H_
+#define WORDCLOCK_SRC_ILLUMINANCE_ILLUMINANCE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -128,4 +128,4 @@ class Illuminance
     void Task() { sensor_.Task(); }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ILLUMINANCE_ILLUMINANCE_H_

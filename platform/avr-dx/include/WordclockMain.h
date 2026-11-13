@@ -10,8 +10,8 @@
  * in one place and checked in the simulator.
  */
 
-#ifndef _WORDCLOCK_MAIN_H_
-#define _WORDCLOCK_MAIN_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKMAIN_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKMAIN_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -62,4 +62,4 @@ class WordclockMain
     void Task();
 };
 
-#endif // _WORDCLOCK_MAIN_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKMAIN_H_

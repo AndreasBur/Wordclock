@@ -6,8 +6,8 @@
  * \brief The scheduler: calls every module's task at its own multiple of the tick.
  */
 
-#ifndef _SCHEDULER_H_
-#define _SCHEDULER_H_
+#ifndef WORDCLOCK_SRC_SCHEDULER_SCHEDULER_H_
+#define WORDCLOCK_SRC_SCHEDULER_SCHEDULER_H_
 
 #include "Arduino.h"
 #include <array>
@@ -112,4 +112,4 @@ static_assert(Scheduler::ConvertTaskCycleToSpeed(0u) == 0u, "Cycle zero must rep
 static_assert(Scheduler::ConvertTaskCycleToSpeed(1u) == UINT8_MAX, "Cycle one must report the fastest speed");
 static_assert(Scheduler::ConvertTaskCycleToSpeed(UINT8_MAX) == 1u, "Longest cycle must report the slowest speed");
 
-#endif
+#endif  // WORDCLOCK_SRC_SCHEDULER_SCHEDULER_H_

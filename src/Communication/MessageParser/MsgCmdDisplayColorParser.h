@@ -6,8 +6,8 @@
  * \brief The parser of the display colour command.
  */
 
-#ifndef _MSG_CMD_DISPLAY_COLOR_PARSER_H_
-#define _MSG_CMD_DISPLAY_COLOR_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYCOLORPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYCOLORPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -106,4 +106,4 @@ class MsgCmdDisplayColorParser : public MsgParameterParser<MsgCmdDisplayColorPar
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYCOLORPARSER_H_

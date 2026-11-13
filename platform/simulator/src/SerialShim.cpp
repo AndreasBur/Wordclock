@@ -6,8 +6,6 @@
  * \brief Stands in for the Arduino Serial port.
  */
 
-#define _SERIAL_SHIM_SOURCE_
-
 #include "sim/SerialShim.h"
 /* reads the firmware's answers back into readable lines */
 #include "sim/MessageDecoder.h"

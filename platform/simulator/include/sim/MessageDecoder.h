@@ -19,8 +19,8 @@
  * came.
  */
 
-#ifndef MESSAGE_DECODER_H
-#define MESSAGE_DECODER_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEDECODER_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEDECODER_H_
 
 #include <wx/wx.h>
 #include "StandardTypes.h"
@@ -127,4 +127,4 @@ class MessageDecoder
     static wxString Describe(const wxString& line);
 };
 
-#endif // MESSAGE_DECODER_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEDECODER_H_

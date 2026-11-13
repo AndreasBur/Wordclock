@@ -6,8 +6,6 @@
  * \brief The count of the time since the start.
  */
 
-#define _UPTIME_SOURCE_
-
 #include "Uptime.h"
 
 /*

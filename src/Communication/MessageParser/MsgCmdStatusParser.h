@@ -17,8 +17,8 @@
  * offering them as inputs.
  */
 
-#ifndef _MSG_CMD_STATUS_PARSER_H_
-#define _MSG_CMD_STATUS_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDSTATUSPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDSTATUSPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -159,4 +159,4 @@ class MsgCmdStatusParser : public MsgParameterParser<MsgCmdStatusParser, MSG_CMD
     static void Process() { }
 };
 
-#endif // _MSG_CMD_STATUS_PARSER_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDSTATUSPARSER_H_

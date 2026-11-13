@@ -17,8 +17,8 @@ namespace {
  * has grown to if it was ever used. Declared by avr-libc rather than defined here, so the
  * names are avr-libc's.
  */
-extern "C" char __heap_start; // NOLINT(readability-identifier-naming)
-extern "C" char* __brkval; // NOLINT(readability-identifier-naming)
+extern "C" char __heap_start; // NOLINT(readability-identifier-naming,bugprone-reserved-identifier)
+extern "C" char* __brkval; // NOLINT(readability-identifier-naming,bugprone-reserved-identifier)
 
 constexpr uint16_t kBytesPerKibibyte{1024u};
 

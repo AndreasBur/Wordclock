@@ -15,8 +15,8 @@
  * later needs, see kReadFailuresBeforeReinit.
  */
 
-#ifndef _BH1750_H_
-#define _BH1750_H_
+#ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_BH1750_H_
+#define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_BH1750_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -407,4 +407,4 @@ class BH1750
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_BH1750_H_

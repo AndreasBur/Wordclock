@@ -6,8 +6,8 @@
  * \brief A time of day: hour, minute and second.
  */
 
-#ifndef _CLOCK_TIME_H_
-#define _CLOCK_TIME_H_
+#ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKTIME_H_
+#define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKTIME_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -145,4 +145,4 @@ class ClockTime
     static constexpr bool IsSecondValid(SecondType second) { return (second >= kSecondMinValue) && (second <= kSecondMaxValue);  }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_REALTIMECLOCK_CLOCKTIME_H_

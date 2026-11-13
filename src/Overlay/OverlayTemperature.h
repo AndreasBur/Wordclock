@@ -6,8 +6,8 @@
  * \brief The overlay that shows the temperature.
  */
 
-#ifndef _OVERLAY_TEMPERATURE_H_
-#define _OVERLAY_TEMPERATURE_H_
+#ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYTEMPERATURE_H_
+#define WORDCLOCK_SRC_OVERLAY_OVERLAYTEMPERATURE_H_
 
 #include "StandardTypes.h"
 #include "Overlay.h"
@@ -101,4 +101,4 @@ class OverlayTemperature : public Overlay<OverlayTemperature>
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_OVERLAY_OVERLAYTEMPERATURE_H_

@@ -6,8 +6,8 @@
  * \brief The options the date, temperature and text overlay commands share, as a parameter table.
  */
 
-#ifndef _MSG_CMD_BASE_OVERLAY_PARSER_H_
-#define _MSG_CMD_BASE_OVERLAY_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDBASEOVERLAYPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDBASEOVERLAYPARSER_H_
 
 #include "Arduino.h"
 #include "MsgParameterParser.h"
@@ -79,4 +79,4 @@ class MsgCmdBaseOverlayParser
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDBASEOVERLAYPARSER_H_

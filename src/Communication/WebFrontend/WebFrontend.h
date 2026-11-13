@@ -21,8 +21,8 @@
  * firmware image, which two of them do in two entirely different ways.
  */
 
-#ifndef _WEB_FRONTEND_H_
-#define _WEB_FRONTEND_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_WEBFRONTEND_WEBFRONTEND_H_
+#define WORDCLOCK_SRC_COMMUNICATION_WEBFRONTEND_WEBFRONTEND_H_
 
 #include "StandardTypes.h"
 
@@ -289,4 +289,4 @@ class WebFrontend
 
 #endif // (WEB_FRONTEND_SUPPORT == STD_ON)
 
-#endif // _WEB_FRONTEND_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_WEBFRONTEND_WEBFRONTEND_H_

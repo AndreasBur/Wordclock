@@ -6,8 +6,6 @@
  * \brief The table of words and where each sits on the letter grid.
  */
 
-#define _DISPLAY_WORDS_SOURCE_
-
 #include "DisplayWords.h"
 
 /*

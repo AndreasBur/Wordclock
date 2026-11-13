@@ -18,8 +18,8 @@
  * what tells the two states of the system clock apart.
  */
 
-#ifndef _REAL_TIME_CLOCK_H_
-#define _REAL_TIME_CLOCK_H_
+#ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_REALTIMECLOCK_H_
+#define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_REALTIMECLOCK_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -176,4 +176,4 @@ class RealTimeClock
     void Task();
 };
 
-#endif // _REAL_TIME_CLOCK_H_
+#endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_REALTIMECLOCK_H_

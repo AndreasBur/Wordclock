@@ -1,5 +1,5 @@
-#ifndef _LITTLEFS_H_
-#define _LITTLEFS_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_LITTLEFS_H_
+#define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_LITTLEFS_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stddef.h>
@@ -119,4 +119,4 @@ struct LittleFSStub {
 };
 extern LittleFSStub LittleFS;
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_LITTLEFS_H_

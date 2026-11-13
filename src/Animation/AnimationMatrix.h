@@ -16,8 +16,8 @@
  * src/display/display.c), which uses a yellow head and green rain regardless of the display color.
  */
 
-#ifndef _ANIMATION_MATRIX_H_
-#define _ANIMATION_MATRIX_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONMATRIX_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONMATRIX_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -120,4 +120,4 @@ class AnimationMatrix : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONMATRIX_H_

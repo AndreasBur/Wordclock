@@ -17,8 +17,8 @@
  * is nothing to hold here.
  */
 
-#ifndef _POWER_SWITCH_H_
-#define _POWER_SWITCH_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_POWERSWITCH_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_POWERSWITCH_H_
 
 #include "StandardTypes.h"
 
@@ -86,4 +86,4 @@ class PowerSwitch
     void SwitchSupplyOff() { supply_on_ = false; }
 };
 
-#endif // _POWER_SWITCH_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_POWERSWITCH_H_

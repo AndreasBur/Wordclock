@@ -9,8 +9,8 @@
  * inline throughout, so every case file can include this and still link: one variable and
  * one function, however many translation units.
  */
-#ifndef _CHECK_H_
-#define _CHECK_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_
 
 #include <array>
 #include <iostream>
@@ -124,4 +124,4 @@ inline PixelBufferType DrawClockFace(byte hour, byte minute)
     return ReadPixels();
 }
 
-#endif // _CHECK_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_

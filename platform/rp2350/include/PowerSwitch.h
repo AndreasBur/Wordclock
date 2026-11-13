@@ -25,8 +25,8 @@
  * backend's hardware notes point for the data line too.
  */
 
-#ifndef _POWER_SWITCH_H_
-#define _POWER_SWITCH_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_POWERSWITCH_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_POWERSWITCH_H_
 
 #include "StandardTypes.h"
 
@@ -134,4 +134,4 @@ class PowerSwitch
     void SwitchSupplyOff() { DriveSupply(false); supply_on_ = false; }
 };
 
-#endif // _POWER_SWITCH_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_POWERSWITCH_H_

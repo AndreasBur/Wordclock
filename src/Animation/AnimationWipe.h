@@ -6,8 +6,8 @@
  * \brief The wipe animation: a diagonal line sweeps across the display and uncovers the new time.
  */
 
-#ifndef _ANIMATION_WIPE_H_
-#define _ANIMATION_WIPE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONWIPE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONWIPE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -90,4 +90,4 @@ class AnimationWipe : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONWIPE_H_

@@ -6,8 +6,6 @@
  * \brief The steps of the wipe animation.
  */
 
-#define _ANIMATION_CLOCK_WIPE_SOURCE_
-
 #include "AnimationWipe.h"
 #include "Display.h"
 #include "DisplayWords.h"

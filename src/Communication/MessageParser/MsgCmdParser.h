@@ -6,8 +6,8 @@
  * \brief The commands by number, and the parser that hands a message to the one it names.
  */
 
-#ifndef _MSG_CMD_PARSER_H_
-#define _MSG_CMD_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -150,4 +150,4 @@ class MsgCmdParser
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDPARSER_H_

@@ -6,8 +6,8 @@
  * \brief The conversions between strings and numbers that the command parsers use.
  */
 
-#ifndef _STRING_TOOLS_H_
-#define _STRING_TOOLS_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_STRINGTOOLS_H_
+#define WORDCLOCK_SRC_COMMUNICATION_STRINGTOOLS_H_
 
 #include "StandardTypes.h"
 #include <errno.h>
@@ -239,4 +239,4 @@ class StringTools
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_STRINGTOOLS_H_

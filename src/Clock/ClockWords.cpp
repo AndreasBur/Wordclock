@@ -6,8 +6,6 @@
  * \brief What the clock words do themselves: comparison and the flat word list.
  */
 
-#define _CLOCKWORDS_SOURCE_
-
 #include "ClockWords.h"
 
 bool ClockWords::operator==(const ClockWords& clock_words) const

@@ -6,8 +6,6 @@
  * \brief What the text output does itself: glyph drawing and the shifting of characters and text.
  */
 
-#define _TEXT_SOURCE_
-
 #include "Text.h"
 #include "Display.h"
 #include "Font.h"

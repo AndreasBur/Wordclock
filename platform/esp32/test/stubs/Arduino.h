@@ -3,8 +3,8 @@
  * the host. Serial here is the *hardware* port: platform/esp32/include/Arduino.h shadows
  * this file, captures this object, and rebinds Serial to WordclockSerial.
  */
-#ifndef _ARDUINO_H_
-#define _ARDUINO_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ARDUINO_H_
+#define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ARDUINO_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
@@ -64,4 +64,4 @@ extern unsigned long TestMillis;
 unsigned long millis();
 extern Stream Serial;
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ARDUINO_H_

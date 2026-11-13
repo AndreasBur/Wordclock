@@ -6,8 +6,8 @@
  * \brief The parser of the time command.
  */
 
-#ifndef _MSG_CMD_TIME_PARSER_H_
-#define _MSG_CMD_TIME_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDTIMEPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDTIMEPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -142,4 +142,4 @@ class MsgCmdTimeParser : public MsgParameterParser<MsgCmdTimeParser, MSG_CMD_TIM
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDTIMEPARSER_H_

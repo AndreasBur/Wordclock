@@ -6,8 +6,8 @@
  * \brief The parser of the remote procedure call command, with the ids of the procedures.
  */
 
-#ifndef _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
-#define _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDREMOTEPROCEDURECALLPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDREMOTEPROCEDURECALLPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -221,4 +221,4 @@ class MsgCmdRemoteProcedureCallParser : public MsgParameterParser<MsgCmdRemotePr
     void Process();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDREMOTEPROCEDURECALLPARSER_H_

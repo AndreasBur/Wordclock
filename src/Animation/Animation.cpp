@@ -6,8 +6,6 @@
  * \brief What the animation base class does itself.
  */
 
-#define _ANIMATION_SOURCE_
-
 #include "Animation.h"
 #include "Clock.h"
 #include "Display.h"

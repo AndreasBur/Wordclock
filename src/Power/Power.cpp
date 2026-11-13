@@ -6,8 +6,6 @@
  * \brief The steps of switching the strip's supply off and on.
  */
 
-#define _POWER_SOURCE_
-
 #include "Power.h"
 #include "Display.h"
 

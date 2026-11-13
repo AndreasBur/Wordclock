@@ -9,8 +9,8 @@
  * sign handling.
  */
 
-#ifndef _ARDUINO_ITOA_H_
-#define _ARDUINO_ITOA_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_ITOA_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_ITOA_H_
 
 /*!
  * \brief Writes `value` into `buffer` in base `base`, as a terminated string, as Arduino's itoa()
@@ -49,4 +49,4 @@ inline char* itoa(int value, char* buffer, int base) // NOLINT(readability-ident
     return buffer;
 }
 
-#endif // _ARDUINO_ITOA_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_ITOA_H_

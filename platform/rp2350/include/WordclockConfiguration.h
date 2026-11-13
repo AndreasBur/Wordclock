@@ -14,8 +14,8 @@
  * ones; these are what a clock with nothing stored joins.
  */
 
-#ifndef _WORDCLOCK_CONFIGURATION_H_
-#define _WORDCLOCK_CONFIGURATION_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKCONFIGURATION_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKCONFIGURATION_H_
 
 #if defined(__has_include)
 # if __has_include("WordclockSecrets.h")
@@ -88,4 +88,4 @@
 # define WORDCLOCK_WIFI_MODEM_SLEEP             true
 #endif
 
-#endif // _WORDCLOCK_CONFIGURATION_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKCONFIGURATION_H_

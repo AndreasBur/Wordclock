@@ -6,8 +6,8 @@
  * \brief The words that tell one time: optional "es ist", hour words and minute words.
  */
 
-#ifndef _CLOCK_WORDS_H_
-#define _CLOCK_WORDS_H_
+#ifndef WORDCLOCK_SRC_CLOCK_CLOCKWORDS_H_
+#define WORDCLOCK_SRC_CLOCK_CLOCKWORDS_H_
 
 #include "Arduino.h"
 #include <array>
@@ -133,4 +133,4 @@ class ClockWords
     void SetHourWords(HourWordsType hour_words) { hour_words_ = hour_words; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_CLOCK_CLOCKWORDS_H_

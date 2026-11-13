@@ -6,8 +6,8 @@
  * \brief The teletype animation: the words of the new time are written letter by letter.
  */
 
-#ifndef _ANIMATION_TELETYPE_H_
-#define _ANIMATION_TELETYPE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONTELETYPE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONTELETYPE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -79,4 +79,4 @@ class AnimationTeletype : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONTELETYPE_H_

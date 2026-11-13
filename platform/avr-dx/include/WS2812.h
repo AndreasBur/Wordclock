@@ -30,8 +30,8 @@
  * the CCL sees the TCB waveforms without their pin outputs enabled.
  */
 
-#ifndef _WS2812_H_
-#define _WS2812_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -144,4 +144,4 @@ class WS2812
     StdReturnType Send(const byte* frame, uint16_t length);
 };
 
-#endif // _WS2812_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_

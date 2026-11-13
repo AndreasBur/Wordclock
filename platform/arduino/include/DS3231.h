@@ -19,8 +19,8 @@
  * turns out to have.
  */
 
-#ifndef _DS3231_H_
-#define _DS3231_H_
+#ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_DS3231_H_
+#define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_DS3231_H_
 
 #include "StandardTypes.h"
 #include "Bit.h"
@@ -286,4 +286,4 @@ static_assert(DS3231::ToBcd(59u) == 0x59u, "and goes back there");
 static_assert(DS3231::FromBcd(DS3231::ToBcd(0u)) == 0u, "zero must round-trip");
 static_assert(DS3231::FromBcd(DS3231::ToBcd(99u)) == 99u, "the largest two-digit value must round-trip");
 
-#endif // _DS3231_H_
+#endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_DS3231_H_

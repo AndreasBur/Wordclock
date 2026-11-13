@@ -6,8 +6,8 @@
  * \brief The parser of the display brightness command.
  */
 
-#ifndef _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
-#define _MSG_CMD_DISPLAY_BRIGHTNESS_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYBRIGHTNESSPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYBRIGHTNESSPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -114,4 +114,4 @@ class MsgCmdDisplayBrightnessParser : public MsgParameterParser<MsgCmdDisplayBri
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYBRIGHTNESSPARSER_H_

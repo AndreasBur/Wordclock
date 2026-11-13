@@ -6,8 +6,6 @@
  * \brief The glyph table of the Lucida Sans font.
  */
 
-#define _FONT_LUCIDA_SANS_9X10_SOURCE_
-
 #include "FontLucidaSans9x10.h"
 
 /*

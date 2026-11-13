@@ -35,7 +35,6 @@ Checks: >
   -bugprone-dynamic-static-initializers,
   -bugprone-easily-swappable-parameters,
   -bugprone-narrowing-conversions,
-  -bugprone-reserved-identifier,
   -bugprone-suspicious-enum-usage,
   -bugprone-too-small-loop-variable,
   -cert-dcl37-c,
@@ -66,10 +65,9 @@ Checks: >
 #   enumerations, which is how that library is written. All fifteen findings were in the
 #   simulator's window code.
 #
-# bugprone-reserved-identifier, cert-dcl37-c, cert-dcl51-cpp
-#   Report the include guards. _DISPLAY_H_ is reserved to the implementation and the guards
-#   are named that way in all 112 headers; renaming them would be the largest diff in the
-#   repository for no behavioural gain.
+# cert-dcl37-c, cert-dcl51-cpp
+#   bugprone-reserved-identifier under two more names, which is on. With them on, a name that
+#   belongs to the toolchain, as avr-libc's __heap_start, would need all three in its NOLINT.
 #
 # cert-err58-cpp
 #   Reports the singletons: a static object whose constructor could throw. Nothing here

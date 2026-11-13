@@ -25,8 +25,8 @@
  * adding a field cannot silently change what the platforms are compiled against.
  */
 
-#ifndef _PERSISTENCE_H_
-#define _PERSISTENCE_H_
+#ifndef WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
+#define WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -129,4 +129,4 @@ class Persistence
     static StdReturnType Reset();
 };
 
-#endif // _PERSISTENCE_H_
+#endif  // WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_

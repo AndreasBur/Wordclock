@@ -6,8 +6,6 @@
  * \brief Turns an answer from the firmware into a readable line.
  */
 
-#define _MESSAGE_DECODER_SOURCE_
-
 #include "sim/MessageDecoder.h"
 #include <wx/tokenzr.h>
 

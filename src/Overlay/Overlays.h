@@ -6,8 +6,8 @@
  * \brief The date, temperature and text overlays together, and which of them holds the display.
  */
 
-#ifndef _OVERLAYS_H_
-#define _OVERLAYS_H_
+#ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYS_H_
+#define WORDCLOCK_SRC_OVERLAY_OVERLAYS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -564,4 +564,4 @@ class Overlays
     StdReturnType Abort();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_OVERLAY_OVERLAYS_H_

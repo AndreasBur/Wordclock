@@ -6,8 +6,8 @@
  * \brief The parser of the date overlay command.
  */
 
-#ifndef _MSG_CMD_OVERLAY_DATE_PARSER_H_
-#define _MSG_CMD_OVERLAY_DATE_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYDATEPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYDATEPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -152,4 +152,4 @@ class MsgCmdOverlayDateParser : public MsgCmdOverlayParser<MsgCmdOverlayDatePars
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYDATEPARSER_H_

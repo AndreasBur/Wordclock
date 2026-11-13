@@ -1,5 +1,5 @@
-#ifndef _ESP_HTTP_SERVER_H_
-#define _ESP_HTTP_SERVER_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_
+#define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
@@ -40,4 +40,4 @@ int httpd_req_to_sockfd(httpd_req_t*);
 esp_err_t httpd_ws_recv_frame(httpd_req_t*, httpd_ws_frame_t*, size_t);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t, int, httpd_ws_frame_t*);
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_

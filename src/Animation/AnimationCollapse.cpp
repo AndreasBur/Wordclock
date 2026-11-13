@@ -6,8 +6,6 @@
  * \brief The steps of the collapse animation.
  */
 
-#define _ANIMATION_COLLAPSE_SOURCE_
-
 #include "AnimationCollapse.h"
 #include "Display.h"
 #include "DisplayWords.h"

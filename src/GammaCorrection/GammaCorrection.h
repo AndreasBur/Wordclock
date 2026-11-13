@@ -44,8 +44,8 @@
  *   kept as published: one 256th of a doubling is not something anybody sees.
  */
 
-#ifndef _GAMMA_CORRECTION_H_
-#define _GAMMA_CORRECTION_H_
+#ifndef WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_
+#define WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -119,4 +119,4 @@ class GammaCorrection
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_

@@ -19,8 +19,8 @@
  * what the language says rather than what a hand-written approximation would.
  */
 
-#ifndef _STL_TYPE_TRAITS_
-#define _STL_TYPE_TRAITS_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_TYPE_TRAITS_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_TYPE_TRAITS_
 
 /*
  * On this toolchain these headers are the standard library, see type_traits, so declaring
@@ -200,4 +200,4 @@ template<class T> using underlying_type_t = typename underlying_type<T>::type;
 } // namespace std
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
-#endif // _STL_TYPE_TRAITS_
+#endif // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_TYPE_TRAITS_

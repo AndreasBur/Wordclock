@@ -6,8 +6,8 @@
  * \brief The animations facade: selects the animation and runs it to change the displayed time.
  */
 
-#ifndef _ANIMATIONS_H_
-#define _ANIMATIONS_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONS_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONS_H_
 
 #include "StandardTypes.h"
 #include "Bit.h"
@@ -536,4 +536,4 @@ class Animations
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONS_H_

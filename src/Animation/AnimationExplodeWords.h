@@ -6,8 +6,8 @@
  * \brief The explode-words animation: word by word, the old time into the centre, the new one out.
  */
 
-#ifndef _ANIMATION_EXPLODE_WORDS_H_
-#define _ANIMATION_EXPLODE_WORDS_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEWORDS_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEWORDS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -127,4 +127,4 @@ class AnimationExplodeWords : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEWORDS_H_

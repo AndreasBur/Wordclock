@@ -1,5 +1,5 @@
-#ifndef _HARDWARE_DMA_H_
-#define _HARDWARE_DMA_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_
+#define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
@@ -16,4 +16,4 @@ void channel_config_set_dreq(dma_channel_config*, uint);
 void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void*, uint, bool);
 bool dma_channel_is_busy(uint);
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_

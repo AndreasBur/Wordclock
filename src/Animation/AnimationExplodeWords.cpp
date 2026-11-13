@@ -6,8 +6,6 @@
  * \brief The steps of the explode-words animation.
  */
 
-#define _ANIMATION_CLOCK_EXPLODE_SOURCE_
-
 #include "AnimationExplodeWords.h"
 #include "Display.h"
 #include "DisplayWords.h"

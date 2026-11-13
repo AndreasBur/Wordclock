@@ -22,8 +22,8 @@
  * then binds Serial to this class, so including one from here would close that circle.
  */
 
-#ifndef _WORDCLOCK_SERIAL_H_
-#define _WORDCLOCK_SERIAL_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKSERIAL_H_
+#define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKSERIAL_H_
 
 #include "StandardTypes.h"
 
@@ -262,4 +262,4 @@ class WordclockSerial
     void flush(); // NOLINT(readability-identifier-naming)
 };
 
-#endif // _WORDCLOCK_SERIAL_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKSERIAL_H_

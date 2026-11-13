@@ -16,8 +16,8 @@
  * reader has to know about; a return code is one the compiler makes them handle.
  */
 
-#ifndef _SYSTEM_H_
-#define _SYSTEM_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_SYSTEM_H_
+#define WORDCLOCK_PLATFORM_ESP32_INCLUDE_SYSTEM_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -311,4 +311,4 @@ class System
     StdReturnType ReconnectNetwork();
 };
 
-#endif // _SYSTEM_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_SYSTEM_H_

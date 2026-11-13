@@ -10,8 +10,8 @@
  * SerialShim.
  */
 
-#ifndef _ARDUINO_H_
-#define _ARDUINO_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_
 
 /*
  * Re-exported, all of them: this header exists to pull the pieces together, and what includes it
@@ -42,4 +42,4 @@
  */
 #define Serial                  SerialShim::GetInstance() // NOLINT(readability-identifier-naming)
 
-#endif // _ARDUINO_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_

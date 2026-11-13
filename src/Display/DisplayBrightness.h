@@ -6,8 +6,8 @@
  * \brief The brightness of the display, from the light sensor or set by hand.
  */
 
-#ifndef _DISPLAY_BRIGHTNESS_H_
-#define _DISPLAY_BRIGHTNESS_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYBRIGHTNESS_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYBRIGHTNESS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -220,4 +220,4 @@ class DisplayBrightness
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYBRIGHTNESS_H_

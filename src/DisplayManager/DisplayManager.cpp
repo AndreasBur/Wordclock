@@ -6,8 +6,6 @@
  * \brief Decides what the display shows.
  */
 
-#define _DISPLAY_MANAGER_SOURCE_
-
 #include "DisplayManager.h"
 #include "Animations.h"
 #include "Clock.h"

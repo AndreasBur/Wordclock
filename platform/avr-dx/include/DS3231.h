@@ -13,8 +13,8 @@
  * what the chip counted through the battery is all there is after a restart.
  */
 
-#ifndef _DS3231_H_
-#define _DS3231_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_DS3231_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_DS3231_H_
 
 #include "StandardTypes.h"
 #include "Bit.h"
@@ -241,4 +241,4 @@ static_assert(DS3231::kTenthsPerDegree == 10, "the conversion below is written i
 static_assert(DS3231::ToTenths(0x19, 0x40u) == 252, "+25.25 degrees must read as 25.2");
 static_assert(DS3231::ToTenths(static_cast<int8_t>(0xFE), 0x80u) == -15, "-1.5 degrees must read as -1.5");
 
-#endif // _DS3231_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_DS3231_H_

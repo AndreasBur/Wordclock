@@ -6,8 +6,8 @@
  * \brief One pixel: its red, green and blue values, stored in the order the LED strip wants.
  */
 
-#ifndef _PIXEL_H_
-#define _PIXEL_H_
+#ifndef WORDCLOCK_SRC_PIXELS_PIXEL_H_
+#define WORDCLOCK_SRC_PIXELS_PIXEL_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -154,4 +154,4 @@ class Pixel
     void DecrementBlue() { if(pixel_raw_[kColorOffsetBlue] > 0u) pixel_raw_[kColorOffsetBlue]--; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_PIXELS_PIXEL_H_

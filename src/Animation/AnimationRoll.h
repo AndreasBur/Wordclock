@@ -15,8 +15,8 @@
  * src/display/display.c).
  */
 
-#ifndef _ANIMATION_ROLL_H_
-#define _ANIMATION_ROLL_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONROLL_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONROLL_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -109,4 +109,4 @@ class AnimationRoll : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONROLL_H_

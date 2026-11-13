@@ -6,8 +6,8 @@
  * \brief The cursor animation: a single pixel walks across all LEDs and leaves the new time behind.
  */
 
-#ifndef _ANIMATION_CURSOR_H_
-#define _ANIMATION_CURSOR_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -75,4 +75,4 @@ class AnimationCursor : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_

@@ -21,8 +21,8 @@
  * each got wrong the same way.
  */
 
-#ifndef _UPTIME_H_
-#define _UPTIME_H_
+#ifndef WORDCLOCK_SRC_UPTIME_UPTIME_H_
+#define WORDCLOCK_SRC_UPTIME_UPTIME_H_
 
 #include "Arduino.h"
 
@@ -96,4 +96,4 @@ class Uptime
     void Task();
 };
 
-#endif // _UPTIME_H_
+#endif  // WORDCLOCK_SRC_UPTIME_UPTIME_H_

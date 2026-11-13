@@ -6,8 +6,6 @@
  * \brief The steps of the drop animation.
  */
 
-#define _ANIMATION_CLOCK_DROP_SOURCE_
-
 #include "AnimationDrop.h"
 #include "Display.h"
 #include "DisplayWord.h"

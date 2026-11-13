@@ -9,8 +9,8 @@
  * any byte is written: an image larger than the partition, which is what picking the factory
  * file instead of the OTA one looks like from here.
  */
-#ifndef _UPDATE_H_
-#define _UPDATE_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_UPDATE_H_
+#define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_UPDATE_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 
@@ -74,4 +74,4 @@ class UpdateClass
 extern UpdateClass Update;
 
 // NOLINTEND(readability-identifier-naming)
-#endif // _UPDATE_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_UPDATE_H_

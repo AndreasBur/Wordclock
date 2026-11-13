@@ -14,8 +14,8 @@
  * them.
  */
 
-#ifndef _PIXELS_H_
-#define _PIXELS_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_PIXELS_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_PIXELS_H_
 
 #include "StandardTypes.h"
 #include "Pixel.h"
@@ -300,4 +300,4 @@ class Pixels
     void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 
-#endif // _PIXELS_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_PIXELS_H_

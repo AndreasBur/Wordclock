@@ -11,8 +11,8 @@
  * it is being changed.
  */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SETTINGS_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SETTINGS_H_
 
 #include <wx/wx.h>
 #include "StandardTypes.h"
@@ -95,4 +95,4 @@ class Settings : public wxDialog
     }
 };
 
-#endif // SETTINGS_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SETTINGS_H_

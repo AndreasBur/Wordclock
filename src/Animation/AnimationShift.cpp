@@ -6,8 +6,6 @@
  * \brief The steps of the shift animation.
  */
 
-#define _ANIMATION_SHIFT_SOURCE_
-
 #include "AnimationShift.h"
 #include "Display.h"
 #include "DisplayWords.h"

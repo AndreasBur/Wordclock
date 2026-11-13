@@ -17,8 +17,8 @@
  * update. Answers travel the other way, sent from the firmware's tick.
  */
 
-#ifndef _WEB_INTERFACE_H_
-#define _WEB_INTERFACE_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBINTERFACE_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBINTERFACE_H_
 
 #include "StandardTypes.h"
 
@@ -127,4 +127,4 @@ class WebInterface
     void OnClientOpened() { WebFrontend::GetInstance().OnClientOpened(); }
 };
 
-#endif // _WEB_INTERFACE_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBINTERFACE_H_

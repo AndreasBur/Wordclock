@@ -6,8 +6,6 @@
  * \brief The steps of the roll animation.
  */
 
-#define _ANIMATION_ROLL_SOURCE_
-
 #include "AnimationRoll.h"
 #include "Display.h"
 #include "DisplayWords.h"

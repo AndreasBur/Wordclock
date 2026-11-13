@@ -6,8 +6,6 @@
  * \brief The steps of the cube animation.
  */
 
-#define _ANIMATION_CUBE_SOURCE_
-
 #include "AnimationCube.h"
 #include "StandardTypes.h"
 #include "Display.h"

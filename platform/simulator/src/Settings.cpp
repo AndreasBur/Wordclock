@@ -6,8 +6,6 @@
  * \brief Simulator settings window.
  */
 
-#define _SETTINGS_SOURCE_
-
 #include "sim/Settings.h"
 /* the simulated light sensor the illuminance slider feeds */
 #include "sim/BH1750.h"

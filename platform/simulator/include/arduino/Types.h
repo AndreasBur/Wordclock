@@ -9,8 +9,8 @@
  * Arduino.h therefore includes this header first.
  */
 
-#ifndef _ARDUINO_TYPES_H_
-#define _ARDUINO_TYPES_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_TYPES_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_TYPES_H_
 
 #include <stdint.h>
 
@@ -19,4 +19,4 @@ typedef uint8_t byte; // NOLINT(readability-identifier-naming)
 /*! \brief A truth value, as Arduino's boolean. */
 typedef bool    boolean; // NOLINT(readability-identifier-naming)
 
-#endif // _ARDUINO_TYPES_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_TYPES_H_

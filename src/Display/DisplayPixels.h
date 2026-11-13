@@ -6,8 +6,8 @@
  * \brief A buffer of the pixels of the grid, to compose in and then write to the display.
  */
 
-#ifndef _DISPLAY_PIXELS_H_
-#define _DISPLAY_PIXELS_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYPIXELS_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYPIXELS_H_
 
 #include "Bit.h"
 #include "Arduino.h"
@@ -143,4 +143,4 @@ class DisplayPixels
 	}
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYPIXELS_H_

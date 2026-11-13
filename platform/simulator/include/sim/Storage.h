@@ -18,8 +18,8 @@
  * rejected there rather than here.
  */
 
-#ifndef _STORAGE_H_
-#define _STORAGE_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_STORAGE_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_STORAGE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -108,4 +108,4 @@ class Storage
     StdReturnType Clear();
 };
 
-#endif // _STORAGE_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_STORAGE_H_

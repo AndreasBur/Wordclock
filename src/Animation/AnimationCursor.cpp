@@ -6,8 +6,6 @@
  * \brief The steps of the cursor animation.
  */
 
-#define _ANIMATION_CLOCK_CURSOR_SOURCE_
-
 #include "AnimationCursor.h"
 #include "Display.h"
 #include "DisplayWords.h"

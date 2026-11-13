@@ -6,8 +6,6 @@
  * \brief The steps of the explode-pixels animation.
  */
 
-#define _ANIMATION_CLOCK_IMPLODE_SOURCE_
-
 #include "AnimationExplodePixels.h"
 #include "Display.h"
 #include "DisplayWords.h"

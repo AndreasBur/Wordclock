@@ -19,8 +19,8 @@
  * literals, so a build with -mdouble=64 gets the limits of the double it actually has.
  */
 
-#ifndef _STL_LIMITS_
-#define _STL_LIMITS_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_LIMITS_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_LIMITS_
 
 #include "type_traits"
 
@@ -110,4 +110,4 @@ template<> struct numeric_limits<long double> {
 } // namespace std
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
-#endif // _STL_LIMITS_
+#endif // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_LIMITS_

@@ -6,8 +6,8 @@
  * \brief The overlay that shows a configured text.
  */
 
-#ifndef _OVERLAY_TEXT_H_
-#define _OVERLAY_TEXT_H_
+#ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYTEXT_H_
+#define WORDCLOCK_SRC_OVERLAY_OVERLAYTEXT_H_
 
 #include "StandardTypes.h"
 #include "Overlay.h"
@@ -111,4 +111,4 @@ class OverlayText : public Overlay<OverlayText>
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_OVERLAY_OVERLAYTEXT_H_
