@@ -184,9 +184,9 @@ target_link_libraries(Wordclock PRIVATE WordclockCore WordclockShims)
 if(WORDCLOCK_BUILD_TESTS)
     # One binary out of several files, not one binary per file: the ESP32 side went that
     # way and had to build an object cache to stop compiling the core once per executable.
-    file(GLOB TEST_CASES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/cases/*.cpp)
-    add_executable(WordclockTests tests/WordclockTests.cpp ${TEST_CASES})
-    target_include_directories(WordclockTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    file(GLOB TEST_CASES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/cases/*.cpp)
+    add_executable(WordclockTests ${CMAKE_SOURCE_DIR}/test/WordclockTests.cpp ${TEST_CASES})
+    target_include_directories(WordclockTests PRIVATE ${CMAKE_SOURCE_DIR}/test)
     target_link_libraries(WordclockTests PRIVATE WordclockCore WordclockShims)
     add_test(NAME WordclockTests COMMAND WordclockTests)
 endif()
@@ -194,7 +194,7 @@ endif()
 # --------------------------------------------------------------------------
 # Fuzzers
 # --------------------------------------------------------------------------
-# One executable per file in tests/fuzz, each linked against the same core and shims as the
+# One executable per file in test/fuzz, each linked against the same core and shims as the
 # tests. The core has to be instrumented as well, not only the fuzz target: libFuzzer steers by
 # the branches of the code it reaches, and those are in the core. So the flags go on
 # WordclockBuildSettings, which every object of this build compiles with.
@@ -208,11 +208,11 @@ if(WORDCLOCK_BUILD_FUZZERS)
     target_compile_options(WordclockBuildSettings INTERFACE -fsanitize=fuzzer-no-link ${FUZZ_SANITIZERS})
     target_link_options(WordclockBuildSettings INTERFACE ${FUZZ_SANITIZERS})
 
-    file(GLOB FUZZ_TARGETS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/fuzz/*.cpp)
+    file(GLOB FUZZ_TARGETS CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/fuzz/*Fuzz.cpp)
     foreach(source ${FUZZ_TARGETS})
         get_filename_component(name ${source} NAME_WE)
         add_executable(${name} ${source})
-        target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/fuzz)
+        target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/test/fuzz)
         target_link_libraries(${name} PRIVATE WordclockCore WordclockShims)
         target_link_options(${name} PRIVATE -fsanitize=fuzzer)
     endforeach()

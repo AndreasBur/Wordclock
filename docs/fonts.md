@@ -65,5 +65,5 @@ A glyph appended by hand costs three edits, which is the path the degree sign to
 
 The form that answers the index substitutes the space for a byte it cannot map, so a
 missing branch draws a blank instead of failing. That is what the degree sign's check in
-[WordclockTests.cpp](../platform/simulator/tests/WordclockTests.cpp) compares
+[WordclockTests.cpp](../test/WordclockTests.cpp) compares
 against: the space, not an empty display.

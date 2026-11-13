@@ -145,7 +145,7 @@ per-platform edits. This is also the build that runs inside the container.
 ctest --preset simulator
 ```
 
-[tests/](tests/) holds regression tests for the firmware core. They build
+[test/](../../test/) at the root holds the regression tests of the firmware core. They build
 alongside the application and share its objects, so they add one translation
 unit and a link rather than a second build of the core; `-DWORDCLOCK_BUILD_TESTS=OFF`
 leaves them out.
@@ -179,7 +179,6 @@ platform/simulator/
 │   ├── Arduino.h         Arduino-core shim (Serial, PROGMEM, itoa, …)
 │   └── arduino/          split Arduino helper shims (types, bits, progmem, itoa)
 ├── src/                  their implementations
-├── tests/                regression tests that run without a display
 ├── WordclockApp.*        wxApp entry point + 10 ms task timer
 ├── WordclockMain.*       wires the scheduler to the simulated real-time clock
 └── CMakeLists.txt        simulator build (pulled in by the root switch)
