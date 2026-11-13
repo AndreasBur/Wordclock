@@ -104,7 +104,7 @@ cmake --list-presets=all               # avr, clang, sanitize, coverage, fuzz, c
 ```
 
 Or through the [Makefile](Makefile), which is the index over the presets and everything that
-is not CMake: `make` lists every target, `make simulator` is the line above, `make run` starts
+is not CMake: `make` lists every target, `make tests` is the line above, `make run` starts
 the window, and `make check` is everything CI runs.
 
 That way requires CMake ≥ 3.25 for the presets, Ninja, a C++17 compiler and wxWidgets 3.x
@@ -166,8 +166,8 @@ with clang:
 
 | Job | `make` | What it does |
 |-----|--------|--------------|
-| Simulator and core tests | `simulator` | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
-| Host builds with clang | `clang` | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
+| Simulator and core tests | `tests` | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
+| Host builds with clang | `clang host-clang` | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
 | Web pages in a browser | `web` | [`tools/web-smoke.py`](tools/web-smoke.py): the panel and the console in Chromium against the simulator, at 390 and 1280 px — no console error, nothing wider than the window, a command typed in the console answered |
 | ESP32 backend on the host | `host-esp32` | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
 | RP2350 backend on the host | `host-rp2350` | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
@@ -189,25 +189,26 @@ under the sanitizers, and a fuzzer for what no test thought of:
 
 | Job | `make` | What it does |
 |-----|--------|--------------|
-| clang-tidy | `tidy` | The template's [`tools/tidy.sh`](tools/tidy.sh): each target of [`tools/project.sh`](tools/project.sh) through its own compile database - the AVR's from CMake, the ESP32's and the RP2350's from PlatformIO - then the tests with the simulator, then the fuzzers. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in the backends' host tests, through the database their `run.sh compiledb` writes |
+| clang-tidy | `tidy tidy-host-suites` | The template's [`tools/tidy.sh`](tools/tidy.sh): each target of [`tools/project.sh`](tools/project.sh) through its own compile database - the AVR's from CMake, the ESP32's and the RP2350's from PlatformIO - then the tests with the simulator, then the fuzzers. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in the backends' host tests, through the database their `run.sh compiledb` writes |
 | Headers | `headers` | Every header of `src/` and `platform/` compiled on its own, by each target's compiler and the host's, through [`tools/self_contained_headers.py`](tools/self_contained_headers.py) |
 | coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and fails if together they reach less of the lines, branches and conditions of `src/` than `COVERAGE_MINIMUM` of [`tools/project.sh`](tools/project.sh) says; a table of what none of them runs goes into the job's summary. Through the template's [`tools/coverage.sh`](tools/coverage.sh), which takes the host suites from `coverage_suites()` |
-| sanitizers | `sanitizers` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
+| sanitizers | `sanitize host-sanitize` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
 | fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers are in [`test/fuzz/`](test/fuzz/), their options beside them, and [`tools/fuzz.sh`](tools/fuzz.sh) runs them |
 | cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
-| Style and scripts | `style` | The template's [`tools/lint.sh`](tools/lint.sh): clang-format and the indentation of the Doxygen blocks, cpplint with what [`CPPLINT.cfg`](CPPLINT.cfg) filters and why, shellcheck over every shell script, ruff over every Python one and actionlint over the workflows. `make fmt` formats in place. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
+| Style and scripts | `lint` | The template's [`tools/lint.sh`](tools/lint.sh): clang-format and the indentation of the Doxygen blocks, cpplint with what [`CPPLINT.cfg`](CPPLINT.cfg) filters and why, shellcheck over every shell script, ruff over every Python one and actionlint over the workflows. `make fmt` formats in place. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
 | Web page linters | `web-lint` | [html-validate](https://html-validate.org/) over both pages as whole documents and eslint over the scripts inline in them, at the versions [`package-lock.json`](package-lock.json) pins. What each checks and leaves out is in [`.htmlvalidate.mjs`](.htmlvalidate.mjs) and [`eslint.config.mjs`](eslint.config.mjs) |
 
 cppcheck reads `src/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
 clang-tidy already covers through the compile database.
 
-Each job is one target of the [Makefile](Makefile), and the workflows run nothing else, so
-the column above is also what to type before pushing. Nothing in them needs a display, a board,
+Each job is a target of the [Makefile](Makefile), the template's, or of [tools/project.mk](tools/project.mk),
+Wordclock's own, and the workflows run nothing else, so the column above is also what to type
+before pushing. Nothing in them needs a display, a board,
 or anything the dev container does not carry. The Doxygen blocks are `docs`:
 
 ```bash
-make lint                     # scripts, docs, cppcheck, web pages: seconds, no build
+make lint                     # clang-format, cpplint, the scripts: seconds, no build
 make tidy                     # clang-tidy over every target, the tests and the fuzzers
 make check                    # every job of both workflows, warnings as errors
 make fuzz FUZZ_SECONDS=300    # longer than the three minutes a pull request gets

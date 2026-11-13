@@ -56,7 +56,7 @@ the line it is for.
 - One space between a command, its direction and its name, `\param[in] column`; nothing is aligned
   in columns.
 - A line that continues a command starts where the text after the command starts, as the
-  `\return` above does. `make fmt` indents it so, after clang-format; `make style` fails where a
+  `\return` above does. `make fmt` indents it so, after clang-format; `make lint` fails where a
   line is not indented so. Both run the template's `tools/lib/doc_indent.py`.
 
 ### The parts, in this order
@@ -152,7 +152,7 @@ animation."
   clangd shows these in the editor as you type. A backslash meant as a char is written `\\`, or
   clang takes it for a command.
 
-- **`tools/lib/doc_indent.py`**, through `make style`, checks that the lines continuing a command
+- **`tools/lib/doc_indent.py`**, through `make lint`, checks that the lines continuing a command
   are indented under its text.
 
 All three run in `static-analysis.yml` on every pull request.

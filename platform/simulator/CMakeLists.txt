@@ -62,6 +62,20 @@ add_custom_command(
 
 add_custom_target(WordclockWebPage DEPENDS "${WEB_PAGE_HEADER}")
 
+# Written at configure as well, where it is missing: clang-tidy and the header check compile each
+# file of a configured build without building it, and a source that includes WebPage.h does not
+# compile before the rule above has run. A configured build that is never built still has one.
+if(NOT EXISTS "${WEB_PAGE_HEADER}")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated")
+    execute_process(
+        COMMAND python3 "${EMBED_WEB}" "${WEB_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/generated"
+        RESULT_VARIABLE EMBED_RESULT
+        OUTPUT_QUIET)
+    if(NOT EMBED_RESULT EQUAL 0)
+        message(FATAL_ERROR "embed_web.py could not write ${WEB_PAGE_HEADER}")
+    endif()
+endif()
+
 # ...plus the wxWidgets stand-ins for the hardware. Only the two entry-point
 # files below are specific to the app; everything here is shared with the tests.
 set(SHIM_SOURCES

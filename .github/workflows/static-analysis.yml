@@ -86,7 +86,7 @@ jobs:
       # of tools/project.sh, the tests and the fuzzers, and the names in the backends' host tests;
       # then every header compiled on its own by each target's compiler and the host's.
       - name: clang-tidy
-        run: make tidy
+        run: make tidy tidy-host-suites
 
       - name: Every header on its own
         run: make headers
@@ -160,7 +160,7 @@ jobs:
           packages: cmake ninja-build libwxgtk3.2-dev
 
       - name: Run the three suites
-        run: make sanitizers
+        run: make sanitize host-sanitize
 
   # The tests run what somebody thought of; this runs what nobody did. libFuzzer makes up
   # inputs for the two ways data from outside reaches the firmware - a command line as a
@@ -230,7 +230,7 @@ jobs:
       - uses: ./.github/actions/uv-sync
 
       - name: clang-format, cpplint, shellcheck, ruff and actionlint
-        run: make style
+        run: make lint
 
   # The two pages a clock serves, which only a browser had ever read: html-validate over each as
   # a whole document, eslint over the scripts inline in them. Node at the major version the dev
