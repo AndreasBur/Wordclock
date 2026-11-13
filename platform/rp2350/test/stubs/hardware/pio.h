@@ -1,5 +1,5 @@
-#ifndef _HARDWARE_PIO_H_
-#define _HARDWARE_PIO_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_PIO_H_
+#define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_PIO_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
@@ -32,4 +32,4 @@ void pio_sm_init(PIO, uint, uint, const pio_sm_config*);
 void pio_sm_set_enabled(PIO, uint, bool);
 uint pio_get_dreq(PIO, uint, bool);
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_PIO_H_

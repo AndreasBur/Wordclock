@@ -6,8 +6,6 @@
  * \brief How a command is told apart and handed to its parser.
  */
 
-#define _MSG_CMD_PARSER_SOURCE_
-
 #include "MsgCmdParser.h"
 #include "MsgCmdRemoteProcedureCallParser.h"
 #include "MsgCmdDisplayColorParser.h"

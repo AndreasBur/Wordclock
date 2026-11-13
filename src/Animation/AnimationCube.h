@@ -6,8 +6,8 @@
  * \brief The cube animation: a rectangle shrinks to the centre and grows back over the new time.
  */
 
-#ifndef _ANIMATION_CUBE_H_
-#define _ANIMATION_CUBE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCUBE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONCUBE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -118,4 +118,4 @@ class AnimationCube : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONCUBE_H_

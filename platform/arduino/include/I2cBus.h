@@ -11,8 +11,8 @@
  * difference is all the file holds.
  */
 
-#ifndef _I2C_BUS_H_
-#define _I2C_BUS_H_
+#ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
+#define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -41,4 +41,4 @@ class I2cBus
     static StdReturnType Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz);
 };
 
-#endif // _I2C_BUS_H_
+#endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_

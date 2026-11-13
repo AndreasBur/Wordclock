@@ -13,8 +13,8 @@
  * letters move.
  */
 
-#ifndef _ANIMATION_COLLAPSE_H_
-#define _ANIMATION_COLLAPSE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCOLLAPSE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONCOLLAPSE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -112,4 +112,4 @@ class AnimationCollapse : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONCOLLAPSE_H_

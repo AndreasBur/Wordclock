@@ -34,8 +34,8 @@
  * rule kept rather than broken - the display stays where the hand put it.
  */
 
-#ifndef _NIGHT_SWITCH_H_
-#define _NIGHT_SWITCH_H_
+#ifndef WORDCLOCK_SRC_NIGHTSWITCH_NIGHTSWITCH_H_
+#define WORDCLOCK_SRC_NIGHTSWITCH_NIGHTSWITCH_H_
 
 #include "Arduino.h"
 #include "ClockTime.h"
@@ -249,4 +249,4 @@ class NightSwitch
     void Task();
 };
 
-#endif // _NIGHT_SWITCH_H_
+#endif  // WORDCLOCK_SRC_NIGHTSWITCH_NIGHTSWITCH_H_

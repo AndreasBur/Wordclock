@@ -6,8 +6,8 @@
  * \brief The drop animation: the letters of the new time fall down their column into place.
  */
 
-#ifndef _ANIMATION_DROP_H_
-#define _ANIMATION_DROP_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONDROP_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONDROP_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -91,4 +91,4 @@ class AnimationDrop : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONDROP_H_

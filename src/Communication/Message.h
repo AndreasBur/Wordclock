@@ -6,8 +6,8 @@
  * \brief A line from the serial port: a fixed buffer to add characters to and search.
  */
 
-#ifndef _MESSAGE_H_
-#define _MESSAGE_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGE_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -116,4 +116,4 @@ class Message
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGE_H_

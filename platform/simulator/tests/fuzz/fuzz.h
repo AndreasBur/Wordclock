@@ -13,8 +13,8 @@
  * task, which counts on from the host's own clock and would make every run a little different;
  * the date and time are set instead.
  */
-#ifndef _FUZZ_H_
-#define _FUZZ_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_
 
 #include "Arduino.h"
 #include "ClockDateTime.h"
@@ -66,4 +66,4 @@ inline void RunUntilThePortIsRead()
     RunTicks(1u);
 }
 
-#endif // _FUZZ_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_FUZZ_FUZZ_H_

@@ -6,8 +6,8 @@
  * Grouped by subject, the same way platform/esp32/test/cases/ is. The order they run in
  * is main.cpp's business and is not arbitrary; it says why there.
  */
-#ifndef _CASES_H_
-#define _CASES_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_
 
 /* display_test.cpp */
 void TestSingleBits();
@@ -158,4 +158,4 @@ void TestFloatConversionKeepsToTheType();
 /* webhost_test.cpp */
 void TestWebHostOutlastsAnIdleConnection();
 
-#endif // _CASES_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CASES_H_

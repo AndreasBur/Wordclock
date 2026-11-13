@@ -6,8 +6,6 @@
  * \brief What the overlays do as a whole.
  */
 
-#define _OVERLAYS_SOURCE_
-
 #include "Overlays.h"
 #include "Animations.h"
 #include "RealTimeClock.h"

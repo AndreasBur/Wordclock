@@ -21,8 +21,8 @@
  * that file's.
  */
 
-#ifndef _WEB_TRANSPORT_H_
-#define _WEB_TRANSPORT_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBTRANSPORT_H_
+#define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBTRANSPORT_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -122,4 +122,4 @@ class WebTransport
     void SendBinary(const byte* bytes, size_t length);
 };
 
-#endif // _WEB_TRANSPORT_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBTRANSPORT_H_

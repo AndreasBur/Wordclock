@@ -9,8 +9,6 @@
  * overflow ISR of that timer.
  */
 
-#define _TIMER_SOURCE_
-
 #include "Timer.h"
 #include "Bit.h"
 #include <avr/interrupt.h>

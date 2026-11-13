@@ -6,8 +6,8 @@
  * \brief Shifts of the whole display or of one row or column, optionally rotating.
  */
 
-#ifndef _TRANSFORMATION_H_
-#define _TRANSFORMATION_H_
+#ifndef WORDCLOCK_SRC_TRANSFORMATION_TRANSFORMATION_H_
+#define WORDCLOCK_SRC_TRANSFORMATION_TRANSFORMATION_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -116,4 +116,4 @@ class Transformation
     static StdReturnType ShiftColumnDown(byte column, bool rotate = false);
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_TRANSFORMATION_TRANSFORMATION_H_

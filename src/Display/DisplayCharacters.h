@@ -6,8 +6,8 @@
  * \brief The letters of the grid, by id, and the size of the grid.
  */
 
-#ifndef _DISPLAY_CHARACTERS_H_
-#define _DISPLAY_CHARACTERS_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCHARACTERS_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYCHARACTERS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -307,4 +307,4 @@ class DisplayCharacters
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYCHARACTERS_H_

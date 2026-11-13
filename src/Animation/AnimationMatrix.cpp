@@ -6,8 +6,6 @@
  * \brief The steps of the matrix animation.
  */
 
-#define _ANIMATION_MATRIX_SOURCE_
-
 #include "AnimationMatrix.h"
 #include "Display.h"
 #include "DisplayWords.h"

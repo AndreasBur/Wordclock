@@ -15,8 +15,8 @@
  * 2's job, and that one already sets a colour properly.
  */
 
-#ifndef _MSG_CMD_COLOR_CYCLE_PARSER_H_
-#define _MSG_CMD_COLOR_CYCLE_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCOLORCYCLEPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCOLORCYCLEPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -119,4 +119,4 @@ class MsgCmdColorCycleParser : public MsgParameterParser<MsgCmdColorCycleParser,
     }
 };
 
-#endif // _MSG_CMD_COLOR_CYCLE_PARSER_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCOLORCYCLEPARSER_H_

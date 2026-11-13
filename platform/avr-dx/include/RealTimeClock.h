@@ -14,8 +14,8 @@
  * the old time.
  */
 
-#ifndef _REAL_TIME_CLOCK_H_
-#define _REAL_TIME_CLOCK_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_REALTIMECLOCK_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_REALTIMECLOCK_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -147,4 +147,4 @@ class RealTimeClock
     void Task();
 };
 
-#endif // _REAL_TIME_CLOCK_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_REALTIMECLOCK_H_

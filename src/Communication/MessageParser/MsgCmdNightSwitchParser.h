@@ -13,8 +13,8 @@
  * makes a half-remembered setting checkable in one line.
  */
 
-#ifndef _MSG_CMD_NIGHT_SWITCH_PARSER_H_
-#define _MSG_CMD_NIGHT_SWITCH_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -134,4 +134,4 @@ class MsgCmdNightSwitchParser : public MsgParameterParser<MsgCmdNightSwitchParse
     }
 };
 
-#endif // _MSG_CMD_NIGHT_SWITCH_PARSER_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_

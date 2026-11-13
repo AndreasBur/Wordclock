@@ -14,8 +14,8 @@
  * worth telling apart from what came before.
  */
 
-#ifndef _VERSION_H_
-#define _VERSION_H_
+#ifndef WORDCLOCK_SRC_VERSION_VERSION_H_
+#define WORDCLOCK_SRC_VERSION_VERSION_H_
 
 #ifndef WORDCLOCK_VERSION
 /*!
@@ -27,4 +27,4 @@
 # define WORDCLOCK_VERSION                              "0.1.0"
 #endif
 
-#endif // _VERSION_H_
+#endif  // WORDCLOCK_SRC_VERSION_VERSION_H_

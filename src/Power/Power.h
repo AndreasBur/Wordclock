@@ -30,8 +30,8 @@
  * released before the strip is told it may light up again.
  */
 
-#ifndef _POWER_H_
-#define _POWER_H_
+#ifndef WORDCLOCK_SRC_POWER_POWER_H_
+#define WORDCLOCK_SRC_POWER_POWER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -161,4 +161,4 @@ class Power
     void Task();
 };
 
-#endif // _POWER_H_
+#endif  // WORDCLOCK_SRC_POWER_POWER_H_

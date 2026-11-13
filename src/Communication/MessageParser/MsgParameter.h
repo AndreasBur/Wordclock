@@ -6,8 +6,8 @@
  * \brief One option of a command: its short name and the type of its argument.
  */
 
-#ifndef _MSG_PARAMETER_H_
-#define _MSG_PARAMETER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGPARAMETER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGPARAMETER_H_
 
 
 /*!
@@ -83,4 +83,4 @@ class MsgParameter
     void SetArgumentType(ArgumentTypeType argument_type) { argument_type_ = argument_type; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGPARAMETER_H_

@@ -14,8 +14,8 @@
  * reading starts invalid rather than at a comfortable room temperature.
  */
 
-#ifndef _DS3231_H_
-#define _DS3231_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_DS3231_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_DS3231_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -131,4 +131,4 @@ class DS3231
     static inline bool simulated_temperature_valid{false};
 };
 
-#endif // _DS3231_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_DS3231_H_

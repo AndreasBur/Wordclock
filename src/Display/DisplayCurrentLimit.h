@@ -9,8 +9,8 @@
  * brightness that still fits it.
  */
 
-#ifndef _DISPLAY_CURRENT_LIMIT_H_
-#define _DISPLAY_CURRENT_LIMIT_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCURRENTLIMIT_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYCURRENTLIMIT_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -171,4 +171,4 @@ class DisplayCurrentLimit
 static_assert(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS <= 16000u,
               "DisplayCurrentLimit: budget beyond 16 A would overflow the brightness solution");
 
-#endif // _DISPLAY_CURRENT_LIMIT_H_
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYCURRENTLIMIT_H_

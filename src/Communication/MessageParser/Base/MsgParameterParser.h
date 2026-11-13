@@ -6,8 +6,8 @@
  * \brief The base of the command parsers, which reads the options by a parameter table.
  */
 
-#ifndef _MSG_PARAMETER_PARSER_H_
-#define _MSG_PARAMETER_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGPARAMETERPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGPARAMETERPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -364,4 +364,4 @@ template <typename Derived, size_t ParameterTableSize> class MsgParameterParser
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGPARAMETERPARSER_H_

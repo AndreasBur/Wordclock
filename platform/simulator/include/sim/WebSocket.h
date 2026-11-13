@@ -9,8 +9,8 @@
  * tests can check every byte without a network.
  */
 
-#ifndef _WEB_SOCKET_H_
-#define _WEB_SOCKET_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBSOCKET_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBSOCKET_H_
 
 #include "StandardTypes.h"
 
@@ -156,4 +156,4 @@ class WebSocket
     static std::string ConvertToBase64(const uint8_t* bytes, size_t length);
 };
 
-#endif // _WEB_SOCKET_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBSOCKET_H_

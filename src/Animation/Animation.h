@@ -6,8 +6,8 @@
  * \brief The base class of all animations, with the state and helpers they share.
  */
 
-#ifndef _ANIMATION_H_
-#define _ANIMATION_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATION_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATION_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -135,4 +135,4 @@ class Animation
     static bool IsPixelPartOfClockWords(ClockWords::WordsListType clock_words_table, byte index);
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATION_H_

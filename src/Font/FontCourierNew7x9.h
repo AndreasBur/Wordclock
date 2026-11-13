@@ -6,8 +6,8 @@
  * \brief The Courier New font, 7 columns by 9 rows.
  */
 
-#ifndef _FONT_COURIER_NEW_7X9_H_
-#define _FONT_COURIER_NEW_7X9_H_
+#ifndef WORDCLOCK_SRC_FONT_FONTCOURIERNEW7X9_H_
+#define WORDCLOCK_SRC_FONT_FONTCOURIERNEW7X9_H_
 
 #include "Arduino.h"
 #include "Font.h"
@@ -63,4 +63,4 @@ class FontCourierNew7x9 : public Font<FontCharHorizontal<byte, FONT_COURIER_NEW_
     static const FontTableType& GetFontTable() { return kFontTable; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_FONT_FONTCOURIERNEW7X9_H_

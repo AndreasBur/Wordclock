@@ -6,8 +6,8 @@
  * \brief A calendar date: year, month and day, with its weekday.
  */
 
-#ifndef _CLOCK_DATE_H_
-#define _CLOCK_DATE_H_
+#ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATE_H_
+#define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -270,4 +270,4 @@ class ClockDate
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATE_H_

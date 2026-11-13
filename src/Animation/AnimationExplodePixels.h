@@ -6,8 +6,8 @@
  * \brief The explode-pixels animation: the old time is pulled into the centre, the new one expands.
  */
 
-#ifndef _ANIMATION_EXPLODE_PIXELS_H_
-#define _ANIMATION_EXPLODE_PIXELS_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEPIXELS_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEPIXELS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -134,4 +134,4 @@ class AnimationExplodePixels : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEPIXELS_H_

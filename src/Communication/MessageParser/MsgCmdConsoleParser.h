@@ -19,8 +19,8 @@
  * its bare number when its socket opens, so opening the panel took the password off the clock.
  */
 
-#ifndef _MSG_CMD_CONSOLE_PARSER_H_
-#define _MSG_CMD_CONSOLE_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -129,4 +129,4 @@ class MsgCmdConsoleParser : public MsgParameterParser<MsgCmdConsoleParser, MSG_C
     }
 };
 
-#endif // _MSG_CMD_CONSOLE_PARSER_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_

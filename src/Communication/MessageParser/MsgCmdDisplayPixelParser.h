@@ -6,8 +6,8 @@
  * \brief The parser of the display pixel command.
  */
 
-#ifndef _MSG_CMD_DISPLAY_PIXEL_PARSER_H_
-#define _MSG_CMD_DISPLAY_PIXEL_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYPIXELPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYPIXELPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -182,4 +182,4 @@ class MsgCmdDisplayPixelParser : public MsgParameterParser<MsgCmdDisplayPixelPar
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYPIXELPARSER_H_

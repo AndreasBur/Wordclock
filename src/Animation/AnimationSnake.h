@@ -6,8 +6,8 @@
  * \brief The snake animation: a short snake winds through the rows and leaves the new time behind.
  */
 
-#ifndef _ANIMATION_SNAKE_H_
-#define _ANIMATION_SNAKE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSNAKE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONSNAKE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -95,4 +95,4 @@ class AnimationSnake : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONSNAKE_H_

@@ -19,8 +19,8 @@
  * constructed on first use and no static initialisation order can get in front of it.
  */
 
-#ifndef _ARDUINO_H_
-#define _ARDUINO_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_ARDUINO_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_ARDUINO_H_
 
 /*
  * Re-exported, every one of them: this header is the backend's Arduino API, and what includes it
@@ -69,7 +69,7 @@
  * Only declared, never defined: it exists so that a flash string and a RAM string are different
  * types and pick different print() overloads.
  */
-class __FlashStringHelper;
+class __FlashStringHelper;  // NOLINT(bugprone-reserved-identifier): the Arduino core's name
 
 /*!
  * \brief Keeps a string literal in flash, as Arduino's F().
@@ -285,4 +285,4 @@ class SerialPort
     void flush(); // NOLINT(readability-identifier-naming)
 };
 
-#endif // _ARDUINO_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_ARDUINO_H_

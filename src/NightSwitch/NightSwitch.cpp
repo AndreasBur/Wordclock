@@ -6,8 +6,6 @@
  * \brief What the night window does at its edges, and how it reads the time.
  */
 
-#define _NIGHT_SWITCH_SOURCE_
-
 #include "NightSwitch.h"
 #include "Display.h"
 #include "Power.h"

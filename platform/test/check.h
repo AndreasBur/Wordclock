@@ -11,8 +11,8 @@
  * Kept out of stubs/, which stands in for the framework; this is the test's own
  * vocabulary and not something the backend ever sees.
  */
-#ifndef _CHECK_H_
-#define _CHECK_H_
+#ifndef WORDCLOCK_PLATFORM_TEST_CHECK_H_
+#define WORDCLOCK_PLATFORM_TEST_CHECK_H_
 
 #include <cstdio>
 
@@ -35,4 +35,4 @@ inline int Report()
     return (failures == 0) ? 0 : 1;
 }
 
-#endif // _CHECK_H_
+#endif  // WORDCLOCK_PLATFORM_TEST_CHECK_H_

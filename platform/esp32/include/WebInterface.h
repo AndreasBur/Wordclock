@@ -16,8 +16,8 @@
  * way, sent from the firmware's own task.
  */
 
-#ifndef _WEB_INTERFACE_H_
-#define _WEB_INTERFACE_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBINTERFACE_H_
+#define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBINTERFACE_H_
 
 #include "StandardTypes.h"
 
@@ -136,4 +136,4 @@ class WebInterface
     void OnClientClosed(int descriptor);
 };
 
-#endif // _WEB_INTERFACE_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBINTERFACE_H_

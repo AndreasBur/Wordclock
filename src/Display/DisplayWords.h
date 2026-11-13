@@ -6,8 +6,8 @@
  * \brief The words of the clock, by id, and where each sits on the letter grid.
  */
 
-#ifndef _DISPLAY_WORDS_H_
-#define _DISPLAY_WORDS_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYWORDS_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYWORDS_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -167,4 +167,4 @@ class DisplayWords
     static bool IsWordIdValid(WordIdType word_id) { return word_id < WordIdType::kNumberOfWords; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYWORDS_H_

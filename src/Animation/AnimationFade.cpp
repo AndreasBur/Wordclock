@@ -6,8 +6,6 @@
  * \brief The steps of the fade animation.
  */
 
-#define _ANIMATION_CLOCK_FADE_SOURCE_
-
 #include "AnimationFade.h"
 #include "Display.h"
 #include "Clock.h"

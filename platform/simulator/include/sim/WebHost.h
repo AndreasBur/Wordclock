@@ -22,8 +22,8 @@
  * window, which is a price a development tool may pay and a clock on a wall may not.
  */
 
-#ifndef _WEB_HOST_H_
-#define _WEB_HOST_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBHOST_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBHOST_H_
 
 #include "StandardTypes.h"
 
@@ -227,4 +227,4 @@ class WebHost
                              const char* body, size_t length, bool is_gzipped);
 };
 
-#endif // _WEB_HOST_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBHOST_H_

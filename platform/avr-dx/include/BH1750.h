@@ -13,8 +13,8 @@
  * The bus is shared with the clock chip, and neither driver owns it - see Twi.h.
  */
 
-#ifndef _BH1750_H_
-#define _BH1750_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_BH1750_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_BH1750_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -375,4 +375,4 @@ class BH1750
     void Task();
 };
 
-#endif // _BH1750_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_BH1750_H_

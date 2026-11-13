@@ -6,8 +6,6 @@
  * \brief The glyph table of the Sprite font.
  */
 
-#define _FONT_SPRITE_5X8_SOURCE_
-
 #include "FontSprite5x8.h"
 
 /*

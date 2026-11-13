@@ -6,8 +6,8 @@
  * \brief The fade animation: the display dims to dark, the time changes, and it fades back up.
  */
 
-#ifndef _ANIMATION_FADE_H_
-#define _ANIMATION_FADE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONFADE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONFADE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -89,4 +89,4 @@ class AnimationFade : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONFADE_H_

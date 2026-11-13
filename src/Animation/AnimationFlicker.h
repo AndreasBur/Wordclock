@@ -6,8 +6,8 @@
  * \brief The flicker animation: the display flickers a few times, then the new time is there.
  */
 
-#ifndef _ANIMATION_FLICKER_H_
-#define _ANIMATION_FLICKER_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONFLICKER_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONFLICKER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -91,4 +91,4 @@ class AnimationFlicker : public Animation
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONFLICKER_H_

@@ -6,8 +6,6 @@
  * \brief The steps of the snake animation.
  */
 
-#define _ANIMATION_CLOCK_SNAKE_SOURCE_
-
 #include "AnimationSnake.h"
 #include "Bit.h"
 #include "Display.h"

@@ -6,8 +6,8 @@
  * \brief The squeeze animation: the old words are eaten away letter by letter, the new ones grow.
  */
 
-#ifndef _ANIMATION_SQUEEZE_H_
-#define _ANIMATION_SQUEEZE_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSQUEEZE_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONSQUEEZE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -103,4 +103,4 @@ class AnimationSqueeze : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONSQUEEZE_H_

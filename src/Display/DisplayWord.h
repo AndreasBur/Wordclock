@@ -6,8 +6,8 @@
  * \brief Where one word of the clock sits on the letter grid.
  */
 
-#ifndef _DISPLAY_WORD_H_
-#define _DISPLAY_WORD_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYWORD_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYWORD_H_
 
 #include "Arduino.h"
 
@@ -72,4 +72,4 @@ class DisplayWord
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYWORD_H_

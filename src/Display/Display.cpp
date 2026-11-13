@@ -6,8 +6,6 @@
  * \brief What the display does itself: brightness, colour, current limit, words and pixels.
  */
 
-#define _DISPLAY_SOURCE_
-
 #include "Display.h"
 #include "Bit.h"
 #include "DisplayWord.h"

@@ -9,8 +9,8 @@
  * access.
  */
 
-#ifndef _ARDUINO_PROGMEM_H_
-#define _ARDUINO_PROGMEM_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_PROGMEM_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_PROGMEM_H_
 
 #include <string.h>
 
@@ -51,4 +51,4 @@
  */
 #define memcpy_P(x, y, z)       memcpy((x), (y), (z)) // NOLINT(readability-identifier-naming)
 
-#endif // _ARDUINO_PROGMEM_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_PROGMEM_H_

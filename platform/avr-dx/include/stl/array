@@ -13,8 +13,8 @@
  * it.
  */
 
-#ifndef _STL_ARRAY_
-#define _STL_ARRAY_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_ARRAY_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_ARRAY_
 
 #include <stddef.h>
 
@@ -44,7 +44,7 @@ struct array {
      * Public and named with the standard's underscore, because an aggregate has no other way to
      * hold its storage - the brace initialisers in the core reach it directly.
      */
-    T _M_elems[N];
+    T elements[N];
 
     using value_type = T; /*!< The type of the elements. */
     using size_type = size_t; /*!< The type of an index and of the number of elements. */
@@ -57,37 +57,37 @@ struct array {
      * \param[in] index The index, below N.
      * \return The element.
      */
-    constexpr T& operator[](size_type index) { return _M_elems[index]; }
+    constexpr T& operator[](size_type index) { return elements[index]; }
     /*!
      * \brief Returns the element at `index`, which is not checked, for reading.
      *
      * \param[in] index The index, below N.
      * \return The element.
      */
-    constexpr const T& operator[](size_type index) const { return _M_elems[index]; }
+    constexpr const T& operator[](size_type index) const { return elements[index]; }
 
     /*! \brief Returns a pointer to the first element. */
-    constexpr T* data() { return _M_elems; }
+    constexpr T* data() { return elements; }
     /*! \brief Returns a pointer to the first element, for reading. */
-    constexpr const T* data() const { return _M_elems; }
+    constexpr const T* data() const { return elements; }
 
     /*! \brief Returns an iterator to the first element. */
-    constexpr iterator begin() { return _M_elems; }
+    constexpr iterator begin() { return elements; }
     /*! \brief Returns an iterator to the first element, for reading. */
-    constexpr const_iterator begin() const { return _M_elems; }
+    constexpr const_iterator begin() const { return elements; }
     /*! \brief Returns an iterator past the last element. */
-    constexpr iterator end() { return _M_elems + N; }
+    constexpr iterator end() { return elements + N; }
     /*! \brief Returns an iterator past the last element, for reading. */
-    constexpr const_iterator end() const { return _M_elems + N; }
+    constexpr const_iterator end() const { return elements + N; }
 
     /*! \brief Returns the first element. */
-    constexpr T& front() { return _M_elems[0]; }
+    constexpr T& front() { return elements[0]; }
     /*! \brief Returns the first element, for reading. */
-    constexpr const T& front() const { return _M_elems[0]; }
+    constexpr const T& front() const { return elements[0]; }
     /*! \brief Returns the last element. */
-    constexpr T& back() { return _M_elems[N - 1u]; }
+    constexpr T& back() { return elements[N - 1u]; }
     /*! \brief Returns the last element, for reading. */
-    constexpr const T& back() const { return _M_elems[N - 1u]; }
+    constexpr const T& back() const { return elements[N - 1u]; }
 
     /*! \brief Returns the number of elements, N. */
     constexpr size_type size() const { return N; }
@@ -102,7 +102,7 @@ struct array {
      * \param[in] value The value.
      */
     void fill(const T& value) {
-        for(size_type index = 0u; index < N; index++) { _M_elems[index] = value; }
+        for(size_type index = 0u; index < N; index++) { elements[index] = value; }
     }
 };
 
@@ -144,4 +144,4 @@ constexpr bool operator!=(const array<T, N>& left, const array<T, N>& right)
 } // namespace std
 // NOLINTEND(cert-dcl58-cpp,readability-identifier-naming)
 
-#endif // _STL_ARRAY_
+#endif // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STL_ARRAY_

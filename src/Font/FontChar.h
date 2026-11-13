@@ -6,8 +6,8 @@
  * \brief One glyph of a font, as rows or as columns of bits.
  */
 
-#ifndef _FONT_CHAR_H_
-#define _FONT_CHAR_H_
+#ifndef WORDCLOCK_SRC_FONT_FONTCHAR_H_
+#define WORDCLOCK_SRC_FONT_FONTCHAR_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -244,4 +244,4 @@ template <typename ColumnType, byte ColumnsSize> class FontCharVertical : public
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_FONT_FONTCHAR_H_

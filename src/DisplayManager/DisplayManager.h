@@ -11,8 +11,8 @@
  * driven with up to date.
  */
 
-#ifndef _DISPLAY_MANAGER_H_
-#define _DISPLAY_MANAGER_H_
+#ifndef WORDCLOCK_SRC_DISPLAYMANAGER_DISPLAYMANAGER_H_
+#define WORDCLOCK_SRC_DISPLAYMANAGER_DISPLAYMANAGER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -116,4 +116,4 @@ class DisplayManager
     StdReturnType AbortAnimation();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAYMANAGER_DISPLAYMANAGER_H_

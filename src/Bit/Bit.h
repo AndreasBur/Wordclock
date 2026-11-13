@@ -22,8 +22,8 @@
  * warning at SetBits().
  */
 
-#ifndef _BIT_H_
-#define _BIT_H_
+#ifndef WORDCLOCK_SRC_BIT_BIT_H_
+#define WORDCLOCK_SRC_BIT_BIT_H_
 
 #include <stdint.h>
 
@@ -218,4 +218,4 @@ class Bit
     }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_BIT_BIT_H_

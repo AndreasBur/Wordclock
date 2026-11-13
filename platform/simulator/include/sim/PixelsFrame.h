@@ -13,8 +13,8 @@
  * belongs to SerialShim, which they are handed to.
  */
 
-#ifndef PIXELS_FRAME_H
-#define PIXELS_FRAME_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELSFRAME_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELSFRAME_H_
 
 #include <wx/wx.h>
 #include <wx/button.h>
@@ -133,4 +133,4 @@ class PixelsFrame : public wxFrame
     void Render();
 };
 
-#endif // PIXELS_FRAME_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELSFRAME_H_

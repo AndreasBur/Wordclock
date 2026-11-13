@@ -6,8 +6,8 @@
  * \brief The shift animation: the old time shifts out of the display, then the new one shifts in.
  */
 
-#ifndef _ANIMATION_SHIFT_H_
-#define _ANIMATION_SHIFT_H_
+#ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_
+#define WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -104,4 +104,4 @@ class AnimationShift : public Animation
     void Task();
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_

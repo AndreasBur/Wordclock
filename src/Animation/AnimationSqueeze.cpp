@@ -6,8 +6,6 @@
  * \brief The steps of the squeeze animation.
  */
 
-#define _ANIMATION_CLOCK_SQUEEZE_SOURCE_
-
 #include "AnimationSqueeze.h"
 #include "Display.h"
 #include "DisplayWords.h"

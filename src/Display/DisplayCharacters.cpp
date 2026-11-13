@@ -14,8 +14,6 @@
  * positions in DisplayWords.
  */
 
-#define _DISPLAY_CHARACTERS_SOURCE_
-
 #include "DisplayCharacters.h"
 
 // The table the file block describes: one string per row, row 0 first, each with the null that

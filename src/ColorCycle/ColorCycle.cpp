@@ -6,8 +6,6 @@
  * \brief The steps of the colour cycle, and the hue each of them is.
  */
 
-#define _COLOR_CYCLE_SOURCE_
-
 #include "ColorCycle.h"
 #include "Display.h"
 

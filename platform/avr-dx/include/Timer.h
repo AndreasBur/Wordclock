@@ -19,8 +19,8 @@
  * driver, not a new time base.
  */
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TIMER_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TIMER_H_
 
 #include "StandardTypes.h"
 #include <avr/io.h>
@@ -505,4 +505,4 @@ class Timer
     }
 };
 
-#endif
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TIMER_H_

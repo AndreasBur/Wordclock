@@ -6,8 +6,6 @@
  * \brief The shifts of the display, of one row and of one column.
  */
 
-#define _TRANSFORMATION_SOURCE_
-
 #include "Transformation.h"
 #include "Display.h"
 

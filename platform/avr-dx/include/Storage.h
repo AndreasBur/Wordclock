@@ -15,8 +15,8 @@
  * be spent on bytes that already hold the right value.
  */
 
-#ifndef _STORAGE_H_
-#define _STORAGE_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STORAGE_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STORAGE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -116,4 +116,4 @@ class Storage
     StdReturnType Clear();
 };
 
-#endif // _STORAGE_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STORAGE_H_

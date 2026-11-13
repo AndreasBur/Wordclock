@@ -6,8 +6,8 @@
  * \brief The parser of the text overlay command.
  */
 
-#ifndef _MSG_CMD_OVERLAY_TEXT_PARSER_H_
-#define _MSG_CMD_OVERLAY_TEXT_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEXTPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEXTPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -164,4 +164,4 @@ class MsgCmdOverlayTextParser : public MsgCmdOverlayParser<MsgCmdOverlayTextPars
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEXTPARSER_H_

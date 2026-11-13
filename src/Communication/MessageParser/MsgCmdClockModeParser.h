@@ -6,8 +6,8 @@
  * \brief The parser of the clock mode command.
  */
 
-#ifndef _MSG_CMD_CLOCK_MODE_PARSER_H_
-#define _MSG_CMD_CLOCK_MODE_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCLOCKMODEPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCLOCKMODEPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -112,4 +112,4 @@ class MsgCmdClockModeParser : public MsgParameterParser<MsgCmdClockModeParser, M
     void Process() const { Show(); }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCLOCKMODEPARSER_H_

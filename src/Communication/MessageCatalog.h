@@ -22,8 +22,8 @@
  * entry names the parser it was taken from.
  */
 
-#ifndef MESSAGE_CATALOG_H
-#define MESSAGE_CATALOG_H
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGECATALOG_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGECATALOG_H_
 
 #include "Arduino.h"
 
@@ -149,4 +149,4 @@ class MessageCatalog
     static const CommandType* FindRemoteProcedureCallCommand();
 };
 
-#endif // MESSAGE_CATALOG_H
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGECATALOG_H_

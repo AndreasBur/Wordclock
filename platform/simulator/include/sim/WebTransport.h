@@ -14,8 +14,8 @@
  * the window.
  */
 
-#ifndef _WEB_TRANSPORT_H_
-#define _WEB_TRANSPORT_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_
 
 #include "StandardTypes.h"
 // Where this backend's `byte` comes from - the two on hardware get it from the Arduino core,
@@ -112,4 +112,4 @@ class WebTransport
     void SendBinary(const byte* bytes, size_t length);
 };
 
-#endif // _WEB_TRANSPORT_H_
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_

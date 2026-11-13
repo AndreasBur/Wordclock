@@ -6,8 +6,8 @@
  * \brief The Lucida Sans font, 9 columns by 10 rows.
  */
 
-#ifndef _FONT_LUCIDA_SANS_9X10_H_
-#define _FONT_LUCIDA_SANS_9X10_H_
+#ifndef WORDCLOCK_SRC_FONT_FONTLUCIDASANS9X10_H_
+#define WORDCLOCK_SRC_FONT_FONTLUCIDASANS9X10_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -64,4 +64,4 @@ class FontLucidaSans9x10 : public Font<FontCharVertical<uint16_t, FONT_LUCIDA_SA
     static const FontTableType& GetFontTable() { return kFontTable; }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_FONT_FONTLUCIDASANS9X10_H_

@@ -6,8 +6,8 @@
  * \brief The colour of the display, and what it is dimmed to.
  */
 
-#ifndef _DISPLAY_COLOR_H_
-#define _DISPLAY_COLOR_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCOLOR_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAYCOLOR_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -242,4 +242,4 @@ class DisplayColor
 #endif
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAYCOLOR_H_

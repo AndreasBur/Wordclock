@@ -22,8 +22,8 @@
  * then binds Serial to this class, so including one from here would close that circle.
  */
 
-#ifndef _WORDCLOCK_SERIAL_H_
-#define _WORDCLOCK_SERIAL_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKSERIAL_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKSERIAL_H_
 
 #include "StandardTypes.h"
 
@@ -38,8 +38,10 @@
  * is ArduinoCore-API: a class of the same name declared at global scope is a second class
  * that conflicts with that using-declaration. GCC let it pass; clang refuses it.
  */
+// NOLINTBEGIN(bugprone-reserved-identifier): the core's name
 namespace arduino { class __FlashStringHelper; }
 using arduino::__FlashStringHelper;
+// NOLINTEND(bugprone-reserved-identifier)
 
 /*!
  * \brief The room for one answer line.
@@ -260,4 +262,4 @@ class WordclockSerial
     void flush(); // NOLINT(readability-identifier-naming)
 };
 
-#endif // _WORDCLOCK_SERIAL_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKSERIAL_H_

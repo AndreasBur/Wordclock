@@ -14,8 +14,8 @@
  * are read back from — out of a class whose subject is the letter grid.
  */
 
-#ifndef SERIAL_SHIM_H
-#define SERIAL_SHIM_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SERIALSHIM_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SERIALSHIM_H_
 
 #include <wx/wx.h>
 #include "arduino/Types.h"
@@ -247,4 +247,4 @@ class SerialShim
     }
 };
 
-#endif // SERIAL_SHIM_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SERIALSHIM_H_

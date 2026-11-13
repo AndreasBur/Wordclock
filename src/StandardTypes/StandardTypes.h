@@ -8,8 +8,8 @@
  * Library with standard types.
  */
 
-#ifndef _STANDARD_TYPES_H_
-#define _STANDARD_TYPES_H_
+#ifndef WORDCLOCK_SRC_STANDARDTYPES_STANDARDTYPES_H_
+#define WORDCLOCK_SRC_STANDARDTYPES_STANDARDTYPES_H_
 
 /*
  * Re-exported, every one of them, for the same reason as the backends' Arduino.h: what includes
@@ -107,4 +107,4 @@ uint8_t DigitsOfNumber(T number, unsigned base)
     return number_of_digits;
 }
 
-#endif
+#endif  // WORDCLOCK_SRC_STANDARDTYPES_STANDARDTYPES_H_

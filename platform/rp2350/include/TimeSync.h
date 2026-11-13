@@ -16,8 +16,8 @@
  * the clock without a time source until something asks again.
  */
 
-#ifndef _TIME_SYNC_H_
-#define _TIME_SYNC_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_
 
 // Ahead of WiFiNTP.h, which calls ::hostByName without including what declares it: the
 // framework's header compiles only behind a WiFi.h that its includer brought along.
@@ -61,4 +61,4 @@ inline void StartTimeServers()
 
 } // namespace wordclock_time
 
-#endif // _TIME_SYNC_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_

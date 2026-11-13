@@ -26,8 +26,8 @@
  * esp_http_server.h - has to include them before this file, or the macro reaches into them.
  */
 
-#ifndef _WORDCLOCK_ARDUINO_H_
-#define _WORDCLOCK_ARDUINO_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_ARDUINO_H_
+#define WORDCLOCK_PLATFORM_ESP32_INCLUDE_ARDUINO_H_
 
 /*
  * The real one, at the path scripts/firmware_includes.py found in the installed framework
@@ -97,4 +97,4 @@ inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate)
  */
 #define Serial                  WordclockSerial::GetInstance() // NOLINT(readability-identifier-naming)
 
-#endif // _WORDCLOCK_ARDUINO_H_
+#endif  // WORDCLOCK_PLATFORM_ESP32_INCLUDE_ARDUINO_H_

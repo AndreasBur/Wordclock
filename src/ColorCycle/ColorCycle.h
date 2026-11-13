@@ -27,8 +27,8 @@
  * and how fast; where in the round it was does not matter to anybody.
  */
 
-#ifndef _COLOR_CYCLE_H_
-#define _COLOR_CYCLE_H_
+#ifndef WORDCLOCK_SRC_COLORCYCLE_COLORCYCLE_H_
+#define WORDCLOCK_SRC_COLORCYCLE_COLORCYCLE_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -138,4 +138,4 @@ class ColorCycle
     void Task();
 };
 
-#endif // _COLOR_CYCLE_H_
+#endif  // WORDCLOCK_SRC_COLORCYCLE_COLORCYCLE_H_

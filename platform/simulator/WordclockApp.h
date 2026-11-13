@@ -6,8 +6,8 @@
  * \brief The wxWidgets application of the simulator.
  */
 
-#ifndef WORDCLOCKAPP_H
-#define WORDCLOCKAPP_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKAPP_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKAPP_H_
 
 #include <wx/app.h>
 #include <wx/timer.h>
@@ -63,4 +63,4 @@ class WordclockApp : public wxApp
         };
 };
 
-#endif // WORDCLOCKAPP_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKAPP_H_

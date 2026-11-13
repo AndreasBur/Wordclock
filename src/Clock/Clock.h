@@ -6,8 +6,8 @@
  * \brief The clock: turns a time into the words to show, in the selectable dialects.
  */
 
-#ifndef _CLOCK_H_
-#define _CLOCK_H_
+#ifndef WORDCLOCK_SRC_CLOCK_CLOCK_H_
+#define WORDCLOCK_SRC_CLOCK_CLOCK_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -283,4 +283,4 @@ class Clock
     StdReturnType Refresh(byte hour, byte minute) const;
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_CLOCK_CLOCK_H_

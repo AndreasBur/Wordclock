@@ -6,8 +6,6 @@
  * \brief The glyph table of the Tahoma font.
  */
 
-#define _FONT_TAHOMA_10X10_SOURCE_
-
 #include "FontTahoma10x10.h"
 
 /*

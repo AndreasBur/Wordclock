@@ -16,8 +16,8 @@
  * the LED strip's clock and its data line. TWI1's default pins are untouched by anything else here.
  */
 
-#ifndef _TWI_H_
-#define _TWI_H_
+#ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TWI_H_
+#define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TWI_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -147,4 +147,4 @@ class Twi
     StdReturnType ReadRegister(byte address, byte register_address, byte* data, byte length);
 };
 
-#endif // _TWI_H_
+#endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TWI_H_

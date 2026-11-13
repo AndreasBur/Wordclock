@@ -6,8 +6,8 @@
  * \brief The display: the pixels of the letter grid, with brightness, colour and current limit.
  */
 
-#ifndef _DISPLAY_H_
-#define _DISPLAY_H_
+#ifndef WORDCLOCK_SRC_DISPLAY_DISPLAY_H_
+#define WORDCLOCK_SRC_DISPLAY_DISPLAY_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -932,4 +932,4 @@ class Display
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_DISPLAY_DISPLAY_H_

@@ -1,5 +1,5 @@
-#ifndef _ESPMDNS_H_
-#define _ESPMDNS_H_
+#ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESPMDNS_H_
+#define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESPMDNS_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 struct MDNSStub {
@@ -8,4 +8,4 @@ struct MDNSStub {
 };
 extern MDNSStub MDNS;
 // NOLINTEND(readability-identifier-naming)
-#endif
+#endif  // WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESPMDNS_H_

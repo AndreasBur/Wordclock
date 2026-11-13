@@ -6,8 +6,8 @@
  * \brief The parser of the temperature overlay command.
  */
 
-#ifndef _MSG_CMD_OVERLAY_TEMPERATURE_PARSER_H_
-#define _MSG_CMD_OVERLAY_TEMPERATURE_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEMPERATUREPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEMPERATUREPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -156,4 +156,4 @@ class MsgCmdOverlayTemperatureParser : public MsgCmdOverlayParser<MsgCmdOverlayT
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEMPERATUREPARSER_H_

@@ -16,8 +16,8 @@
  * it is attached and checks for them, so printing headless is a no-op rather than a crash.
  */
 
-#ifndef PIXELS_H
-#define PIXELS_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELS_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELS_H_
 
 #include "StandardTypes.h"
 #include "Pixel.h"
@@ -287,4 +287,4 @@ class Pixels
     void ResumeOutput() { output_suspended_ = false; dirty_ = true; }
 };
 
-#endif // PIXELS_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELS_H_

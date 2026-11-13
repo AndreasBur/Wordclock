@@ -6,8 +6,8 @@
  * \brief What the simulator runs the firmware with: the host's time and the scheduler.
  */
 
-#ifndef WORDCLOCKMAIN_H
-#define WORDCLOCKMAIN_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKMAIN_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKMAIN_H_
 
 #include "Scheduler.h"
 
@@ -43,4 +43,4 @@ class WordclockMain
         };
 };
 
-#endif // WORDCLOCKMAIN_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_WORDCLOCKMAIN_H_

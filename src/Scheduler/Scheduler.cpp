@@ -6,8 +6,6 @@
  * \brief The scheduler's tick and the order in which it calls the module tasks.
  */
 
-#define _SCHEDULER_SOURCE_
-
 #include "Scheduler.h"
 #include "StandardTypes.h"
 #include "Animations.h"

@@ -6,8 +6,6 @@
  * \brief What the animations facade does itself.
  */
 
-#define _ANIMATIONS_SOURCE_
-
 #include "Animations.h"
 #include "Display.h"
 #include "Clock.h"

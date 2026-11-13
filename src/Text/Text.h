@@ -6,8 +6,8 @@
  * \brief The text output: draws characters and scrolls text over the display in several fonts.
  */
 
-#ifndef _TEXT_H_
-#define _TEXT_H_
+#ifndef WORDCLOCK_SRC_TEXT_TEXT_H_
+#define WORDCLOCK_SRC_TEXT_TEXT_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -311,4 +311,4 @@ class Text
     Orientation GetFontOrientation(FontType font) const;
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_TEXT_TEXT_H_

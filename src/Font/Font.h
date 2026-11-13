@@ -6,8 +6,8 @@
  * \brief A font: a table of glyphs, read by index.
  */
 
-#ifndef _FONT_H_
-#define _FONT_H_
+#ifndef WORDCLOCK_SRC_FONT_FONT_H_
+#define WORDCLOCK_SRC_FONT_FONT_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -133,4 +133,4 @@ template <typename FontCharType, size_t FontTableSize> class Font
 
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_FONT_FONT_H_

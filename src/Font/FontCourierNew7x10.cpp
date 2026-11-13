@@ -6,8 +6,6 @@
  * \brief The glyph table of the Courier New 7x10 font.
  */
 
-#define _FONT_COURIER_NEW_7X10_SOURCE_
-
 #include "FontCourierNew7x10.h"
 
 /*

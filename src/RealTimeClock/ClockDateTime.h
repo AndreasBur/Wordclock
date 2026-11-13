@@ -6,8 +6,8 @@
  * \brief A date and a time of day together.
  */
 
-#ifndef _CLOCK_DATE_TIME_H_
-#define _CLOCK_DATE_TIME_H_
+#ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATETIME_H_
+#define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATETIME_H_
 
 #include "StandardTypes.h"
 #include "ClockDate.h"
@@ -112,4 +112,4 @@ class ClockDateTime
     static DayType GetDaysOfMonth(MonthType month, YearType year) { return ClockDate::GetDaysOfMonth(month, year); }
 };
 
-#endif
+#endif  // WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATETIME_H_

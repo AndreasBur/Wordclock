@@ -10,8 +10,8 @@
  * host clock after it has been initialized, just like an RTC would.
  */
 
-#ifndef _REAL_TIME_CLOCK_H_
-#define _REAL_TIME_CLOCK_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_REALTIMECLOCK_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_REALTIMECLOCK_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -157,4 +157,4 @@ class RealTimeClock
     }
 };
 
-#endif
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_REALTIMECLOCK_H_

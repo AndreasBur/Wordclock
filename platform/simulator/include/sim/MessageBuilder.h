@@ -13,8 +13,8 @@
  * message.
  */
 
-#ifndef MESSAGE_BUILDER_H
-#define MESSAGE_BUILDER_H
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEBUILDER_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEBUILDER_H_
 
 #include <wx/wx.h>
 #include <wx/odcombo.h>
@@ -152,4 +152,4 @@ class MessageBuilder : public wxDialog
     }
 };
 
-#endif // MESSAGE_BUILDER_H
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEBUILDER_H_

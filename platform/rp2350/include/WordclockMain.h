@@ -13,8 +13,8 @@
  * which SNTP sets.
  */
 
-#ifndef _WORDCLOCK_MAIN_H_
-#define _WORDCLOCK_MAIN_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKMAIN_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKMAIN_H_
 
 #include "Scheduler.h"
 
@@ -62,4 +62,4 @@ class WordclockMain
         Scheduler wc_scheduler_;
 };
 
-#endif // _WORDCLOCK_MAIN_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKMAIN_H_

@@ -18,8 +18,8 @@
  * join anything.
  */
 
-#ifndef _MSG_CMD_NETWORK_PARSER_H_
-#define _MSG_CMD_NETWORK_PARSER_H_
+#ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
+#define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -165,4 +165,4 @@ class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_C
     }
 };
 
-#endif // _MSG_CMD_NETWORK_PARSER_H_
+#endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_

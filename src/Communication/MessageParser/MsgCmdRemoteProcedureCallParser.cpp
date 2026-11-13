@@ -6,8 +6,6 @@
  * \brief What each remote procedure does, and the answer to one.
  */
 
-#define _MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_SOURCE_
-
 #include "MsgCmdRemoteProcedureCallParser.h"
 #include "Animations.h"
 #include "Clock.h"

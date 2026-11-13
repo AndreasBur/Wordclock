@@ -10,8 +10,8 @@
  * physical sensor is present in the wxWidgets simulator.
  */
 
-#ifndef _BH1750_H_
-#define _BH1750_H_
+#ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_BH1750_H_
+#define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_BH1750_H_
 
 #include "StandardTypes.h"
 #include "Arduino.h"
@@ -316,4 +316,4 @@ class BH1750
     static inline IlluminanceType simulated_illuminance{BH1750_CALIBRATION_MAX_DEFAULT_LX_VALUE};
 };
 
-#endif
+#endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_BH1750_H_

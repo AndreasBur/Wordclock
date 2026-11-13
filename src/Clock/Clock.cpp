@@ -6,8 +6,6 @@
  * \brief The word tables of the clock dialects and how a time is looked up in them.
  */
 
-#define _CLOCK_SOURCE_
-
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"

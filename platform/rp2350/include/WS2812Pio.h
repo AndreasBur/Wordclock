@@ -17,8 +17,8 @@
  * timing around.
  */
 
-#ifndef _WS2812_PIO_H_
-#define _WS2812_PIO_H_
+#ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WS2812PIO_H_
+#define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WS2812PIO_H_
 
 #include "StandardTypes.h"
 
@@ -158,4 +158,4 @@ class WS2812Pio
     StdReturnType Transmit(const WordType* frame, size_t count);
 };
 
-#endif // _WS2812_PIO_H_
+#endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WS2812PIO_H_
