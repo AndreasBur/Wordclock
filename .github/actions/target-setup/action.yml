@@ -1,0 +1,64 @@
+# What the targets of tools/project.sh need, for a CI job: arduino-cli at the dev container's
+# version where a target is built by arduino-cli, the Python tools with PlatformIO where one is
+# built by PlatformIO, then `make setup`, which installs each target's core or platform and checks
+# a CMake target's toolchain file. PlatformIO's platforms and toolchains are kept between runs
+# as the cores are, keyed by every platformio.ini. The apt packages a CMake target needs, as
+# gcc-avr, come from .devcontainer/apt-packages.txt through the action apt-install, as in the dev
+# container.
+#
+# arduino-cli's version is read from the ARG ARDUINO_CLI_VERSION line of .devcontainer/Dockerfile,
+# as uv-sync reads uv's, so there is one place that says which arduino-cli. The cores, their
+# toolchains among them, are kept between runs, keyed by tools/project.sh, which names them: a run
+# whose cores have not changed fetches nothing.
+name: Set up the targets
+description: arduino-cli where a target needs it, and what each target needs through make setup
+
+runs:
+  using: composite
+  steps:
+    - name: Read the build systems and arduino-cli's version
+      id: read
+      shell: bash
+      run: |
+        systems=$(tools/setup.sh --systems | paste -sd ' ' -)
+        echo "systems=$systems" >> "$GITHUB_OUTPUT"
+        # The version only where a target is built by arduino-cli: a project without one, as a
+        # firmware of CMake and PlatformIO, may have a Dockerfile that installs none.
+        case " $systems " in
+          *" arduino-cli "*)
+            version=$(sed -n 's/^ARG ARDUINO_CLI_VERSION=//p' .devcontainer/Dockerfile)
+            if [ -z "$version" ]; then
+              echo "::error::.devcontainer/Dockerfile names no ARG ARDUINO_CLI_VERSION"
+              exit 1
+            fi
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            ;;
+        esac
+
+    - if: contains(steps.read.outputs.systems, 'arduino-cli')
+      uses: arduino/setup-arduino-cli@v2
+      with:
+        version: ${{ steps.read.outputs.version }}
+
+    - name: Cache the cores
+      if: contains(steps.read.outputs.systems, 'arduino-cli')
+      uses: actions/cache@v6
+      with:
+        path: ~/.arduino15
+        key: arduino-${{ runner.os }}-${{ hashFiles('tools/project.sh') }}
+        restore-keys: arduino-${{ runner.os }}-
+
+    - if: contains(steps.read.outputs.systems, 'platformio')
+      uses: ./.github/actions/uv-sync
+
+    - name: Cache PlatformIO's platforms
+      if: contains(steps.read.outputs.systems, 'platformio')
+      uses: actions/cache@v6
+      with:
+        path: ~/.platformio
+        key: platformio-${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
+        restore-keys: platformio-${{ runner.os }}-
+
+    - name: Set up the targets
+      shell: bash
+      run: make setup

@@ -3,9 +3,9 @@
 # board was to install a toolchain and build it - which asks a lot of somebody who wants a
 # clock rather than a compiler.
 #
-# The build is not repeated here. This workflow calls ci.yml, waits for every one of its jobs
-# including the tests and the analysers' sibling workflow's subject matter, and publishes the
-# artefacts those jobs uploaded. Two things follow from that and both are the point: a tag
+# The build is not repeated here. This workflow calls the template's ci.yml and
+# static-analysis.yml and Wordclock's own wordclock.yml, waits for every one of their jobs, and
+# publishes the artefacts wordclock.yml's firmware job uploaded. Two things follow from that and both are the point: a tag
 # whose CI is red produces no release at all, and the file a user downloads is byte-for-byte
 # the file that was checked, not a second build of the same commit that could pick up a
 # different toolchain version.
@@ -32,6 +32,14 @@ jobs:
     name: Checks
     uses: ./.github/workflows/ci.yml
 
+  analysis:
+    name: Analysis
+    uses: ./.github/workflows/static-analysis.yml
+
+  wordclock:
+    name: Wordclock
+    uses: ./.github/workflows/wordclock.yml
+
   # The firmware says its version itself - status command 12, the page's footer - and takes it
   # from Version.h, not from the tag. So a tag v0.2.0 on a commit whose Version.h still says
   # 0.1.0 would publish files named 0.2.0 that answer 0.1.0, and nothing would notice until
@@ -55,18 +63,19 @@ jobs:
 
   publish:
     name: Publish the release
-    needs: [version, checks]
+    needs: [version, checks, analysis, wordclock]
     runs-on: ubuntu-26.04
-    # For the reason ci.yml gives. This job only downloads the artifacts CI produced and
-    # writes the release, so anything approaching this number is something stuck.
+    # This job only downloads the artefacts wordclock.yml produced and writes the release, so
+    # anything approaching this number is something stuck.
     timeout-minutes: 20
     steps:
       # For LICENSE and the notes below, nothing else - the binaries come from the artefacts.
       - uses: actions/checkout@v7
 
-      # No name filter: every artefact of this run, which is the three firmware jobs' output.
-      # A fourth target added to ci.yml then appears here without this file changing, and the
-      # rename step below is what decides how it is called.
+      # No name filter: every artefact of this run, which is the firmware job's three, and the
+      # fuzzers' findings only where a fuzzer failed, which stops the release before this. A
+      # fourth target then appears here without this file changing, and the rename step below
+      # is what decides how it is called.
       - name: Collect what the checks built
         uses: actions/download-artifact@v8
         with:

@@ -2,6 +2,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/theAndreas/Wordclock/ci.yml?branch=main&label=CI&logo=github)](https://github.com/theAndreas/Wordclock/actions/workflows/ci.yml)
 [![static analysis](https://img.shields.io/github/actions/workflow/status/theAndreas/Wordclock/static-analysis.yml?branch=main&label=static%20analysis&logo=github)](https://github.com/theAndreas/Wordclock/actions/workflows/static-analysis.yml)
+[![Wordclock](https://img.shields.io/github/actions/workflow/status/theAndreas/Wordclock/wordclock.yml?branch=main&label=wordclock&logo=github)](https://github.com/theAndreas/Wordclock/actions/workflows/wordclock.yml)
 [![Last commit](https://img.shields.io/github/last-commit/theAndreas/Wordclock?logo=github)](https://github.com/theAndreas/Wordclock/commits/main)
 [![Contributors](https://img.shields.io/github/contributors/theAndreas/Wordclock?logo=github)](https://github.com/theAndreas/Wordclock/graphs/contributors)
 
@@ -123,8 +124,8 @@ pio run -t upload -d platform/rp2350     # hold BOOTSEL on the first upload
 
 The `avr-dx` platform uses the same CMake, but cross-compiles — so its toolchain
 has to be named when the build directory is created, because a compiler cannot be
-swapped afterwards. Its preset does that, and its tests are the documented sizes and the
-stack, checked against the image just built:
+swapped afterwards. Its preset does that, which is the way to flash it, and its test is the
+documented sizes against the image just built; `make stack` adds up its stack:
 
 ```bash
 cmake --workflow --preset avr          # into build-avr/
@@ -157,60 +158,55 @@ with one binary and a real server.
 
 ## Checks
 
-Every pull request runs two workflows, and the two badges above say separately
-whether the code builds and whether it reads clean.
+Every pull request runs three workflows, and the three badges above say separately whether the
+code builds, whether it reads clean, and whether what only Wordclock has works. The first two
+are the template's, as `copier update` keeps them; the third is Wordclock's own.
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) is the six ways this
-repository can be built, each of which breaks on its own, and the host builds once more
-with clang:
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) builds and tests:
 
 | Job | `make` | What it does |
 |-----|--------|--------------|
-| Simulator and core tests | `tests` | Configures and builds the wxWidgets backend with `-Werror` and runs `ctest` |
-| Host builds with clang | `clang host-clang` | The simulator, its tests and both backends' host suites again, compiled by clang with `-Werror` |
+| Lint | `lint` | The template's [`tools/lint.sh`](tools/lint.sh): clang-format and the indentation of the Doxygen blocks, cpplint with what [`CPPLINT.cfg`](CPPLINT.cfg) filters and why, shellcheck over every shell script, ruff over every Python one and actionlint over the workflows. `make fmt` formats in place |
+| Host tests | `tests`, `sanitize`, `coverage` | The simulator and the core tests with `-Werror`; again under AddressSanitizer and UndefinedBehaviorSanitizer; and with `--coverage`, with both backends' host suites through `coverage_suites()` of [`tools/project.sh`](tools/project.sh), failing below its `COVERAGE_MINIMUM` of lines, branches and conditions |
+| Host tests by clang | `clang` | The simulator and the core tests compiled by clang, which warns about other things |
+| Examples | `examples`, `stack` | The image of every target of [`tools/project.sh`](tools/project.sh) - the AVR128DA48's by CMake, the ESP32-S3's and the RP2350's by PlatformIO - failing on a warning in Wordclock's own files; and the AVR's deepest stack against the RAM it leaves free, out of the call graph its link writes |
+
+[`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml) reads the code
+rather than building it:
+
+| Job | `make` | What it does |
+|-----|--------|--------------|
+| clang-tidy | `tidy` | The template's [`tools/tidy.sh`](tools/tidy.sh): each target through its own compile database, then the tests with the simulator, then the fuzzers. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy) |
+| cppcheck | `cppcheck` | Parses `src/` by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
+| Headers on their own | `headers` | Every header of `src/` and `platform/` compiled on its own, by each target's compiler and the host's, through [`tools/self_contained_headers.py`](tools/self_contained_headers.py) |
+| Fuzzers | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from the corpus the runs before left in the cache. The fuzzers are in [`test/fuzz/`](test/fuzz/), their options beside them |
+
+[`.github/workflows/wordclock.yml`](.github/workflows/wordclock.yml) is what the template's
+targets do not reach, its targets in [`tools/project.mk`](tools/project.mk):
+
+| Job | `make` | What it does |
+|-----|--------|--------------|
 | Web pages in a browser | `web` | [`tools/web-smoke.py`](tools/web-smoke.py): the panel and the console in Chromium against the simulator, at 390 and 1280 px — no console error, nothing wider than the window, a command typed in the console answered |
-| ESP32 backend on the host | `host-esp32` | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) — the backend against the stand-ins in `test/stubs`, no board needed |
-| RP2350 backend on the host | `host-rp2350` | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
-| ESP32 firmware | `esp32` | `pio run` for the board it actually runs on, and the sizes its README states against the image |
-| RP2350 firmware | `rp2350` | `pio run` for the Pico 2 W, and the sizes its notes state |
-| AVR Dx firmware | `avr` | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and `make stack`, the template's [`tools/stack.sh`](tools/stack.sh): the deepest stack against the RAM the image leaves free |
-
-A firmware job looks redundant next to its host tests and is not: those compile
-the same sources with the host's compiler and libc, so anything the target's
-toolchain has a different opinion about passes them. `timegm`, which newlib does
-not declare, broke the firmware while every host test stayed green. That argument
-carries furthest for the AVR, an 8-bit freestanding target with more opinions than
-either of the others.
-
-[`.github/workflows/static-analysis.yml`](.github/workflows/static-analysis.yml)
-is what reads the code rather than building it — two analysers, because they are
-good at different things, a report of what the tests reach, the tests run again
-under the sanitizers, and a fuzzer for what no test thought of:
-
-| Job | `make` | What it does |
-|-----|--------|--------------|
-| clang-tidy | `tidy tidy-host-suites` | The template's [`tools/tidy.sh`](tools/tidy.sh): each target of [`tools/project.sh`](tools/project.sh) through its own compile database - the AVR's from CMake, the ESP32's and the RP2350's from PlatformIO - then the tests with the simulator, then the fuzzers. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in the backends' host tests, through the database their `run.sh compiledb` writes |
-| Headers | `headers` | Every header of `src/` and `platform/` compiled on its own, by each target's compiler and the host's, through [`tools/self_contained_headers.py`](tools/self_contained_headers.py) |
-| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and fails if together they reach less of the lines, branches and conditions of `src/` than `COVERAGE_MINIMUM` of [`tools/project.sh`](tools/project.sh) says; a table of what none of them runs goes into the job's summary. Through the template's [`tools/coverage.sh`](tools/coverage.sh), which takes the host suites from `coverage_suites()` |
-| sanitizers | `sanitize host-sanitize` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
-| fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers are in [`test/fuzz/`](test/fuzz/), their options beside them, and [`tools/fuzz.sh`](tools/fuzz.sh) runs them |
-| cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
-| Style and scripts | `lint` | The template's [`tools/lint.sh`](tools/lint.sh): clang-format and the indentation of the Doxygen blocks, cpplint with what [`CPPLINT.cfg`](CPPLINT.cfg) filters and why, shellcheck over every shell script, ruff over every Python one and actionlint over the workflows. `make fmt` formats in place. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
+| The backends' host suites | `host-esp32`, `host-rp2350`, `host-clang`, `host-sanitize`, `tidy-host-suites` | [`platform/esp32/test/run.sh`](platform/esp32/test/run.sh) and [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — each backend against the stand-ins in its `test/stubs`, no board needed — by g++, by clang and under the sanitizers, and their names through the database `run.sh compiledb` writes |
 | Web page linters | `web-lint` | [html-validate](https://html-validate.org/) over both pages as whole documents and eslint over the scripts inline in them, at the versions [`package-lock.json`](package-lock.json) pins. What each checks and leaves out is in [`.htmlvalidate.mjs`](.htmlvalidate.mjs) and [`eslint.config.mjs`](eslint.config.mjs) |
+| Doxygen blocks | `docs` | The template's [`tools/docs.sh`](tools/docs.sh), once per backend: a block Doxygen cannot read, a parameter without its `\param`, an entity without a block |
+| Firmware | `examples`, `documented-sizes` | Every target's image again, every size the documentation states against them through [`tools/documented-sizes.py`](tools/documented-sizes.py), and the images kept: the `.hex` and `.elf` of the AVR, the ESP32-S3's update and factory images, the RP2350's `.uf2` and update image. [`release.yml`](.github/workflows/release.yml) publishes them for a tag |
 
-cppcheck reads `src/` only: without wxWidgets' own headers it stops at
-`DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
-clang-tidy already covers through the compile database.
+A firmware build looks redundant next to the host tests and is not: those compile the same
+sources with the host's compiler and libc, so anything the target's toolchain has a different
+opinion about passes them. `timegm`, which newlib does not declare, broke the firmware while
+every host test stayed green. That argument carries furthest for the AVR, an 8-bit freestanding
+target with more opinions than either of the others.
 
-Each job is a target of the [Makefile](Makefile), the template's, or of [tools/project.mk](tools/project.mk),
-Wordclock's own, and the workflows run nothing else, so the column above is also what to type
-before pushing. Nothing in them needs a display, a board,
-or anything the dev container does not carry. The Doxygen blocks are `docs`:
+Each job is a target of the [Makefile](Makefile), the template's, or of
+[tools/project.mk](tools/project.mk), Wordclock's own, and the workflows run nothing else, so
+the column above is also what to type before pushing. Nothing in them needs a display, a board,
+or anything the dev container does not carry:
 
 ```bash
 make lint                     # clang-format, cpplint, the scripts: seconds, no build
 make tidy                     # clang-tidy over every target, the tests and the fuzzers
-make check                    # every job of both workflows, warnings as errors
+make check                    # every job of the three workflows, warnings as errors
 make fuzz FUZZ_SECONDS=300    # longer than the three minutes a pull request gets
 ```
 

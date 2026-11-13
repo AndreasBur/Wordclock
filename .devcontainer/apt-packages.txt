@@ -1,0 +1,15 @@
+# The project's own Ubuntu packages, beside those the Dockerfile installs for every project: one
+# or more per line, # for a comment. The Dockerfile installs them into the dev container, and a
+# workflow of the project's installs the same with the action apt-install and its input file:
+#
+#   - uses: ./.github/actions/apt-install
+#     with:
+#       file: .devcontainer/apt-packages.txt
+#
+# The template wrote this file once; it is the project's, and `copier update` leaves it alone.
+
+# wxWidgets, which the simulator is built with: the tests, clang-tidy, the header check and the
+# fuzzers all build or read its CMake build, and the core is reached through it.
+libwxgtk3.2-dev
+# avr-gcc and avr-libc, which platform/avr-dx/toolchain-avr.cmake builds the AVR's image with.
+gcc-avr avr-libc

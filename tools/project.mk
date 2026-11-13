@@ -8,8 +8,8 @@
 # What the template's targets do not reach: the simulator's window and its two web pages, the
 # backends' host suites - built by each backend's test/run.sh against stand-ins of its framework,
 # by g++, by clang and under the sanitizers - their names, the web pages' linters, and the sizes
-# the documentation states. And each backend's image on its own, as CI's firmware jobs build and
-# keep them: `make examples` builds all three at once.
+# the documentation states, against the images `make examples` builds. .github/workflows/
+# wordclock.yml runs them in CI, beside the template's workflows.
 
 # Three minutes a fuzzer in CI, where the template gives one: the corpus a run leaves in the cache
 # is what the next goes on from. Set here, after the template's default and before its rules; a
@@ -27,7 +27,7 @@ PROJECT_CHECKS += web-lint host-esp32 host-rp2350 host-clang host-sanitize tidy-
                   web documented-sizes
 
 .PHONY: run web web-lint host-esp32 host-rp2350 host-clang host-sanitize tidy-host-suites \
-        documented-sizes avr esp32 rp2350 clean-all
+        documented-sizes clean-all
 
 ## Wordclock's own
 
@@ -88,25 +88,7 @@ documented-sizes: ## The sizes the documentation states, against the images of m
 	    --esp32-elf build/targets/esp32/default/wordclock/firmware.elf \
 	    --rp2350-elf build/targets/rp2350/default/wordclock/firmware.elf
 
-## Each backend's image on its own, as CI's firmware jobs keep them
-
-# Not the workflow preset: --verbose, so that the size the build printed sits next to the one the
-# documentation states.
-avr: ## The AVR128DA48 image and its documented sizes
-	cmake --preset $(PRESET)avr
-	cmake --build --preset $(PRESET)avr
-	ctest --preset $(PRESET)avr --verbose
-
-esp32: ## The ESP32-S3 image and its documented sizes
-	$(UV_RUN) pio run -d platform/esp32
-	python3 tools/documented-sizes.py \
-	    --esp32-bin platform/esp32/.pio/build/wordclock/firmware.bin \
-	    --esp32-elf platform/esp32/.pio/build/wordclock/firmware.elf
-
-rp2350: ## The RP2350 image and its documented sizes
-	$(UV_RUN) pio run -d platform/rp2350
-	python3 tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
-
-# The template's clean takes build/; these lie beside it.
+# The template's clean takes build/; these lie beside it: the avr preset's build, which a
+# developer flashes from, the images `pio run -d platform/<name>` builds, and the host suites'.
 clean-all: clean ## And the AVR preset's build, the backends' own images and host suites' builds
 	rm -rf build-avr platform/esp32/.pio/build platform/rp2350/.pio/build $(HOST_SUITES)
