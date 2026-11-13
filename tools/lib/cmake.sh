@@ -98,14 +98,26 @@ cmake_programs() {
   cat "${dir}/programs.txt"
 }
 
-# Prints the folder CMake compiles a program's objects into, where avr-gcc writes the call graph
-# of each beside it, for tools/avr_stack.py.
+# Prints where avr-gcc wrote the call graphs of a program, for tools/avr_stack.py, one per line.
+# Those of its link, where it was linked with -flto and -save-temps=obj: beside the ELF, as
+# <program>.elf.ltrans<N>.ltrans.ci, as the frames of the compile are those before LTO inlined
+# across sources. Else the folder its objects were compiled into, CMakeFiles/<program>.dir,
+# wherever in the build the CMakeLists.txt that adds the program lies: a firmware may add its image
+# in platform/<name>/CMakeLists.txt.
 # Arguments:
 #   variant, program
 cmake_graphs() {
+  local elf
+  elf="$(cmake_elf "$1" "$2")"
+  local linked
+  linked="$(compgen -G "${elf}.ltrans*.ci" || true)"
+  if [[ -n "${linked}" ]]; then
+    echo "${linked}"
+    return 0
+  fi
   local dir
   dir="$(cmake_dir "$1")"
-  echo "${dir}/CMakeFiles/$2.dir"
+  find "${dir}" -type d -path "*/CMakeFiles/$2.dir" -print -quit
 }
 
 # Prints the cache entry of a variant's build folder named, empty where it has none.

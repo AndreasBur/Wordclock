@@ -76,9 +76,9 @@ target_compile_options(Wordclock PRIVATE
     "$<$<NOT:$<CONFIG:Debug>>:${AVR_OPTIONS_RELEASE}>")
 
 # -fstack-usage -fcallgraph-info=su -save-temps=obj: every function's frame and every call, as
-#   LTO left them, written beside the image for tools/avr-stack.py. At the link and not at the
-#   compile, because the compile's frames are those before inlining, and LTO inlines across
-#   sources. The image comes out byte for byte the same without them.
+#   LTO left them, written beside the image for the template's tools/stack.sh. At the link and
+#   not at the compile, because the compile's frames are those before inlining, and LTO inlines
+#   across sources. The image comes out byte for byte the same without them.
 target_link_options(Wordclock PRIVATE
     -mmcu=${AVR_MCU}
     -Wl,--gc-sections
@@ -86,11 +86,17 @@ target_link_options(Wordclock PRIVATE
     "$<$<CONFIG:Debug>:${AVR_OPTIONS_DEBUG}>"
     "$<$<NOT:$<CONFIG:Debug>>:${AVR_OPTIONS_RELEASE}>")
 
+# programs/ of the build, which the template's tools/lib/cmake.sh reads the image from, and
+# programs.txt beside it, which names it: tools/compile_examples.sh, stack.sh and the rest build
+# the target avr128da48 of tools/project.sh this way. The call graph of its link lands beside it,
+# Wordclock.elf.ltrans0.ltrans.ci, where cmake_graphs() looks for it.
 set_target_properties(Wordclock PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS ON
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/programs
     SUFFIX ".elf")
+file(WRITE ${CMAKE_BINARY_DIR}/programs.txt "Wordclock\n")
 
 if(AVR_DFP)
     target_compile_options(Wordclock PRIVATE -B ${AVR_DFP}/gcc/dev/${AVR_MCU}/ -I${AVR_DFP}/include)
@@ -109,14 +115,12 @@ add_custom_target(flash
     DEPENDS Wordclock
     VERBATIM)
 
-# The two checks CI runs on the image, as tests of this build, so that `ctest` - and the avr
-# workflow preset - runs them wherever the image is built. The sizes only for the part the
-# README documents: an image built for another Dx part is meant to come out at other numbers.
+# The documented sizes, checked against the image as a test of this build, so that `ctest` - and
+# the avr workflow preset - runs it wherever the image is built; only for the part the README
+# documents, as an image built for another Dx part is meant to come out at other numbers. The
+# stack is the template's `make stack`, which builds the target avr128da48 of tools/project.sh.
 if(AVR_MCU STREQUAL "avr128da48")
     add_test(NAME documented-sizes
         COMMAND python3 tools/documented-sizes.py --elf $<TARGET_FILE:Wordclock>
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
-add_test(NAME stack
-    COMMAND python3 tools/avr-stack.py ${CMAKE_BINARY_DIR} --paths
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

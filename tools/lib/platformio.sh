@@ -14,8 +14,10 @@
 #
 #   PLATFORMIO_BUILD_DIR        <target build dir>/<variant>, one build per variant
 #   PLATFORMIO_BUILD_FLAGS      the variant's flags, as variant_flags() prints them, on every file
-#   PLATFORMIO_BUILD_SRC_FLAGS  -Werror, on the project's own sources only: a warning of a
-#                               framework, as of the Arduino core, is not the project's to fix
+#
+# A warning fails the build where it lies in a file of the project's own, which the log is read
+# for: not -Werror, which a header of a library or of the framework that a source of the project
+# includes would fail as well, and that is not the project's to fix.
 
 readonly PIO=(uv run --frozen pio)
 
@@ -53,12 +55,38 @@ platformio_run() {
   dir="$(platformio_dir "${variant}")"
   PLATFORMIO_BUILD_DIR="${dir}" \
     PLATFORMIO_BUILD_FLAGS="${flags//$'\n'/ }" \
-    PLATFORMIO_BUILD_SRC_FLAGS="-Werror" \
     "${PIO[@]}" run -d "${ROOT_DIR}/${PIO_DIR}" -e "${PIO_ENV}" "$@" 2>&1
 }
 
+# Prints the warnings of the output given that lie in a file of the project's own: one whose path,
+# relative to PIO_DIR as pio prints it, lies in the repository and in no hidden folder of it, as
+# .pio/, where PlatformIO keeps the libraries it fetches. The framework's lie outside it.
+platformio_own_warnings() {
+  local line
+  local path
+  local inside
+  while IFS= read -r line; do
+    if [[ ! "${line}" =~ ^([^:[:space:]]+):[0-9]+:([0-9]+:)?\ warning: ]]; then
+      continue
+    fi
+    path="${BASH_REMATCH[1]}"
+    if [[ "${path}" != /* ]]; then
+      path="${ROOT_DIR}/${PIO_DIR}/${path}"
+    fi
+    path="$(realpath -m "${path}")"
+    if [[ "${path}" != "${ROOT_DIR}"/* ]]; then
+      continue
+    fi
+    inside="/${path#"${ROOT_DIR}"/}"
+    if [[ "${inside}" == */.* ]]; then
+      continue
+    fi
+    echo "${line}"
+  done <<< "$1"
+}
+
 # Builds the image of a variant, failing on an error and on a warning in the project's own
-# sources, and keeps what pio printed beside it, which platformio_sizes() reads.
+# files, and keeps what pio printed beside it, which platformio_sizes() reads.
 # Arguments:
 #   variant: one of VARIANTS
 #   program: optional; there is one, the image
@@ -77,6 +105,13 @@ platformio_build() {
     return 1
   fi
   echo "${output}" > "${dir}/build.log"
+  local own
+  own="$(platformio_own_warnings "${output}")"
+  if [[ -n "${own}" ]]; then
+    err "${label}: the build warns in the project's own files:"
+    err "${own}"
+    return 1
+  fi
 }
 
 # Prints the name of the image: the project's, as the folder's, which cpplint requires it to be.

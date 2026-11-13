@@ -143,8 +143,8 @@ It fits either way on this part, but that margin is the difference between fitti
 not on a smaller one.
 
 The RAM figure is what `.data` and `.bss` take. The stack comes on top of it, from the other
-end, and nothing on this part stops the two from meeting. `tools/avr-stack.py build-avr` adds
-up the deepest call path from `main()` and the two deepest interrupt handlers - at most two
+end, and nothing on this part stops the two from meeting. `make stack` - the template's
+`tools/stack.sh` and `tools/avr_stack.py` - adds up the deepest call path from `main()` and the two deepest interrupt handlers - at most two
 can nest, one on each priority level - out of the call graph the link writes beside the
 image, and fails when that does not fit what is left; CI runs it after every build, and
 `--paths` prints the paths frame by frame. It refuses rather than guesses: recursion, a call
@@ -168,7 +168,7 @@ to; an Atmel-ICE or a PICkit 4 does the same job on a board of your own.
 
 Microchip Studio can debug the result without a project file of its own —
 **File → Open → Open Object File For Debugging**, pointed at
-`build-avr-dbg/platform/avr-dx/Wordclock.elf`. That keeps CMake as the single
+`build-avr-dbg/programs/Wordclock.elf`. That keeps CMake as the single
 place the sources and include paths are listed. Importing the tree as a Studio
 project instead would mean maintaining those paths a second time, by hand, which
 is exactly what the old `.cproj` next door drifted on.

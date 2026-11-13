@@ -35,7 +35,7 @@ export FUZZ_SECONDS ?= 180
 HOST_SUITES := platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
 .PHONY: help check lint run clean \
-        simulator clang avr esp32 rp2350 host-esp32 host-rp2350 web \
+        simulator clang avr examples stack esp32 rp2350 host-esp32 host-rp2350 web \
         tidy headers cppcheck style fmt docs web-lint \
         sanitizers coverage fuzz
 
@@ -50,7 +50,7 @@ help: ## This list
 # The order is cheap first, so that a typo fails in seconds rather than after the fuzzers.
 check: STRICT := 1
 check: ## What CI runs, all of it
-check: lint simulator clang avr host-esp32 host-rp2350 web sanitizers coverage \
+check: lint simulator clang avr stack host-esp32 host-rp2350 web sanitizers coverage \
        esp32 rp2350 tidy headers fuzz
 lint: style docs cppcheck web-lint ## The checks that need no build: seconds
 
@@ -69,12 +69,25 @@ clang: ## The simulator, core tests and both host suites compiled by clang
 	CXX=clang++ platform/esp32/test/run.sh
 	CXX=clang++ platform/rp2350/test/run.sh
 
-# Not the workflow preset: --verbose, so the log shows the paths the stack is made of even when
-# it fits, and the size the build printed sits next to the one the documentation states.
-avr: ## The AVR128DA48 image, its documented sizes and its stack
+# Not the workflow preset: --verbose, so that the size the build printed sits next to the one the
+# documentation states.
+avr: ## The AVR128DA48 image and its documented sizes
 	cmake --preset $(PRESET)avr
 	cmake --build --preset $(PRESET)avr
 	ctest --preset $(PRESET)avr --verbose
+
+# The template's tools/compile_examples.sh: the image of every target of tools/project.sh, the
+# AVR's by CMake and the ESP32's and the RP2350's by PlatformIO, each failing on a warning in
+# Wordclock's own files, and a table of their flash and RAM, into CI's job summary as well.
+examples: ## Every target's image, through the template's tools; their flash and RAM
+	tools/compile_examples.sh | tee -a "$${GITHUB_STEP_SUMMARY:-/dev/null}"
+
+# The template's tools/stack.sh: the deepest call path of the AVR image from main() and the two
+# deepest interrupt handlers, out of the call graph its link writes, against the RAM .data and
+# .bss leave. It refuses rather than guesses: recursion, a call through a pointer, a frame of
+# dynamic size and malloc() each stop it.
+stack: ## The deepest stack of the AVR image against the RAM it leaves
+	tools/stack.sh
 
 esp32: ## The ESP32-S3 image and its documented sizes
 	$(UV_RUN) pio run -d platform/esp32
