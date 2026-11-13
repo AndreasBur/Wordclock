@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDATEPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDATEPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "RealTimeClock.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the date command. */
 #define MSG_CMD_DATE_PARSER_PARAMETER_TABLE_SIZE 3u

@@ -9,9 +9,10 @@
 #ifndef WORDCLOCK_SRC_FONT_FONT_H_
 #define WORDCLOCK_SRC_FONT_FONT_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include <array>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief How a font's table is packed: one word per pixel row, or one per pixel column. */
 enum class Orientation {

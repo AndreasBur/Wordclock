@@ -7,9 +7,10 @@
  */
 
 #include "AnimationMatrix.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationMatrix::Init() {
   Animation::Init(StateType::kIdle);

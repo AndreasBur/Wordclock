@@ -9,11 +9,11 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "Message.h"
 #include "ErrorMessage.h"
+#include "Message.h"
 #include "Overlays.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of MsgCmdParser::CommandType::kNone, 0, which names no command. */
 #define MSG_COMMAND_NONE_NUMBER 0u

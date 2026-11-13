@@ -1,8 +1,8 @@
 // The commands as a line arrives over the serial port or the web socket: the number picks the
 // parser, the options change the clock.
 
-#include "check.h"
-#include "cases.h"
+#include <array>
+#include <string>
 
 #include "Animations.h"
 #include "BH1750.h"
@@ -22,9 +22,8 @@
 #include "RealTimeClock.h"
 #include "Scheduler.h"
 #include "Text.h"
-
-#include <array>
-#include <string>
+#include "cases.h"
+#include "check.h"
 
 /*
  * What is checked is what a command changes, not what it answers. The simulator's port collects

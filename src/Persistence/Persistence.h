@@ -28,8 +28,8 @@
 #ifndef WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
 #define WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The cycle of the persistence's task, in scheduler ticks, so 200 * 10 ms = 2 s between

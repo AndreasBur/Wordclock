@@ -2,8 +2,9 @@
 #define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_WIRE_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include <vector>
 /*
  * Answers reads out of one buffer and keeps everything that was written, so a driver's

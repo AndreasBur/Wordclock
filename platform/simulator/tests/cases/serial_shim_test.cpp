@@ -1,11 +1,10 @@
 // The simulator's port speaks the firmware's Latin-1, as the hardware's ports do.
 
-#include "check.h"
-#include "cases.h"
-
-#include "sim/SerialShim.h"
-
 #include <cstring>
+
+#include "cases.h"
+#include "check.h"
+#include "sim/SerialShim.h"
 
 /*
  * An answer with an umlaut, as the text overlay can hold one. The port took the firmware's

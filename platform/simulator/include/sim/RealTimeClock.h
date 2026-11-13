@@ -13,11 +13,13 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_REALTIMECLOCK_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_REALTIMECLOCK_H_
 
-#include "StandardTypes.h"
+#include <wx/datetime.h>
+
+#include <chrono>
+
 #include "Arduino.h"
 #include "ClockDateTime.h"
-#include <chrono>
-#include <wx/datetime.h>
+#include "StandardTypes.h"
 
 /*!
  * \brief The clock: the date and time the clock shows, kept up to date by Task().

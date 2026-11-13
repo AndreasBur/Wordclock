@@ -9,11 +9,13 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_STRINGTOOLS_H_
 #define WORDCLOCK_SRC_COMMUNICATION_STRINGTOOLS_H_
 
-#include "StandardTypes.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <type_traits>
+
+#include "StandardTypes.h"
 
 /*!
  * \brief The conversions between strings and numbers that the command parsers use, and a copy of a

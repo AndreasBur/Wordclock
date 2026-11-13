@@ -2,8 +2,8 @@
 #define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_PIO_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 typedef unsigned int uint;
 typedef struct pio_hw {
   uint32_t volatile txf[4];

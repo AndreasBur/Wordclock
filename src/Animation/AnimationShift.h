@@ -9,11 +9,11 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONSHIFT_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 #include "Transformation.h"
-#include "Animation.h"
 
 /*! \brief STD_ON to shift by columns, to the right; exactly one of the two switches is STD_ON. */
 #define ANIMATION_SHIFT_HORIZONTAL STD_ON

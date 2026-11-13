@@ -22,9 +22,10 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TIMER_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TIMER_H_
 
-#include "StandardTypes.h"
 #include <avr/io.h>
 #include <stddef.h>
+
+#include "StandardTypes.h"
 
 /*!
  * \brief STD_ON gives TCA0 an instance, `Timer<TimerA0>`, and an overflow ISR.

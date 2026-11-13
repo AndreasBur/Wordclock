@@ -14,7 +14,6 @@
  */
 
 #include "Arduino.h"
-
 #include "Pixels.h"
 #include "Scheduler.h"
 #include "System.h"

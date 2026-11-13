@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYBRIGHTNESS_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYBRIGHTNESS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "Illuminance.h"
 #include "GammaCorrection.h"
+#include "Illuminance.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The brightness of the display: the brightness set, and what of it is to reach the LEDs.

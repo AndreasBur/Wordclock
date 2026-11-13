@@ -10,8 +10,8 @@
 #define WORDCLOCK_SRC_COMMUNICATION_COMMUNICATION_H_
 
 #include "Arduino.h"
-#include "Message.h"
 #include "ErrorMessage.h"
+#include "Message.h"
 
 /*!
  * \brief The scheduler ticks between two calls of Communication::Task(), so 10 * 10 ms = 100 ms.

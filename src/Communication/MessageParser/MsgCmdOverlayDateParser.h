@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYDATEPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYDATEPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
 #include "Overlays.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The parser of command 5, the date overlay command: sets when the date scrolls over the

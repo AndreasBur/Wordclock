@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCOLOR_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYCOLOR_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Pixel.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Whether DisplayColor keeps a dimmed copy of the colour, STD_ON, or not, STD_OFF.

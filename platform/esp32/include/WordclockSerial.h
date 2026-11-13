@@ -25,12 +25,13 @@
 #ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKSERIAL_H_
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WORDCLOCKSERIAL_H_
 
-#include "StandardTypes.h"
+#include <stddef.h>
+#include <stdint.h>
 
 #include <atomic>
 #include <mutex>
-#include <stddef.h>
-#include <stdint.h>
+
+#include "StandardTypes.h"
 
 /*
  * Only ever used as a pointer, so the declaration is enough - and it has to be made here

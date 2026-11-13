@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONTELETYPE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONTELETYPE_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The teletype animation: writes the words of the new time letter by letter, one word after

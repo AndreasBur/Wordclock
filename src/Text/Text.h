@@ -9,15 +9,15 @@
 #ifndef WORDCLOCK_SRC_TEXT_TEXT_H_
 #define WORDCLOCK_SRC_TEXT_TEXT_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
-#include "Transformation.h"
 #include "FontCourierNew7x10.h"
 #include "FontCourierNew7x9.h"
 #include "FontLucidaSans9x10.h"
 #include "FontSprite5x8.h"
 #include "FontTahoma10x10.h"
+#include "StandardTypes.h"
+#include "Transformation.h"
 
 /*! \brief The scheduler ticks between two calls of Text::Task() to start with: 1, every tick. */
 #define TEXT_TASK_CYCLE_INIT_VALUE 1u

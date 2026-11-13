@@ -17,10 +17,10 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_REALTIMECLOCK_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_REALTIMECLOCK_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockDateTime.h"
 #include "DS3231.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The calls of RealTimeClock::Task() that pass without reading the chip between two that

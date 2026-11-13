@@ -18,10 +18,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCOLORCYCLEPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCOLORCYCLEPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgParameterParser.h"
 #include "ColorCycle.h"
+#include "MsgParameterParser.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the colour cycle command. */
 #define MSG_CMD_COLOR_CYCLE_PARSER_PARAMETER_TABLE_SIZE 2u

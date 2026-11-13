@@ -6,8 +6,9 @@
  * \brief The LED matrix as the firmware core sees it, see Pixels.h.
  */
 
-#include "Arduino.h"
 #include "Pixels.h"
+
+#include "Arduino.h"
 #include "WS2812.h"
 
 namespace {

@@ -7,10 +7,10 @@
  */
 
 #include "WordclockApp.h"
-#include "sim/PixelsFrame.h"
-#include "sim/WebHost.h"
 
 #include "WebFrontend.h"
+#include "sim/PixelsFrame.h"
+#include "sim/WebHost.h"
 
 // wxWidgets' macros for the entry point and the event table, which Doxygen would take for
 // functions of this file.

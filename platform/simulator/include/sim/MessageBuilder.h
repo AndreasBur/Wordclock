@@ -16,12 +16,14 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEBUILDER_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEBUILDER_H_
 
-#include <wx/wx.h>
 #include <wx/odcombo.h>
+#include <wx/wx.h>
+
 #include <array>
-#include "StandardTypes.h"
-#include "PixelsFrame.h"
+
 #include "MessageCatalog.h"
+#include "PixelsFrame.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The message builder: a window that puts a command together from MessageCatalog and writes

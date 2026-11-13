@@ -10,17 +10,16 @@
 
 #if (WEB_FRONTEND_SUPPORT == STD_ON)
 
-#include "sim/WebSocket.h"
-#include "sim/WebTransport.h"
-#include "sim/WordclockSerial.h"
-
-#include "WebFrontend.h"
-
 #include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+
+#include "WebFrontend.h"
+#include "sim/WebSocket.h"
+#include "sim/WebTransport.h"
+#include "sim/WordclockSerial.h"
 
 // Local to this file, so Doxygen leaves it out.
 /*! \cond */

@@ -19,8 +19,8 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_STORAGE_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_STORAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The directory of LittleFS the blob is kept in, below the root. */
 #define STORAGE_NAMESPACE "wordclock"

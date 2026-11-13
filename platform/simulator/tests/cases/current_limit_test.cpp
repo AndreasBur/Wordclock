@@ -7,14 +7,13 @@
  * brightness it had.
  */
 
-#include "check.h"
-#include "cases.h"
-
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayCurrentLimit.h"
 #include "DisplayManager.h"
 #include "Pixels.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 constexpr uint32_t kBudgetMicroAmps{static_cast<uint32_t>(DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS) *

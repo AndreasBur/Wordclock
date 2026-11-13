@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSNAKE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONSNAKE_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 #define ANIMATION_SNAKE_LENGTH 8u /*!< The length of the snake in pixels. */
 

@@ -20,10 +20,10 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WS2812PIO_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WS2812PIO_H_
 
-#include "StandardTypes.h"
-
 #include <stddef.h>
 #include <stdint.h>
+
+#include "StandardTypes.h"
 
 /*!
  * \brief The PIO block the strip's state machine runs in: 0 selects `pio0`, any other value `pio1`.

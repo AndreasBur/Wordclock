@@ -42,11 +42,12 @@
 
 #if (WEB_FRONTEND_SUPPORT == STD_ON)
 
-#include "Pixels.h"
-#include "WebTransport.h"
+#include <stddef.h>
 
 #include <atomic>
-#include <stddef.h>
+
+#include "Pixels.h"
+#include "WebTransport.h"
 
 /*!
  * \brief The longest command a socket frame may carry, in characters.

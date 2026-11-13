@@ -19,8 +19,8 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TWI_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_TWI_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The clock of the bus, in hertz. */
 #define TWI_FREQUENCY_HZ 100000uL

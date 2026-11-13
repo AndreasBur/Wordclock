@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The cursor animation: a single pixel walks across all LEDs and leaves the letters of the

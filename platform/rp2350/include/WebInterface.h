@@ -24,9 +24,9 @@
 
 // What a browser is *sent* lives there, together with the frame rate limit and the longest
 // command a socket frame may carry - shared with the ESP32 backend rather than kept twice.
-#include "WebFrontend.h"
-
 #include <stddef.h>
+
+#include "WebFrontend.h"
 
 /*
  * There is no client limit here, and the one that used to stand in this place was never one:

@@ -10,9 +10,11 @@
  */
 
 #include "Timer.h"
-#include "Bit.h"
+
 #include <avr/interrupt.h>
 #include <util/atomic.h>
+
+#include "Bit.h"
 
 // Local to this file, so Doxygen leaves it out.
 /*! \cond */

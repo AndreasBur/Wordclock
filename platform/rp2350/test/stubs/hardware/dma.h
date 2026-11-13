@@ -2,8 +2,9 @@
 #define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include "pio.h"
 typedef enum { DMA_SIZE_8 = 0, DMA_SIZE_16 = 1, DMA_SIZE_32 = 2 } dma_channel_transfer_size;
 typedef struct {

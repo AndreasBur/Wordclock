@@ -6,8 +6,9 @@
  * \brief The clock chip: the time it counted, and the temperature it measures, see DS3231.h.
  */
 
-#include "Arduino.h"
 #include "DS3231.h"
+
+#include "Arduino.h"
 #include "Twi.h"
 
 namespace {

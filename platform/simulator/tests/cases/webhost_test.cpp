@@ -1,14 +1,14 @@
 // The simulator's web host, over a real socket on loopback.
 
-#include "check.h"
-#include "cases.h"
-
 #include "sim/WebHost.h"
 
 #include <chrono>
 #include <future>
 #include <iostream>
 #include <thread>
+
+#include "cases.h"
+#include "check.h"
 
 #ifndef _WIN32
 #include <arpa/inet.h>

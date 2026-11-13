@@ -6,11 +6,12 @@
  * \brief Pulse-shaping WS2812 transmitter for the AVR Dx, see WS2812.h.
  */
 
+#include "WS2812.h"
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "WS2812.h"
 #include "Bit.h"
 
 // Local to this file, so Doxygen leaves it out.

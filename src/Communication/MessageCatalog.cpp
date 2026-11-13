@@ -9,6 +9,7 @@
  */
 
 #include "MessageCatalog.h"
+
 #include "StandardTypes.h"
 // The command numbers are taken from here rather than copied, so they cannot fall behind
 // the firmware. Its OVERLAYS_SUPPORT_* switches reach the entries below through it too.
@@ -28,10 +29,11 @@
  * that test them are public and constexpr, so the range can be measured rather than
  * copied.
  */
+#include <limits>
+
 #include "ClockDate.h"
 #include "ClockTime.h"
 #include "Display.h"
-#include <limits>
 
 // Everything up to the member functions is local to this file, so Doxygen leaves it out.
 /*! \cond */

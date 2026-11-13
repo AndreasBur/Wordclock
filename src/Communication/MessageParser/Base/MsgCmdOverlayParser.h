@@ -9,11 +9,11 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDOVERLAYPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGCMDOVERLAYPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgParameterParser.h"
-#include "MsgCmdBaseOverlayParser.h"
 #include "ClockDateTime.h"
+#include "MsgCmdBaseOverlayParser.h"
+#include "MsgParameterParser.h"
+#include "StandardTypes.h"
 #include "Text.h"
 
 /*!

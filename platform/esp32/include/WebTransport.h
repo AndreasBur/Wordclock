@@ -24,10 +24,10 @@
 #ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBTRANSPORT_H_
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_WEBTRANSPORT_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
-
 #include <stddef.h>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief One route's answer, being written: the body of a response, which the core writes into and

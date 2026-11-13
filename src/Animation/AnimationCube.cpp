@@ -7,10 +7,11 @@
  */
 
 #include "AnimationCube.h"
-#include "StandardTypes.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
+#include "StandardTypes.h"
 
 void AnimationCube::Init() {
   Animation::Init(StateType::kIdle);

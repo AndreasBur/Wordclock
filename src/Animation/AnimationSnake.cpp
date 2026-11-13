@@ -7,9 +7,10 @@
  */
 
 #include "AnimationSnake.h"
+
 #include "Bit.h"
-#include "Display.h"
 #include "Clock.h"
+#include "Display.h"
 
 void AnimationSnake::Init() {
   Animation::Init(StateType::kIdle);

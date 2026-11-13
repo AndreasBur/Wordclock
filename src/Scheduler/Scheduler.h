@@ -9,8 +9,9 @@
 #ifndef WORDCLOCK_SRC_SCHEDULER_SCHEDULER_H_
 #define WORDCLOCK_SRC_SCHEDULER_SCHEDULER_H_
 
-#include "Arduino.h"
 #include <array>
+
+#include "Arduino.h"
 
 /*!
  * \brief Milliseconds between two Task() calls, and thereby the unit every module's task cycle

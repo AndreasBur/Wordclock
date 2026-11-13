@@ -18,10 +18,11 @@
  * header and offers to drop this one from a file that uses nothing else of it.
  */
 // IWYU pragma: begin_exports
-#include <limits>
-#include <stdint.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#include <limits>
 #include <type_traits>
 // IWYU pragma: end_exports
 

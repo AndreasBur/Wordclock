@@ -21,8 +21,8 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_STORAGE_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_STORAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The file the blob is kept in, in the working directory. */
 #define STORAGE_FILE_NAME "wordclock-settings.bin"

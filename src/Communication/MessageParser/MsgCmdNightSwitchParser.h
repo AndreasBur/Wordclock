@@ -16,10 +16,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNIGHTSWITCHPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
 #include "NightSwitch.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the night switch command. */
 #define MSG_CMD_NIGHT_SWITCH_PARSER_PARAMETER_TABLE_SIZE 6u

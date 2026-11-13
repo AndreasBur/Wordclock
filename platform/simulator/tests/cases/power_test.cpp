@@ -1,13 +1,13 @@
 // The order the strip's supply is switched in, which is the whole of this feature.
 
-#include "check.h"
-#include "cases.h"
+#include "Power.h"
 
 #include "Clock.h"
 #include "Display.h"
 #include "Pixels.h"
-#include "Power.h"
 #include "PowerSwitch.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 /*

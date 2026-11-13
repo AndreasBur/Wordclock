@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONFLICKER_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONFLICKER_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include "Animation.h"
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief One less than the switches of the flicker; the display is switched off and on this many

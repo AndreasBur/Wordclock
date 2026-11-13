@@ -12,8 +12,8 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCURRENTLIMIT_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYCURRENTLIMIT_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief What the supply behind the strip can deliver, in milliamps, minus the margin it should

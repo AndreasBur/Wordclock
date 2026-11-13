@@ -7,9 +7,10 @@
  */
 
 #include "AnimationShift.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationShift::Init() {
   Animation::Init(StateType::kIdle);

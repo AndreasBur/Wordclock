@@ -7,8 +7,9 @@
  */
 
 #include "AnimationTeletype.h"
-#include "Display.h"
+
 #include "Clock.h"
+#include "Display.h"
 
 void AnimationTeletype::Init() {
   Animation::Init(StateType::kIdle);

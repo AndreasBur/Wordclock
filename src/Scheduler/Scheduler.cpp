@@ -7,19 +7,20 @@
  */
 
 #include "Scheduler.h"
-#include "StandardTypes.h"
+
 #include "Animations.h"
+#include "ColorCycle.h"
+#include "Communication.h"
 #include "DisplayManager.h"
 #include "Illuminance.h"
-#include "Communication.h"
+#include "NightSwitch.h"
 #include "Overlays.h"
 #include "Persistence.h"
-#include "NightSwitch.h"
-#include "ColorCycle.h"
 #include "Power.h"
-#include "Uptime.h"
+#include "StandardTypes.h"
 #include "Temperature.h"
 #include "Text.h"
+#include "Uptime.h"
 
 void Scheduler::Task() { TriggerTasks(); }
 

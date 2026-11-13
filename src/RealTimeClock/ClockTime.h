@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKTIME_H_
 #define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKTIME_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief A time of day: hour, minute and second.

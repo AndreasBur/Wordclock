@@ -17,8 +17,8 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_DS3231_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_DS3231_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The bus address of the chip; not used, as the simulator opens no bus. */
 #define DS3231_I2C_ADDR 0x68u

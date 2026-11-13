@@ -22,9 +22,9 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDCONSOLEPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 #include "System.h"
 
 /*! \brief The number of options in the parameter table of the console command. */

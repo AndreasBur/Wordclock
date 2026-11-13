@@ -3,10 +3,10 @@
  * Wire, and the clock does so after begin(), which would otherwise put its default back over it.
  * A clock other than that default is asked for, or the order could not be seen.
  */
+#include <Wire.h>
+
 #include "I2cBus.h"
 #include "check.h"
-
-#include <Wire.h>
 
 namespace {
 constexpr byte kPinSda{4u};

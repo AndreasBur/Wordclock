@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYPIXELS_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYPIXELS_H_
 
-#include "Bit.h"
 #include "Arduino.h"
+#include "Bit.h"
 #include "Display.h"
 
 /*!

@@ -14,8 +14,8 @@
 #ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
 #define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The I2C bus, as far as opening it goes. */
 class I2cBus {

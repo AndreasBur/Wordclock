@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYCHARACTERS_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYCHARACTERS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of columns of the letter grid. */
 #define DISPLAY_CHARACTERS_NUMBER_OF_COLUMNS 11u

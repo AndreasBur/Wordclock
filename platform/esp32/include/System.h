@@ -19,8 +19,8 @@
 #ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_SYSTEM_H_
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_SYSTEM_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The length of a buffer for the network address, its terminator included.

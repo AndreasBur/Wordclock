@@ -18,6 +18,7 @@
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SERIALSHIM_H_
 
 #include <wx/wx.h>
+
 #include "arduino/Types.h"
 
 /*!

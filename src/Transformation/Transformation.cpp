@@ -7,6 +7,7 @@
  */
 
 #include "Transformation.h"
+
 #include "Display.h"
 
 StdReturnType Transformation::ShiftLeft(bool rotate) {

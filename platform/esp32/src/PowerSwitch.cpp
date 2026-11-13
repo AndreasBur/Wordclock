@@ -6,8 +6,9 @@
  * \brief The supply port, driven through the core's own GPIO calls, see PowerSwitch.h.
  */
 
-#include "Arduino.h"
 #include "PowerSwitch.h"
+
+#include "Arduino.h"
 
 void PowerSwitch::Init() {
   if (!IsFitted()) {

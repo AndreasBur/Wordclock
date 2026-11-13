@@ -6,10 +6,11 @@
  * \brief The supply port, driven through the port registers, see PowerSwitch.h.
  */
 
+#include "PowerSwitch.h"
+
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "PowerSwitch.h"
 
 /*! \brief The bit of POWER_SWITCH_PIN in the registers of POWER_SWITCH_PORT. */
 #define POWER_SWITCH_PIN_MASK static_cast<uint8_t>(1u << POWER_SWITCH_PIN)

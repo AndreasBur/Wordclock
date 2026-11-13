@@ -7,8 +7,9 @@
  */
 
 #include "Animations.h"
-#include "Display.h"
+
 #include "Clock.h"
+#include "Display.h"
 
 Animations::StateType Animations::GetState() const {
   if (GetStateOfCurrentAnimation() == Animation::StateType::kClearTime ||

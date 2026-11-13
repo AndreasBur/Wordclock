@@ -5,11 +5,7 @@
  * says its time is worthless does to the answer, and that a reading survives the trip as
  * the string it is read back as.
  */
-#include "Arduino.h"
 #include "DS3231.h"
-#include "Overlays.h"
-#include "Temperature.h"
-#include "check.h"
 
 #include <Wire.h>
 
@@ -17,6 +13,11 @@
 #include <cstdio>
 #include <cstring>
 #include <vector>
+
+#include "Arduino.h"
+#include "Overlays.h"
+#include "Temperature.h"
+#include "check.h"
 
 /* One temperature reading, handed over the way the chip would. */
 static void AnswerWith(uint8_t degrees, uint8_t fraction) {

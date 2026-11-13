@@ -1,12 +1,12 @@
 // The web socket protocol, against the RFCs rather than against a browser.
 
-#include "check.h"
-#include "cases.h"
-
 #include "sim/WebSocket.h"
 
 #include <cstdio>
 #include <string>
+
+#include "cases.h"
+#include "check.h"
 
 namespace {
 std::string ToSha1Hex(std::string const& message) {

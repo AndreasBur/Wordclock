@@ -9,10 +9,11 @@
  * through the SDK too.
  */
 
+#include "PowerSwitch.h"
+
 #include <hardware/gpio.h>
 
 #include "Arduino.h"
-#include "PowerSwitch.h"
 
 void PowerSwitch::Init() {
   if (!IsFitted()) {

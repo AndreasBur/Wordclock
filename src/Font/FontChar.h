@@ -9,9 +9,10 @@
 #ifndef WORDCLOCK_SRC_FONT_FONTCHAR_H_
 #define WORDCLOCK_SRC_FONT_FONTCHAR_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include <array>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief What every glyph has: its width in columns.

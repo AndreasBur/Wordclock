@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATETIME_H_
 #define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATETIME_H_
 
-#include "StandardTypes.h"
 #include "ClockDate.h"
 #include "ClockTime.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief A date and a time of day together.

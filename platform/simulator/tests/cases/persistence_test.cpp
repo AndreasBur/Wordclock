@@ -1,15 +1,15 @@
 // What survives a restart, and what a reset puts back.
 
-#include "check.h"
-#include "cases.h"
+#include "Persistence.h"
 
 #include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
 #include "Illuminance.h"
 #include "Overlays.h"
-#include "Persistence.h"
 #include "Pixels.h"
+#include "cases.h"
+#include "check.h"
 #include "sim/Storage.h"
 
 /*

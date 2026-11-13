@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYCOLORPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYCOLORPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the display colour command. */
 #define MSG_CMD_DISPLAY_COLOR_PARSER_PARAMETER_TABLE_SIZE 3u

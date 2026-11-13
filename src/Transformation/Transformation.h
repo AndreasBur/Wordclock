@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_TRANSFORMATION_TRANSFORMATION_H_
 #define WORDCLOCK_SRC_TRANSFORMATION_TRANSFORMATION_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Shifts of the pixels of the display: of the whole display, or of one row or column.

@@ -22,10 +22,10 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBTRANSPORT_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBTRANSPORT_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
-
 #include <stddef.h>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 class AsyncWebServerRequest;
 class AsyncResponseStream;

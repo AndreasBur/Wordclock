@@ -2,8 +2,9 @@
 #define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_ESPASYNCWEBSERVER_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include <functional>
 #include <map>
 #include <string>

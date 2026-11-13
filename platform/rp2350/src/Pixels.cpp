@@ -10,10 +10,10 @@
  * most of its 800 lines on, and what only an oscilloscope can debug.
  */
 
-#include "WS2812Pio.h"
+#include "Pixels.h"
 
 #include "Arduino.h"
-#include "Pixels.h"
+#include "WS2812Pio.h"
 
 namespace {
 /*

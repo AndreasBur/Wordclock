@@ -25,11 +25,12 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBHOST_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBHOST_H_
 
-#include "StandardTypes.h"
-
 #include <stddef.h>
 #include <stdint.h>
+
 #include <string>
+
+#include "StandardTypes.h"
 
 /*!
  * \brief The TCP port the web host listens on, on loopback.

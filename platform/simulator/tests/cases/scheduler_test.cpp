@@ -1,8 +1,7 @@
 // The speed/cycle round trip, the uptime counter, and when and in which order the scheduler runs a
 // task.
 
-#include "check.h"
-#include "cases.h"
+#include "Scheduler.h"
 
 #include "Animations.h"
 #include "BH1750.h"
@@ -13,9 +12,9 @@
 #include "Persistence.h"
 #include "Pixels.h"
 #include "Power.h"
-#include "Scheduler.h"
 #include "Uptime.h"
-
+#include "cases.h"
+#include "check.h"
 #include "sim/SerialShim.h"
 
 /*

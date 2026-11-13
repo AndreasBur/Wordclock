@@ -1,15 +1,15 @@
 // The shifts of the display, and the roll animation that is their one user in every direction.
 
-#include "check.h"
-#include "cases.h"
-
-#include "Animations.h"
-#include "Clock.h"
-#include "Display.h"
 #include "Transformation.h"
 
 #include <array>
 #include <cstddef>
+
+#include "Animations.h"
+#include "Clock.h"
+#include "Display.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 using GridType = std::array<std::array<bool, DISPLAY_NUMBER_OF_COLUMNS>, DISPLAY_NUMBER_OF_ROWS>;

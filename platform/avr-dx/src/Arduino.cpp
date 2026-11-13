@@ -15,10 +15,11 @@
  * can delay it counts against that budget. See WS2812.cpp for the timing this has to stay inside.
  */
 
+#include "Arduino.h"
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#include "Arduino.h"
 #include "Bit.h"
 
 // Local to this file, so Doxygen leaves it out.

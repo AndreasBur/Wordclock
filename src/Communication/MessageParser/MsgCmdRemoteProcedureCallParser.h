@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDREMOTEPROCEDURECALLPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDREMOTEPROCEDURECALLPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the remote procedure call command. */
 #define MSG_CMD_REMOTE_PROCEDURE_CALL_PARSER_PARAMETER_TABLE_SIZE 1u

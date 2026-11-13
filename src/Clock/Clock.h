@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_CLOCK_CLOCK_H_
 #define WORDCLOCK_SRC_CLOCK_CLOCK_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Whether a new clock shows ES IST at every time, STD_ON, or only at the full and the half

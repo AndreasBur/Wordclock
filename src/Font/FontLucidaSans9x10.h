@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_FONT_FONTLUCIDASANS9X10_H_
 #define WORDCLOCK_SRC_FONT_FONTLUCIDASANS9X10_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Font.h"
 #include "FontChar.h"
+#include "StandardTypes.h"
 
 /*! \brief The width of the font in columns. */
 #define FONT_LUCIDA_SANS_9X10_WIDTH 9u

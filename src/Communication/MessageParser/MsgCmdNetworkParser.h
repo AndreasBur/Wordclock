@@ -21,13 +21,13 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
 
-#include "StandardTypes.h"
+#include <string.h>
+
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 #include "StringTools.h"
 #include "System.h"
-
-#include <string.h>
 
 /*! \brief The number of options in the parameter table of the network command. */
 #define MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE 2u

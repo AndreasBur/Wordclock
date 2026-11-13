@@ -9,15 +9,15 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGPARAMETERPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_BASE_MSGPARAMETERPARSER_H_
 
-#include "StandardTypes.h"
+#include <array>
+#include <type_traits>
+
 #include "Arduino.h"
+#include "Communication.h"
 #include "ErrorMessage.h"
 #include "MsgParameter.h"
+#include "StandardTypes.h"
 #include "StringTools.h"
-
-#include <type_traits>
-#include "Communication.h"
-#include <array>
 
 /*! \brief STD_ON reads the arguments of type MsgParameter::ArgumentTypeType::kChar. */
 #define MSG_PARAMETER_PARSER_ARGUMENT_TYPE_CHAR STD_OFF

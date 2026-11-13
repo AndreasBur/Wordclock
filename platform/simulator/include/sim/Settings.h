@@ -15,8 +15,9 @@
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SETTINGS_H_
 
 #include <wx/wx.h>
-#include "StandardTypes.h"
+
 #include "PixelsFrame.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The settings window: the controls that stand in for hardware the PC does not have, the

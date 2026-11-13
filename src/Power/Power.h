@@ -33,9 +33,9 @@
 #ifndef WORDCLOCK_SRC_POWER_POWER_H_
 #define WORDCLOCK_SRC_POWER_POWER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "PowerSwitch.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Scheduler ticks between two calls of Power::Task(): every tick.

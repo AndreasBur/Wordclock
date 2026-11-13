@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYDATE_H_
 #define WORDCLOCK_SRC_OVERLAY_OVERLAYDATE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The date overlay: scrolls the current date over the clock.

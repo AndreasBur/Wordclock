@@ -10,11 +10,11 @@
  * which left every indoor clock pinned to the automatic's floor.
  */
 
-#include "check.h"
-#include "cases.h"
+#include "Illuminance.h"
 
 #include "DisplayBrightness.h"
-#include "Illuminance.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 /*

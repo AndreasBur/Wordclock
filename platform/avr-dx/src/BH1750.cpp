@@ -6,8 +6,9 @@
  * \brief The ambient-light sensor the display dims itself by, see BH1750.h.
  */
 
-#include "Arduino.h"
 #include "BH1750.h"
+
+#include "Arduino.h"
 #include "Bit.h"
 #include "Twi.h"
 

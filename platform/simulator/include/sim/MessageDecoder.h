@@ -23,8 +23,9 @@
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_MESSAGEDECODER_H_
 
 #include <wx/wx.h>
-#include "StandardTypes.h"
+
 #include "MessageCatalog.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Reads a line the firmware printed back into the names behind it, through MessageCatalog

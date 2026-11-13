@@ -7,8 +7,9 @@
  */
 
 #include "AnimationFlicker.h"
-#include "Display.h"
+
 #include "Clock.h"
+#include "Display.h"
 
 void AnimationFlicker::Init() {
   Animation::Init(StateType::kIdle);

@@ -1,14 +1,14 @@
 // The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand.
 
-#include "check.h"
-#include "cases.h"
+#include "NightSwitch.h"
 
 #include "Clock.h"
 #include "Display.h"
-#include "NightSwitch.h"
 #include "Pixels.h"
 #include "Power.h"
 #include "RealTimeClock.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 // One tick of the night switch at a given time. Its own task rather than the scheduler's,

@@ -3,17 +3,18 @@
  * exactly the same path through Communication as one typed on the wire, and that answers
  * come out one line at a time.
  */
-#include "Arduino.h"
-#include "Communication.h"
-#include "MsgCmdRemoteProcedureCallParser.h"
-#include "MsgCmdParser.h"
-#include "Uptime.h"
-#include "Version.h"
-#include "check.h"
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <vector>
+
+#include "Arduino.h"
+#include "Communication.h"
+#include "MsgCmdParser.h"
+#include "MsgCmdRemoteProcedureCallParser.h"
+#include "Uptime.h"
+#include "Version.h"
+#include "check.h"
 
 static std::vector<std::string> lines;
 static void CollectLine(char const* line) { lines.emplace_back(line); }

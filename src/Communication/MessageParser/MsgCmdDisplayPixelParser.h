@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYPIXELPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDDISPLAYPIXELPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Display.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of options in the parameter table of the display pixel command. */
 #define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE 2u

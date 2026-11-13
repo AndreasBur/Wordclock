@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATE_H_
 #define WORDCLOCK_SRC_REALTIMECLOCK_CLOCKDATE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief A calendar date: year, month and day, with its weekday.

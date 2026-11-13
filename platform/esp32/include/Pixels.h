@@ -17,8 +17,8 @@
 #ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_PIXELS_H_
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_PIXELS_H_
 
-#include "StandardTypes.h"
 #include "Pixel.h"
+#include "StandardTypes.h"
 
 /*! \brief The number of LEDs of the strip. */
 #define PIXELS_NUMBER_OF_LEDS 110

@@ -1,15 +1,14 @@
 // That every animation ends on the time it was started for.
 
-#include "check.h"
-#include "cases.h"
-
-#include "Animations.h"
 #include "AnimationSnake.h"
+#include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
 #include "DisplayManager.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
+#include "cases.h"
+#include "check.h"
 
 /*
  * The one promise every animation makes, and the one that is easy to break: whatever it

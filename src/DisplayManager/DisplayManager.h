@@ -14,10 +14,10 @@
 #ifndef WORDCLOCK_SRC_DISPLAYMANAGER_DISPLAYMANAGER_H_
 #define WORDCLOCK_SRC_DISPLAYMANAGER_DISPLAYMANAGER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockTime.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 
 /*! \brief The cycle of the display manager's task, in scheduler ticks. */
 #define DISPLAY_MANAGER_TASK_CYCLE 1u

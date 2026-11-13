@@ -7,6 +7,7 @@
  */
 
 #include "Power.h"
+
 #include "Display.h"
 
 namespace {

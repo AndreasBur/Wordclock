@@ -15,12 +15,11 @@
  * frames in them.
  */
 
-#include "fuzz.h"
-
-#include "WebFrontend.h"
-
 #include <cstddef>
 #include <cstdint>
+
+#include "WebFrontend.h"
+#include "fuzz.h"
 
 namespace {
 constexpr unsigned kTicksAfterTheLastLine{8u};

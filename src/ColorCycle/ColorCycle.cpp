@@ -7,6 +7,7 @@
  */
 
 #include "ColorCycle.h"
+
 #include "Display.h"
 
 namespace {

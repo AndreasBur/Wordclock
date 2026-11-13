@@ -19,15 +19,14 @@
  * first frame is the one that reads them, and a tick is what an input costs - see FuzzCommand.cpp.
  */
 
-#include "fuzz.h"
-
-#include "Storage.h"
-
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+
+#include "Storage.h"
+#include "fuzz.h"
 
 namespace {
 // Two uint16_t before it: the magic, the favourites and the two calibration values.

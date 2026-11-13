@@ -9,14 +9,14 @@
 #ifndef WORDCLOCK_SRC_OVERLAY_OVERLAY_H_
 #define WORDCLOCK_SRC_OVERLAY_OVERLAY_H_
 
-#include "StandardTypes.h"
+#include <type_traits>
+
 #include "Arduino.h"
 #include "ClockDateTime.h"
-#include "Text.h"
-#include "Scheduler.h"
 #include "RealTimeClock.h"
-
-#include <type_traits>
+#include "Scheduler.h"
+#include "StandardTypes.h"
+#include "Text.h"
 
 /*!
  * \brief The base of the date, temperature and text overlays: when an overlay starts, how long it

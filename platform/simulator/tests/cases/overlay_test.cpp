@@ -1,8 +1,5 @@
 // The three overlays - when they may start, what they show, and how long they hold the display.
 
-#include "check.h"
-#include "cases.h"
-
 #include "Animations.h"
 #include "Clock.h"
 #include "Display.h"
@@ -11,6 +8,8 @@
 #include "Pixels.h"
 #include "RealTimeClock.h"
 #include "Temperature.h"
+#include "cases.h"
+#include "check.h"
 #include "sim/DS3231.h"
 
 /*

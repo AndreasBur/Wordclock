@@ -11,13 +11,13 @@
 #include <hardware/dma.h>
 #include <hardware/pio.h>
 
+#include <cstdio>
+#include <cstring>
+
 #include "Arduino.h"
 #include "Pixels.h"
 #include "WS2812Pio.h"
 #include "check.h"
-
-#include <cstdio>
-#include <cstring>
 
 static uint32_t captured[256];
 static size_t captured_count = 0;

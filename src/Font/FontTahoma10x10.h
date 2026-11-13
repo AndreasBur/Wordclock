@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_FONT_FONTTAHOMA10X10_H_
 #define WORDCLOCK_SRC_FONT_FONTTAHOMA10X10_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Font.h"
 #include "FontChar.h"
+#include "StandardTypes.h"
 
 #define FONT_TAHOMA_10X10_WIDTH 10u            /*!< The width of the font in columns. */
 #define FONT_TAHOMA_10X10_HEIGHT 10u           /*!< The height of the font in rows. */

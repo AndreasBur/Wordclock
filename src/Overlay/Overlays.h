@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYS_H_
 #define WORDCLOCK_SRC_OVERLAY_OVERLAYS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Overlay.h"
+#include "StandardTypes.h"
 
 #define OVERLAYS_SUPPORT_DATE STD_ON /*!< Whether the date overlay is built in. */
 /*! \brief Whether the temperature overlay is built in. */

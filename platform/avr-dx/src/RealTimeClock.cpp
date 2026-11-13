@@ -6,8 +6,9 @@
  * \brief The time the core reads, kept by the clock chip, see RealTimeClock.h.
  */
 
-#include "Arduino.h"
 #include "RealTimeClock.h"
+
+#include "Arduino.h"
 
 /*
  * Takes the time from the chip, if it has one to give. What the chip refuses to answer is

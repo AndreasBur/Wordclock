@@ -9,9 +9,10 @@
 #ifndef WORDCLOCK_SRC_PIXELS_PIXEL_H_
 #define WORDCLOCK_SRC_PIXELS_PIXEL_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include <array>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 #define PIXEL_COLOR_OFFSET_GREEN 0u /*!< The index of green in a pixel. */
 #define PIXEL_COLOR_OFFSET_RED 1u   /*!< The index of red in a pixel. */

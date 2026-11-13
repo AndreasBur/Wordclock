@@ -7,6 +7,7 @@
  */
 
 #include "sim/MessageBuilder.h"
+
 #include "sim/SerialShim.h"
 
 /*! \cond */

@@ -7,6 +7,7 @@
  */
 
 #include "sim/MessageDecoder.h"
+
 #include <wx/tokenzr.h>
 
 // Local to this file, so Doxygen leaves it out.

@@ -7,6 +7,7 @@
  */
 
 #include "Text.h"
+
 #include "Display.h"
 #include "Font.h"
 #include "FontChar.h"

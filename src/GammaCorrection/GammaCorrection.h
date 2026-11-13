@@ -47,8 +47,8 @@
 #ifndef WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_
 #define WORDCLOCK_SRC_GAMMACORRECTION_GAMMACORRECTION_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The brightness curve: maps a linear brightness setting onto an exponential curve, so that

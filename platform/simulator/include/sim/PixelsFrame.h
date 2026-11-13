@@ -16,12 +16,14 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELSFRAME_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_PIXELSFRAME_H_
 
-#include <wx/wx.h>
 #include <wx/button.h>
-#include <cmath>
+#include <wx/wx.h>
+
 #include <array>
-#include "StandardTypes.h"
+#include <cmath>
+
 #include "Pixels.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The window of the simulator: the letter grid, drawn from Pixels, and the serial port's

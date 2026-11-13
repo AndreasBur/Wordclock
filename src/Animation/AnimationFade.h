@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONFADE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONFADE_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include "Animation.h"
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The fade animation: dims the display down to dark, changes the time, and fades it back up.

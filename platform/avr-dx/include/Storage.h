@@ -18,8 +18,8 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STORAGE_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_STORAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The most bytes one Storage::Write() may hold, and one Storage::Read() may ask for.

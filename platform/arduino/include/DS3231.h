@@ -22,10 +22,10 @@
 #ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_DS3231_H_
 #define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_DS3231_H_
 
-#include "StandardTypes.h"
-#include "Bit.h"
 #include "Arduino.h"
+#include "Bit.h"
 #include "ClockDateTime.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The bus address of the chip.

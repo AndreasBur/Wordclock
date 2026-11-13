@@ -30,10 +30,10 @@
  * neighbour happens to include this header too.
  */
 // IWYU pragma: begin_exports
+#include <avr/pgmspace.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <avr/pgmspace.h>
 // IWYU pragma: end_exports
 
 /*!

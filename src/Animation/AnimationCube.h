@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCUBE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONCUBE_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
 #include "Animation.h"
+#include "Arduino.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 
 /*! \brief The left column of the smallest frame. */
 #define ANIMATION_CUBE_COLUMN_START_MAX_VALUE 4u

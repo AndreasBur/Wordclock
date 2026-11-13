@@ -9,14 +9,14 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAY_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAY_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "Pixels.h"
-#include "DisplayCharacters.h"
-#include "DisplayWords.h"
 #include "DisplayBrightness.h"
+#include "DisplayCharacters.h"
 #include "DisplayColor.h"
 #include "DisplayCurrentLimit.h"
+#include "DisplayWords.h"
+#include "Pixels.h"
+#include "StandardTypes.h"
 
 #ifndef DISPLAY_DATA_PIN
 /*!

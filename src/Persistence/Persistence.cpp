@@ -11,20 +11,20 @@
 
 #include "Persistence.h"
 
+#include <string.h>
+
 #include "Animations.h"
+#include "Bit.h"
 #include "Clock.h"
+#include "ColorCycle.h"
 #include "Display.h"
 #include "Illuminance.h"
-#include "ColorCycle.h"
 #include "NightSwitch.h"
-#include "Overlays.h"
 #include "OverlayText.h"
-#include "Text.h"
+#include "Overlays.h"
 #include "Storage.h"
-#include "Bit.h"
 #include "StringTools.h"
-
-#include <string.h>
+#include "Text.h"
 
 namespace {
 /*

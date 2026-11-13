@@ -23,9 +23,9 @@
 
 // What a browser is *sent* lives there, together with the frame rate limit and the longest
 // command a socket frame may carry - shared with the RP2350 backend rather than kept twice.
-#include "WebFrontend.h"
-
 #include <stddef.h>
+
+#include "WebFrontend.h"
 
 /*!
  * \brief The most web socket clients that are sent the lines and the frames at once.

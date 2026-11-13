@@ -16,10 +16,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCOLLAPSE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONCOLLAPSE_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The collapse animation: the letters slide to one edge of their row and close every gap,

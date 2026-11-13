@@ -7,9 +7,10 @@
  */
 
 #include "AnimationSqueeze.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationSqueeze::Init() {
   Animation::Init(StateType::kIdle);

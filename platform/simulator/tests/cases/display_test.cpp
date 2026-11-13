@@ -1,11 +1,9 @@
 // What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table.
 
-#include "check.h"
-#include "cases.h"
+#include "Display.h"
 
 #include "Animations.h"
 #include "Clock.h"
-#include "Display.h"
 #include "DisplayCharacters.h"
 #include "DisplayColor.h"
 #include "DisplayManager.h"
@@ -13,6 +11,8 @@
 #include "GammaCorrection.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
+#include "cases.h"
+#include "check.h"
 
 // Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
 // dimmed copy, and what this would check is the strip's master.

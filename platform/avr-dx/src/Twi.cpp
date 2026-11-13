@@ -6,10 +6,11 @@
  * \brief The I2C bus the clock chip and the light sensor share, see Twi.h.
  */
 
+#include "Twi.h"
+
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "Twi.h"
 
 // Local to this file, so Doxygen leaves it out.
 /*! \cond */

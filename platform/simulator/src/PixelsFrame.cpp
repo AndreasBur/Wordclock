@@ -7,11 +7,11 @@
  */
 
 #include "sim/PixelsFrame.h"
-#include "sim/Settings.h"
-#include "sim/MessageBuilder.h"
-#include "sim/SerialShim.h"
 
 #include "DisplayCharacters.h"
+#include "sim/MessageBuilder.h"
+#include "sim/SerialShim.h"
+#include "sim/Settings.h"
 
 #if defined(PIXELS) && (defined(__APPLE__) || defined(__linux__))
 #include "WordclockIcon.xpm"

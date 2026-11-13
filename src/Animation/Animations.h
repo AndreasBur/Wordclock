@@ -9,25 +9,25 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONS_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONS_H_
 
-#include "StandardTypes.h"
-#include "Bit.h"
-#include "Arduino.h"
 #include "Animation.h"
-#include "AnimationTeletype.h"
+#include "AnimationCollapse.h"
+#include "AnimationCube.h"
 #include "AnimationCursor.h"
 #include "AnimationDrop.h"
-#include "AnimationWipe.h"
-#include "AnimationSnake.h"
-#include "AnimationShift.h"
-#include "AnimationFade.h"
-#include "AnimationCube.h"
-#include "AnimationFlicker.h"
-#include "AnimationSqueeze.h"
 #include "AnimationExplodePixels.h"
 #include "AnimationExplodeWords.h"
+#include "AnimationFade.h"
+#include "AnimationFlicker.h"
 #include "AnimationMatrix.h"
 #include "AnimationRoll.h"
-#include "AnimationCollapse.h"
+#include "AnimationShift.h"
+#include "AnimationSnake.h"
+#include "AnimationSqueeze.h"
+#include "AnimationTeletype.h"
+#include "AnimationWipe.h"
+#include "Arduino.h"
+#include "Bit.h"
+#include "StandardTypes.h"
 
 #define ANIMATIONS_SUPPORT_TELETYPE STD_ON       /*!< Whether Teletype is built in. */
 #define ANIMATIONS_SUPPORT_CURSOR STD_ON         /*!< Whether Cursor is built in. */

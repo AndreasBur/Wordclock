@@ -30,9 +30,9 @@
 #ifndef WORDCLOCK_SRC_COLORCYCLE_COLORCYCLE_H_
 #define WORDCLOCK_SRC_COLORCYCLE_COLORCYCLE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Pixel.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief Scheduler ticks per step of hue, so 100 * 10 ms is a step a second and 256 of those are a

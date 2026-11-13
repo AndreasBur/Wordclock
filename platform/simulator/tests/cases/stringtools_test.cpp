@@ -1,12 +1,12 @@
 // The conversions of StringTools at the ends of their ranges.
 
-#include "check.h"
-#include "cases.h"
+#include "StringTools.h"
 
 #include <cstring>
 #include <limits>
 
-#include "StringTools.h"
+#include "cases.h"
+#include "check.h"
 
 using ResultType = StringTools::ResultType;
 

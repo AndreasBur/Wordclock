@@ -13,21 +13,21 @@
 // is what the loader would read on the next boot.
 #include <LittleFS.h>
 #include <PicoOTA.h>
-
-#include "Arduino.h"
-#include "Communication.h"
-#include "Pixels.h"
-#include "System.h"
-#include "WebInterface.h"
 #include <WiFi.h>
-#include "WordclockSerial.h"
-#include "check.h"
 
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <vector>
+
+#include "Arduino.h"
+#include "Communication.h"
+#include "Pixels.h"
+#include "System.h"
+#include "WebInterface.h"
+#include "WordclockSerial.h"
+#include "check.h"
 
 /*
  * Enough of a parse to say the document is well formed: brackets balanced and no string

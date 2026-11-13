@@ -7,9 +7,10 @@
  */
 
 #include "AnimationExplodePixels.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationExplodePixels::Init() {
   Animation::Init(StateType::kIdle);

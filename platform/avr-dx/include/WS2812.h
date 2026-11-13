@@ -33,8 +33,8 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WS2812_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The pin of PORTA that carries the strip's data line, PA3.

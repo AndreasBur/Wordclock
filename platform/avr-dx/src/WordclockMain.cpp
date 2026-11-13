@@ -6,12 +6,13 @@
  * \brief The firmware, brought up and ticked, see WordclockMain.h.
  */
 
+#include "WordclockMain.h"
+
 #include "Arduino.h"
 #include "Display.h"
 #include "Persistence.h"
 #include "PowerSwitch.h"
 #include "RealTimeClock.h"
-#include "WordclockMain.h"
 
 /*
  * An instance method, though it reads no member: main() brings the firmware up through

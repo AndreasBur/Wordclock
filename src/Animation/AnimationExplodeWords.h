@@ -9,11 +9,11 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEWORDS_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEWORDS_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
 #include "Display.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The explode-words animation: the two halves of AnimationExplodePixels, but word by word:

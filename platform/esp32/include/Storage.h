@@ -19,8 +19,8 @@
 #ifndef WORDCLOCK_PLATFORM_ESP32_INCLUDE_STORAGE_H_
 #define WORDCLOCK_PLATFORM_ESP32_INCLUDE_STORAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /* Both are limited to 15 characters by NVS. */
 /*! \brief The NVS namespace the blob is kept in. */

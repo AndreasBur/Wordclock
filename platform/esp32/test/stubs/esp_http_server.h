@@ -2,10 +2,11 @@
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ESP_HTTP_SERVER_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
-#include "esp_err.h"
+#include <stdint.h>
 #include <sys/types.h>
+
+#include "esp_err.h"
 typedef struct httpd_t* httpd_handle_t;
 typedef enum { HTTP_GET = 1, HTTP_POST = 2 } httpd_method_t;
 typedef struct httpd_req {

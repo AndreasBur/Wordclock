@@ -6,11 +6,12 @@
  * \brief Where the settings survive a restart, in the on-chip EEPROM, see Storage.h.
  */
 
+#include "Storage.h"
+
 #include <avr/eeprom.h>
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "Storage.h"
 
 namespace {
 /* The length byte, and the blob behind it. */

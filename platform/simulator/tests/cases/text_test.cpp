@@ -1,11 +1,11 @@
 // Which characters the text overlay can draw, through the entry point that refuses the rest.
 
-#include "check.h"
-#include "cases.h"
+#include "Text.h"
 
 #include "Display.h"
 #include "Pixels.h"
-#include "Text.h"
+#include "cases.h"
+#include "check.h"
 
 /*
  * Which characters the text overlay can draw, checked through the one entry point that

@@ -13,8 +13,8 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_BH1750_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_BH1750_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The bus address of the sensor; not used, as the simulator opens no bus. */
 #define BH1750_I2C_ADDR 0x76u

@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_OVERLAY_OVERLAYTEXT_H_
 #define WORDCLOCK_SRC_OVERLAY_OVERLAYTEXT_H_
 
-#include "StandardTypes.h"
 #include "Overlay.h"
+#include "StandardTypes.h"
 #include "StringTools.h"
 
 /*!

@@ -9,12 +9,12 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEPIXELS_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONEXPLODEPIXELS_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
-#include "DisplayPixels.h"
 #include "Display.h"
+#include "DisplayPixels.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The explode-pixels animation: the previous time is pulled into the centre, all of its

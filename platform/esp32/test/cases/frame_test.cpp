@@ -5,12 +5,12 @@
  */
 #include <driver/rmt_tx.h>
 
+#include <cstdio>
+#include <cstring>
+
 #include "Arduino.h"
 #include "Pixels.h"
 #include "check.h"
-
-#include <cstdio>
-#include <cstring>
 
 static byte captured[512];
 static size_t captured_size = 0;

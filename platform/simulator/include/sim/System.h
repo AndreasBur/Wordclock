@@ -20,8 +20,8 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SYSTEM_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_SYSTEM_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The length of a buffer for the network address, its terminator included. */
 #define SYSTEM_ADDRESS_STRING_LENGTH 16u

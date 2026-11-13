@@ -7,9 +7,10 @@
  */
 
 #include "AnimationRoll.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationRoll::Init() {
   Animation::Init(StateType::kIdle);

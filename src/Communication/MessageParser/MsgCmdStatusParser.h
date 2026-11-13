@@ -20,10 +20,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDSTATUSPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDSTATUSPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
-#include "MsgParameterParser.h"
 #include "Illuminance.h"
+#include "MsgParameterParser.h"
+#include "StandardTypes.h"
 #include "System.h"
 #include "Temperature.h"
 #include "Uptime.h"

@@ -1,14 +1,13 @@
 // What an accessor answers for an index that is not there, now that each one has a single form.
 
-#include "check.h"
-#include "cases.h"
-
 #include "Display.h"
 #include "DisplayCharacters.h"
 #include "DisplayWords.h"
 #include "FontChar.h"
 #include "FontSprite5x8.h"
 #include "Pixels.h"
+#include "cases.h"
+#include "check.h"
 
 /*
  * Every reader used to come in two forms, and the second one trusted its caller: it read

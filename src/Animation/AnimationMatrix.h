@@ -19,11 +19,11 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONMATRIX_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONMATRIX_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
 #include "Display.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The matrix animation: falling code rain in the display color; the new time stays behind as

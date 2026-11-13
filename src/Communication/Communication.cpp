@@ -7,8 +7,9 @@
  */
 
 #include "Communication.h"
-#include "StandardTypes.h"
+
 #include "MsgCmdParser.h"
+#include "StandardTypes.h"
 
 void Communication::Task() {
   if (IsMessageComplete()) {

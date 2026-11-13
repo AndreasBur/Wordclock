@@ -13,9 +13,9 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKMAIN_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_WORDCLOCKMAIN_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "Scheduler.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The firmware as the AVR runs it: brought up once by Init(), then ticked by Task().

@@ -16,8 +16,8 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_BH1750_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_BH1750_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /* The datasheet's two addresses, selected by the ADDR pin: low is 0x23, high is 0x5C. */
 /*! \brief The bus address of the sensor with its ADDR pin low, the one the driver talks to. */

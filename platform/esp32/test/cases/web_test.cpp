@@ -1,16 +1,9 @@
 // Drives the registered handlers the way the server reaches them - through the
 // registration call - so WebInterface's own wiring is covered rather than bypassed.
-#include <esp_http_server.h>
 #include <ESPmDNS.h>
-#include "Arduino.h"
-#include "Communication.h"
-#include "Pixels.h"
-#include "System.h"
-#include "Update.h"
-#include "WebInterface.h"
-#include "WordclockSerial.h"
 #include <WiFi.h>
-#include "check.h"
+#include <esp_http_server.h>
+
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -19,6 +12,15 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include "Arduino.h"
+#include "Communication.h"
+#include "Pixels.h"
+#include "System.h"
+#include "Update.h"
+#include "WebInterface.h"
+#include "WordclockSerial.h"
+#include "check.h"
 
 /*
  * A registered route as the server keeps it: the handler and the context handed back with

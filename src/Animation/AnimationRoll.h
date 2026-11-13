@@ -18,11 +18,11 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONROLL_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONROLL_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 #include "Transformation.h"
-#include "Animation.h"
 
 /*!
  * \brief The roll animation: the previous time rolls out while the new one rolls in behind it,

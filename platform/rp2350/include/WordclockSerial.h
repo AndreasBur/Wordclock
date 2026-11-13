@@ -25,11 +25,12 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKSERIAL_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKSERIAL_H_
 
-#include "StandardTypes.h"
-
-#include <atomic>
 #include <stddef.h>
 #include <stdint.h>
+
+#include <atomic>
+
+#include "StandardTypes.h"
 
 /*
  * Only ever used as a pointer, so the declaration is enough - and it has to be made here

@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEMPERATUREPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDOVERLAYTEMPERATUREPARSER_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgCmdOverlayParser.h"
 #include "Overlays.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The parser of command 6, the temperature overlay command: sets when the temperature

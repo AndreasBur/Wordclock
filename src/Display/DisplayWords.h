@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_DISPLAY_DISPLAYWORDS_H_
 #define WORDCLOCK_SRC_DISPLAY_DISPLAYWORDS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "DisplayWord.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The words of the clock: where each word stands on the letter grid, by id.

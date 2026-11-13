@@ -7,6 +7,7 @@
  */
 
 #include "NightSwitch.h"
+
 #include "Display.h"
 #include "Power.h"
 #include "RealTimeClock.h"

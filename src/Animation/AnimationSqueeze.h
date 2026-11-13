@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONSQUEEZE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONSQUEEZE_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The squeeze animation: the words of the previous time are eaten away letter by letter,

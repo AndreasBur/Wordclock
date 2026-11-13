@@ -2,8 +2,9 @@
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_DRIVER_RMT_TX_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include "esp_err.h"
 typedef int gpio_num_t;
 typedef enum { RMT_CLK_SRC_DEFAULT = 0 } rmt_clock_source_t;

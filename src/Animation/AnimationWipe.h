@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONWIPE_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONWIPE_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The wipe animation: a diagonal line sweeps across the display and uncovers the new

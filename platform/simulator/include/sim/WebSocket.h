@@ -12,11 +12,12 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBSOCKET_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBSOCKET_H_
 
-#include "StandardTypes.h"
-
 #include <stddef.h>
 #include <stdint.h>
+
 #include <string>
+
+#include "StandardTypes.h"
 
 /*!
  * \brief The web socket protocol of RFC 6455, as far as the two pages need it: the handshake, and

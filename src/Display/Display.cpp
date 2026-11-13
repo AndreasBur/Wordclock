@@ -7,6 +7,7 @@
  */
 
 #include "Display.h"
+
 #include "Bit.h"
 #include "DisplayWord.h"
 #include "Pixel.h"

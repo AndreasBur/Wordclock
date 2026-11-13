@@ -7,8 +7,9 @@
  */
 
 #include "AnimationFade.h"
-#include "Display.h"
+
 #include "Clock.h"
+#include "Display.h"
 
 void AnimationFade::Init() {
   Animation::Init(StateType::kIdle);

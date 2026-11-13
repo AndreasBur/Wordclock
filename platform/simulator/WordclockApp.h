@@ -11,6 +11,7 @@
 
 #include <wx/app.h>
 #include <wx/timer.h>
+
 #include "WordclockMain.h"
 
 /*!

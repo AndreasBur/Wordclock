@@ -7,9 +7,10 @@
  */
 
 #include "AnimationWipe.h"
+
+#include "Clock.h"
 #include "Display.h"
 #include "DisplayWords.h"
-#include "Clock.h"
 
 void AnimationWipe::Init() {
   Animation::Init(StateType::kIdle);

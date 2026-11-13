@@ -2,10 +2,10 @@
  * How this backend opens the bus the BH1750 and the DS3231 share: one Wire.begin() with the pins
  * and the clock, whose answer is the answer - a refused bus is not open, so the drivers try again.
  */
+#include <Wire.h>
+
 #include "I2cBus.h"
 #include "check.h"
-
-#include <Wire.h>
 
 namespace {
 constexpr byte kPinSda{8u};

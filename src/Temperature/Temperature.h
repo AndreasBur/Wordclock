@@ -17,9 +17,9 @@
 #ifndef WORDCLOCK_SRC_TEMPERATURE_TEMPERATURE_H_
 #define WORDCLOCK_SRC_TEMPERATURE_TEMPERATURE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "DS3231.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The temperature: the last reading of the DS3231, as a number and as text.

@@ -8,8 +8,9 @@
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include <string>
 #include <vector>
 typedef uint8_t byte;

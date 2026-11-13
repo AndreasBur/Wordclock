@@ -16,8 +16,8 @@
 #ifndef WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_SYSTEM_H_
 #define WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_SYSTEM_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 // The buffer sizes the status command hands in. Kept identical to the other backends, so
 // the command's own buffers do not have to change with the platform.

@@ -13,18 +13,18 @@
 #include "Communication.h"
 #include "DisplayCharacters.h"
 #include "MessageCatalog.h"
-#include "Pixels.h"
 #include "Pixel.h"
+#include "Pixels.h"
 /*
  * The build generates this from web/. Included here and nowhere else: its arrays have
  * internal linkage, so every further includer would be a second copy of both pages in
  * flash.
  */
-#include "WebPage.h"
-#include "WordclockSerial.h"
-
 #include <stdio.h>
 #include <string.h>
+
+#include "WebPage.h"
+#include "WordclockSerial.h"
 
 namespace {
 /*

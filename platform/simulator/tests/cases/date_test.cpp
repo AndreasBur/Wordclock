@@ -1,9 +1,8 @@
 // The weekday of every date the clock can hold.
 
-#include "check.h"
-#include "cases.h"
-
 #include "ClockDate.h"
+#include "cases.h"
+#include "check.h"
 
 /*
  * Every date from 1 January 2000 to 31 December 2099, against a count that knows nothing of the

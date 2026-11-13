@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_ERRORMESSAGE_H_
 #define WORDCLOCK_SRC_COMMUNICATION_ERRORMESSAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "MsgParameter.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The error answer: writes `Error=` and an error code to Serial, alone, with the short name

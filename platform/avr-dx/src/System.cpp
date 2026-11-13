@@ -6,10 +6,11 @@
  * \brief The machine the clock runs on, see System.h.
  */
 
+#include "System.h"
+
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "System.h"
 
 namespace {
 /*

@@ -9,8 +9,8 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGE_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 #define MESSAGE_LENGTH 50u /*!< The size of a line's buffer, its terminator included. */
 

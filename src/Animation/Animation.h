@@ -9,9 +9,9 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATION_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATION_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "ClockWords.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The base of every animation: its state, and the helpers the animations share.

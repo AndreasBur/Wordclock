@@ -16,9 +16,9 @@
 #ifndef WORDCLOCK_SRC_ILLUMINANCE_ILLUMINANCE_H_
 #define WORDCLOCK_SRC_ILLUMINANCE_ILLUMINANCE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
 #include "BH1750.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The ambient light: the last reading of the BH1750, and the calibration the display's

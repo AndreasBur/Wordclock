@@ -1,13 +1,13 @@
 // The wheel, what it leaves alone, and what the supply is told about it.
 
-#include "check.h"
-#include "cases.h"
+#include "ColorCycle.h"
 
 #include "Clock.h"
-#include "ColorCycle.h"
 #include "Display.h"
 #include "DisplayCurrentLimit.h"
 #include "Pixels.h"
+#include "cases.h"
+#include "check.h"
 
 namespace {
 /*
