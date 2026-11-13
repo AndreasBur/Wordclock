@@ -13,14 +13,14 @@
 # Run over the simulator's compile database, which covers the whole firmware core:
 #
 #   cmake -S . -B build -G Ninja -DPLATFORM=simulator -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-#   run-clang-tidy -p build -quiet 'firmware/|platform/simulator/src'
+#   run-clang-tidy -p build -quiet "^$PWD/src/|platform/simulator/src"
 #
 # and over each hardware backend's, through tools/cross-clang-tidy.py - the same checks, with
 # the database rewritten so that clang can read what a GCC cross compiler was told:
 #
-#   tools/cross-clang-tidy.py build-avr       'firmware/|platform/avr-dx/src'
-#   tools/cross-clang-tidy.py platform/esp32  'firmware/|platform/esp32/src|platform/arduino/src'
-#   tools/cross-clang-tidy.py platform/rp2350 'firmware/|platform/rp2350/src|platform/arduino/src'
+#   tools/cross-clang-tidy.py build-avr       "^$PWD/src/|platform/avr-dx/src"
+#   tools/cross-clang-tidy.py platform/esp32  "^$PWD/src/|platform/esp32/src|platform/arduino/src"
+#   tools/cross-clang-tidy.py platform/rp2350 "^$PWD/src/|platform/rp2350/src|platform/arduino/src"
 #
 Checks: >
   -*,
@@ -127,7 +127,7 @@ Checks: >
 # fetches sit inside platform/<backend>/.pio, which is why that is excluded by name. The
 # frameworks sit in ~/.platformio, and the SDK's pico/platform/ matches even with the slash:
 # the naming check was the first to report there, on __isr and its neighbours.
-HeaderFilterRegex: '/(firmware|platform)/'
+HeaderFilterRegex: '/(src|platform)/'
 ExcludeHeaderFilterRegex: '/\.pio/|/\.platformio/'
 WarningsAsErrors: '*'
 

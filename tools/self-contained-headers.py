@@ -17,11 +17,11 @@ targets do - an #if branch only the AVR selects is only compiled for the AVR - a
 no translation of GCC's flags, since nothing but GCC ever reads them.
 
 The core is checked by every target and each backend's headers by its own, so a run names
-the backend's include directory beside firmware/inc:
+the backend's include directory beside src:
 
-    tools/self-contained-headers.py build firmware/inc platform/simulator/include
-    tools/self-contained-headers.py build-avr firmware/inc platform/avr-dx/include
-    tools/self-contained-headers.py platform/esp32 firmware/inc platform/esp32/include platform/arduino/include
+    tools/self-contained-headers.py build src platform/simulator/include
+    tools/self-contained-headers.py build-avr src platform/avr-dx/include
+    tools/self-contained-headers.py platform/esp32 src platform/esp32/include platform/arduino/include
 """
 
 import argparse
@@ -47,10 +47,12 @@ def arguments_of(entry):
 
 
 def firmware_entry(database):
-    """The flags of a firmware source. They are the same for every source under firmware/src:
+    """The flags of a firmware source. They are the same for every source under src/:
     a target compiles its core with one set of defines and include directories."""
     for entry in database:
-        if '/firmware/src/' in entry['file'] and entry['file'].endswith('.cpp'):
+        # By its whole path: '/src/' alone would take a source of platform/<backend>/src.
+        file = Path(entry['directory'], entry['file']).resolve()
+        if file.is_relative_to(ROOT / 'src') and file.suffix == '.cpp':
             return entry
     raise SystemExit('self-contained-headers.py: no firmware source in the database')
 
@@ -86,8 +88,8 @@ def check(header, arguments, directory, scratch):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('build', type=Path, help='the directory holding compile_commands.json')
-    parser.add_argument('headers', nargs='*', type=Path, default=[ROOT / 'firmware' / 'inc'],
-                        help='the directories whose headers are checked (default: firmware/inc)')
+    parser.add_argument('headers', nargs='*', type=Path, default=[ROOT / 'src'],
+                        help='the directories whose headers are checked (default: src)')
     arguments = parser.parse_args()
 
     database = json.loads((arguments.build / 'compile_commands.json').read_text())

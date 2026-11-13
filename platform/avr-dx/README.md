@@ -1,7 +1,7 @@
 # AVR Dx platform (AVR128DA48)
 
 The on-device backend the xmega project became. It runs the same
-[`../../firmware/`](../../firmware/) core as the simulator and the ESP32, on an
+[`../../src/`](../../src/) core as the simulator and the ESP32, on an
 AVR128DA48, and drives the strip the way the xmega did: the WS2812 pulse widths are
 made in hardware, not counted in software.
 
@@ -10,7 +10,7 @@ reading whatever backend you are working on.
 
 ## How the platform seam works
 
-The firmware core in [`../../firmware/`](../../firmware/) is platform-agnostic. It
+The firmware core in [`../../src/`](../../src/) is platform-agnostic. It
 reaches the hardware **only through header names**, resolved via the compiler's
 include path:
 
@@ -58,7 +58,7 @@ through three backends with only its unchecked half.
 | `Storage.h` | `Storage` singleton with a `kCapacity` and `Read` / `Write` / `Clear` over one byte blob; the core owns the format inside it, so this only has to store what it is given and refuse a blob of another length | On-chip EEPROM, length byte in front of the blob |
 | `System.h` | `System` singleton: `GetFreeMemoryInKibibytes`, `GetNetworkAddress`, `GetLinkQuality` for the status command, and `Restart` / `ResynchroniseTime` / `ReconnectNetwork` for the procedures. Every one of them may answer `kENotOk`, and a backend that cannot do a thing has to — a clock with no network has no address, and the status command sends an empty field rather than a zero. `Restart()` only asks; the application carries it out at the end of the tick, after the answer has gone out | Free memory is real; everything about a network answers `kENotOk`. The uptime is not here: the core counts it in `Uptime`, off the scheduler's tick, because a backend dividing its own millisecond counter down is what used to wrap |
 | `PowerSwitch.h` | `PowerSwitch` singleton: `IsFitted` as a compile-time answer, `IsSupplyOn`, `Init`, `SwitchSupplyOn` / `SwitchSupplyOff`. Three things are the contract rather than the port. `IsFitted()` may be false — the switch is optional hardware, and a backend that says so keeps the two procedures from pretending. `IsSupplyOn()` must then answer **true** anyway, because a board without the switch has the high side bridged and its strip cannot be unpowered. And `Init()` has to switch the supply *on*: the reset leaves it off, and it must run before `Pixels::Init()` claims the data line | `PORTD` through `DIRSET`/`OUTSET`, and declared not fitted until a pin is confirmed |
-| `WebTransport.h` + `WordclockSerial.h` | **Only where `WEB_FRONTEND_SUPPORT` is on**, which is the two backends with a radio and the simulator. `WebResponseBody` with `Write` / `Finish` for one route's answer, and a `WebTransport` singleton with `IsListening` / `HasClients` / `SendText` / `SendBinary`; `WordclockSerial` with `Inject` and `SetLineSink`, which is how a browser's command reaches the parser and how every answer gets back out. What is *sent* is not here: the catalog, the letter grid, the asset table, the UTF-8 widening, the frame rate limit and the comparison against the last frame are [`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h) and are written once. `WebTransport.h` must name no framework type by value, because the firmware includes it and cannot promise the include order a backend's `Arduino.h` needs | Not provided — this part has no radio, and the switch stays off |
+| `WebTransport.h` + `WordclockSerial.h` | **Only where `WEB_FRONTEND_SUPPORT` is on**, which is the two backends with a radio and the simulator. `WebResponseBody` with `Write` / `Finish` for one route's answer, and a `WebTransport` singleton with `IsListening` / `HasClients` / `SendText` / `SendBinary`; `WordclockSerial` with `Inject` and `SetLineSink`, which is how a browser's command reaches the parser and how every answer gets back out. What is *sent* is not here: the catalog, the letter grid, the asset table, the UTF-8 widening, the frame rate limit and the comparison against the last frame are [`WebFrontend`](../../src/Communication/WebFrontend/WebFrontend.h) and are written once. `WebTransport.h` must name no framework type by value, because the firmware includes it and cannot promise the include order a backend's `Arduino.h` needs | Not provided — this part has no radio, and the switch stays off |
 | app entry point | Equivalent of the simulator's `WordclockApp` / `WordclockMain`: initialise, restore the settings with `Persistence::Load()`, then repeatedly tick `Scheduler::Task()` and update the `RealTimeClock` | `main()` in [`src/main.cpp`](src/main.cpp) |
 
 The tick has to come every `Scheduler::GetTaskIntervalMs()` milliseconds: every

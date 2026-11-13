@@ -10,7 +10,7 @@
  * backends call the port. Here the port is SerialShim, which the window already owns.
  *
  * A header of its own rather than SerialShim growing the name, because the seam belongs to whoever
- * reads it: firmware/inc/Communication/WebFrontend includes "WordclockSerial.h" and must not have
+ * reads it: src/Communication/WebFrontend includes "WordclockSerial.h" and must not have
  * to know that this backend spells its port differently.
  */
 

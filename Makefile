@@ -111,13 +111,13 @@ tidy: ## clang-tidy and the standalone headers: the core, the simulator and the 
 # has run - and clang-tidy reports that as the file being missing, which reads like a bad include
 # path rather than a build step that was skipped. It is a python script and costs no build time.
 	cmake --build --preset $(PRESET)simulator --target WordclockWebPage
-	run-clang-tidy -p build -quiet -j "$$(nproc)" 'firmware/|platform/simulator/src'
+	run-clang-tidy -p build -quiet -j "$$(nproc)" '^$(CURDIR)/src/|platform/simulator/src'
 # Every header compiled as the only include of an empty file, by the compiler and with the flags
 # the database records. A header that leans on what its includers happen to include first builds
 # everywhere until one of them stops - tools/self-contained-headers.py says why that is not a
 # finding any analyser above can make. Each backend's target runs it again with its own compiler,
 # because the #if branches a header takes are the target's.
-	python3 tools/self-contained-headers.py build firmware/inc platform/simulator/include
+	python3 tools/self-contained-headers.py build src platform/simulator/include
 # The names are the same everywhere, the tests and the window included, which the run above
 # leaves out: what the other checks would say about test scaffolding is not worth answering, but
 # a test written in the old names reads as the old code. Seconds, not minutes - one check.
@@ -137,28 +137,28 @@ tidy: ## clang-tidy and the standalone headers: the core, the simulator and the 
 # cross-compiling clang-tidy needs installed anyway.
 tidy-avr: ## clang-tidy and the standalone headers for the AVR backend
 	cmake --preset $(PRESET)avr
-	python3 tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
-	python3 tools/self-contained-headers.py build-avr firmware/inc platform/avr-dx/include
+	python3 tools/cross-clang-tidy.py build-avr '^$(CURDIR)/src/|platform/avr-dx/src'
+	python3 tools/self-contained-headers.py build-avr src platform/avr-dx/include
 
 # compiledb rather than a build: it fetches the platform, runs the pre-scripts - which is what
 # writes WebPage.h - and writes the database, and compiles nothing. The headers by the board's own
 # compiler out of the PlatformIO packages.
 tidy-esp32: ## clang-tidy and the standalone headers for the ESP32 backend
 	$(UV_RUN) pio run -d platform/esp32 -t compiledb
-	python3 tools/cross-clang-tidy.py platform/esp32 'firmware/|platform/esp32/src|platform/arduino/src'
-	python3 tools/self-contained-headers.py platform/esp32 firmware/inc platform/esp32/include \
+	python3 tools/cross-clang-tidy.py platform/esp32 '^$(CURDIR)/src/|platform/esp32/src|platform/arduino/src'
+	python3 tools/self-contained-headers.py platform/esp32 src platform/esp32/include \
 	    platform/arduino/include
 
 tidy-rp2350: ## clang-tidy and the standalone headers for the RP2350 backend
 	$(UV_RUN) pio run -d platform/rp2350 -t compiledb
-	python3 tools/cross-clang-tidy.py platform/rp2350 'firmware/|platform/rp2350/src|platform/arduino/src'
-	python3 tools/self-contained-headers.py platform/rp2350 firmware/inc platform/rp2350/include \
+	python3 tools/cross-clang-tidy.py platform/rp2350 '^$(CURDIR)/src/|platform/rp2350/src|platform/arduino/src'
+	python3 tools/self-contained-headers.py platform/rp2350 src platform/rp2350/include \
 	    platform/arduino/include
 
 # No cmake, no wxWidgets, no compile database: cppcheck is given the include directories and
 # works out the configurations itself, which for the firmware core is enough - it reports the
 # same findings with and without compile_commands.json, and this way it still answers when the
-# simulator does not build. firmware/ only, unlike tidy: without wxWidgets' own headers cppcheck
+# simulator does not build. src/ only, unlike tidy: without wxWidgets' own headers cppcheck
 # stops at DECLARE_EVENT_TABLE in the simulator's window class and asks to be told what the macro
 # is; the backend is the half clang-tidy covers through the compile database, and this is the
 # half that needs no toolchain to read.
@@ -173,11 +173,11 @@ tidy-rp2350: ## clang-tidy and the standalone headers for the RP2350 backend
 #
 # The include directories as an array, so each is one argument - a name with a blank included.
 cppcheck: ## cppcheck over the firmware core
-	mapfile -t includes < <(find firmware/inc -type d | sed 's/^/-I/'); \
+	mapfile -t includes < <(find src -type d | sed 's/^/-I/'); \
 	cppcheck --enable=warning,portability --check-level=exhaustive --std=c++17 \
 	    --inline-suppr --suppressions-list=.cppcheck-suppressions --error-exitcode=1 --quiet \
 	    "$${includes[@]}" -Iplatform/simulator/include/sim -Iplatform/simulator/include \
-	    firmware/src firmware/inc
+	    src
 
 # shellcheck over every .sh, ruff over every .py with the checks pyproject.toml selects, and
 # actionlint over .github/workflows with what .github/actionlint.yaml adds - which runs
@@ -187,7 +187,7 @@ scripts: ## shellcheck, ruff and actionlint over the scripts and the workflows
 	$(UV_RUN) ruff check
 	$(UV_RUN) actionlint
 
-# Once per backend, over firmware/ and that backend: a \param that names no parameter, a command
+# Once per backend, over src/ and that backend: a \param that names no parameter, a command
 # Doxygen does not know, an entity without a block or a block that leaves something out.
 # docs/documentation.md says what a block holds. Then the indentation of a line that continues a
 # command, which goes under the command's text.

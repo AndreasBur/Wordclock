@@ -46,9 +46,9 @@ jobs:
       - name: Compare
         run: |
           Tag="${GITHUB_REF_NAME#v}"
-          Firmware=$(sed -n 's/^# *define WORDCLOCK_VERSION *"\(.*\)"$/\1/p' firmware/inc/Version/Version.h)
+          Firmware=$(sed -n 's/^# *define WORDCLOCK_VERSION *"\(.*\)"$/\1/p' src/Version/Version.h)
           if [ "$Tag" != "$Firmware" ]; then
-            echo "::error::The tag says $Tag, firmware/inc/Version/Version.h says ${Firmware:-nothing}"
+            echo "::error::The tag says $Tag, src/Version/Version.h says ${Firmware:-nothing}"
             exit 1
           fi
           echo "Version $Firmware"

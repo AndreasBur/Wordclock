@@ -94,7 +94,7 @@ The two pages are the shared ones, described in
 [`../../web/README.md`](../../web/README.md) - the panel at `/`, the console at
 `/console` - and so is most of what is sent over them: the command catalog, the letter grid
 and the frame broadcast are
-[`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h) in the firmware,
+[`WebFrontend`](../../src/Communication/WebFrontend/WebFrontend.h) in the firmware,
 reached through the `WebTransport.h` this backend provides. What is left in `WebInterface.cpp`
 is the server, the password and the update.
 

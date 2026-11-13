@@ -6,7 +6,7 @@ and communication logic can be developed and debugged on a PC without flashing
 hardware.
 
 The simulator compiles the **shared firmware core** from
-[firmware/](../../firmware/) and only supplies the hardware layer: the Arduino
+[src/](../../src/) and only supplies the hardware layer: the Arduino
 core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 (`Serial`, `PROGMEM`, `pgm_read_byte`, `itoa`, …), the pixel buffer lives in
 [src/Pixels.cpp](src/Pixels.cpp) and the matrix is drawn by
@@ -17,7 +17,7 @@ core is emulated by a small shim in [include/Arduino.h](include/Arduino.h)
 
 Running it opens `http://localhost:8080/` beside the window: the panel at `/` and the console
 at `/console`, the same two pages a clock hands out, answered out of the same
-[`WebFrontend`](../../firmware/inc/Communication/WebFrontend/WebFrontend.h). What used to need
+[`WebFrontend`](../../src/Communication/WebFrontend/WebFrontend.h). What used to need
 a board or a host process built out of the ESP32 backend now needs neither.
 
 The two views are worth having together rather than apart, because each shows what the other
@@ -161,7 +161,7 @@ the same words.
 ## Layout
 
 ```
-firmware/                 shared, platform-agnostic core (../../firmware)
+src/                      shared, platform-agnostic core (../../src)
 platform/simulator/
 ├── include/              simulator-only HAL headers
 │   ├── sim/              simulator implementations

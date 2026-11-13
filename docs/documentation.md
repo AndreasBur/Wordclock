@@ -2,7 +2,7 @@
 
 How the code of Wordclock is documented: which comments are Doxygen blocks, what each block says,
 and how the style is checked. The style is the one of Utl and MaxMatrix, so that every project
-documents alike. It holds for `firmware/` and `platform/`; the tests keep a plain comment at the
+documents alike. It holds for `src/` and `platform/`; the tests keep a plain comment at the
 top and one above each test.
 
 The blocks are read in the code and checked in CI; no reference is published from them. Wordclock
@@ -121,7 +121,7 @@ the paragraphs after the brief.
 
 ### A file
 
-Every file of `firmware/` and `platform/` outside the tests starts with the licence, as `//` lines
+Every file of `src/` and `platform/` outside the tests starts with the licence, as `//` lines
 that tools such as REUSE read, and then a block for the file:
 
 ```cpp

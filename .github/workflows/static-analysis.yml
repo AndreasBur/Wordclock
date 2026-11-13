@@ -20,7 +20,7 @@
 #
 # And every header is compiled on its own, once per build, so that none of them compiles only
 # because of what its includers brought along. The tests are read too: the coverage job reports
-# which lines of firmware/ none of them runs, and the sanitizers job runs them all again under
+# which lines of src/ none of them runs, and the sanitizers job runs them all again under
 # AddressSanitizer and UndefinedBehaviorSanitizer.
 # clang-tidy reads four builds, not one. The simulator's covers the firmware core as the
 # host compiler sees it; each hardware backend is only ever compiled by its own cross
@@ -143,7 +143,7 @@ jobs:
       - name: Analyse
         run: make cppcheck
 
-  # Which lines of firmware/ the tests run, as a table in the job's summary - the least covered
+  # Which lines of src/ the tests run, as a table in the job's summary - the least covered
   # files first, because the gaps are what it is for. Read rather than enforced: there is no
   # threshold, so a pull request is never held up by a number, and the job fails only when a
   # test does. All three suites at once, because each alone reads as a gap where another

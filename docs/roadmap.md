@@ -87,7 +87,7 @@ whose clock is unreachable has nothing to show.
 
 **A second language in the word tables.** The mechanism is half here already: four
 German wordings switch at runtime through `Clock::ModeType`
-([Clock.h](../firmware/inc/Clock/Clock.h)), so "several ways to say the time, chosen
+([Clock.h](../src/Clock/Clock.h)), so "several ways to say the time, chosen
 while running" is a solved problem. ESPWortuhr's shape is the one to copy — one header
 per layout with a generated file collecting them, chosen from a dropdown.
 
@@ -118,20 +118,20 @@ it happened in.
 
 | | Where the reasoning lives |
 |---|---|
-| **RPCs 22 to 30** — clock refresh, animation start and abort, the three overlays on demand, overlay abort, save and reset the settings | the RPC table in [serial-commands.md](serial-commands.md); the per-module `ResetToDefaults()` in [Animations.h](../firmware/inc/Animation/Animations.h) and its siblings |
-| **The temperature overlay**, reading a DS3231 on the bus the light sensor already runs | [OverlayTemperature.h](../firmware/inc/Overlay/OverlayTemperature.h), [Temperature.h](../firmware/inc/Temperature/Temperature.h) |
+| **RPCs 22 to 30** — clock refresh, animation start and abort, the three overlays on demand, overlay abort, save and reset the settings | the RPC table in [serial-commands.md](serial-commands.md); the per-module `ResetToDefaults()` in [Animations.h](../src/Animation/Animations.h) and its siblings |
+| **The temperature overlay**, reading a DS3231 on the bus the light sensor already runs | [OverlayTemperature.h](../src/Overlay/OverlayTemperature.h), [Temperature.h](../src/Temperature/Temperature.h) |
 | **The degree sign**, appended by hand as glyph 102 and sent to the display only | *Adding a single glyph* in [fonts.md](fonts.md) |
-| **Status command 12** — version, uptime, illuminance, temperature, address, link quality, free memory | the `read_only` flag in [MessageCatalog.h](../firmware/inc/Communication/MessageCatalog.h), [Version.h](../firmware/inc/Version/Version.h) |
-| **RPCs 34 to 40** for a control with no display — animation next and previous, clock mode next, three toggles, colour reset | [Animations.h](../firmware/inc/Animation/Animations.h), [DisplayManager.h](../firmware/inc/DisplayManager/DisplayManager.h) |
+| **Status command 12** — version, uptime, illuminance, temperature, address, link quality, free memory | the `read_only` flag in [MessageCatalog.h](../src/Communication/MessageCatalog.h), [Version.h](../src/Version/Version.h) |
+| **RPCs 34 to 40** for a control with no display — animation next and previous, clock mode next, three toggles, colour reset | [Animations.h](../src/Animation/Animations.h), [DisplayManager.h](../src/DisplayManager/DisplayManager.h) |
 | **Platform hooks** — `System.h`, procedures 31 to 33, and the four fields only a backend knows | the [platform contract](../platform/avr-dx/README.md) |
-| **Cutting the strip's supply**, ids 20 and 21 against the WC MiniDev Shield v5 | [Power.h](../firmware/inc/Power/Power.h), and the hardware end in the [ESP32 notes](../platform/esp32/README.md#switching-the-strips-supply) |
-| **The night switch**, which is what turns that into something a clock uses on its own | [NightSwitch.h](../firmware/inc/NightSwitch/NightSwitch.h) |
+| **Cutting the strip's supply**, ids 20 and 21 against the WC MiniDev Shield v5 | [Power.h](../src/Power/Power.h), and the hardware end in the [ESP32 notes](../platform/esp32/README.md#switching-the-strips-supply) |
+| **The night switch**, which is what turns that into something a clock uses on its own | [NightSwitch.h](../src/NightSwitch/NightSwitch.h) |
 | **WiFi provisioning** — credentials in NVS, command 13, an access point when there are none | [web/README.md](../web/README.md) |
 | **The panel and the console** — six task pages at `/`, the generated command groups at `/console` | [web/README.md](../web/README.md) |
 | **OTA update** on both networked backends, `POST /update`, and command 16's password in front of every route | the two backends' READMEs |
 | **An RTC with a battery**, keeping UTC and never overwriting a clock SNTP has set | [RealTimeClock.cpp](../platform/arduino/src/RealTimeClock.cpp) |
-| **Colour animations** — a hue cycle that is a level of its own rather than a write to the colour | [ColorCycle.h](../firmware/inc/ColorCycle/ColorCycle.h) |
-| **The overlay configuration is stored**, all three slots, the text as a fixed field | [Persistence.h](../firmware/inc/Persistence/Persistence.h) |
+| **Colour animations** — a hue cycle that is a level of its own rather than a write to the colour | [ColorCycle.h](../src/ColorCycle/ColorCycle.h) |
+| **The overlay configuration is stored**, all three slots, the text as a fixed field | [Persistence.h](../src/Persistence/Persistence.h) |
 | **An installable console**, with the limit above as the more interesting half of the answer | [manifest.webmanifest](../web/manifest.webmanifest), [web/README.md](../web/README.md) |
 | **One accessor per operation, and both check** — the `*Fast` twins are gone | the [platform contract](../platform/avr-dx/README.md), measured in [decisions.md](decisions.md#the-fast-accessor-pair) |
 | **A coverage report** on every pull request, all three test suites together and no threshold | [coverage.py](../tools/coverage.py) |

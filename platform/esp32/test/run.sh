@@ -48,8 +48,8 @@ fi
 mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
-INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/firmware/inc")
-while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROOT/firmware/inc" -type d)
+INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/src")
+while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done < <(find "$ROOT/src" -type d)
 
 # The path this platform's Arduino.h includes the core's own through. On the target the
 # build script finds it in the framework; here it is the stub.
@@ -67,7 +67,7 @@ COMPILER="${CXX:-g++}"
 if "$COMPILER" --version | grep -q clang; then FLAGS+=(-Wno-unknown-warning-option); fi
 
 # The firmware's web front end is compiled into every target that asks for it and out of the
-# ones that do not - the AVR-Dx has no radio to serve anything over, and firmware/src is
+# ones that do not - the AVR-Dx has no radio to serve anything over, and src is
 # compiled whole. This backend asks, the same way platformio.ini does for the real build.
 FLAGS+=(-DWEB_FRONTEND_SUPPORT=STD_ON)
 
@@ -104,7 +104,7 @@ fi
 # linking one without the other does not resolve. That is the same split the WEB entry below
 # already makes, now that half of what it served lives in the firmware.
 CORE=()
-while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/firmware/src" -name '*.cpp' -not -name 'WebFrontend.cpp')
+while IFS= read -r source; do CORE+=("$source"); done < <(find "$ROOT/src" -name '*.cpp' -not -name 'WebFrontend.cpp')
 
 # WebInterface is not in here: it needs the HTTP server, and the two tests that want it
 # bring their own so they can see what it sends. A test that has no business with HTTP
@@ -121,7 +121,7 @@ BACKEND=(
     "$PLATFORM_DIR/src/WordclockMain.cpp"
     "$PLATFORM_DIR/src/WordclockSerial.cpp"
 )
-WEB=("$PLATFORM_DIR/src/WebInterface.cpp" "$ROOT/firmware/src/Communication/WebFrontend/WebFrontend.cpp")
+WEB=("$PLATFORM_DIR/src/WebInterface.cpp" "$ROOT/src/Communication/WebFrontend/WebFrontend.cpp")
 
 SHARED=("$TEST_DIR/stubs/hardware_port.cpp" "$TEST_DIR/stubs/stubs.cpp")
 

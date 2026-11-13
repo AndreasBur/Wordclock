@@ -10,16 +10,16 @@
 # The overlays wrap the base's task() rather than shadowing it: each one does its own step
 # and then calls Overlay::task() by name, which is the CRTP hand-off and the reason both
 # declare one. cppcheck reads the pair as an accidental redefinition.
-# Named one by one rather than as firmware/inc/Overlay/*.h, because how a wildcard in this
+# Named one by one rather than as src/Overlay/*.h, because how a wildcard in this
 # file is matched has changed between cppcheck versions - and a fourth overlay should have
 # to be added here by somebody who has looked at what the check says about it.
-duplInheritedMember:firmware/inc/Overlay/OverlayDate.h
-duplInheritedMember:firmware/inc/Overlay/OverlayTemperature.h
-duplInheritedMember:firmware/inc/Overlay/OverlayText.h
+duplInheritedMember:src/Overlay/OverlayDate.h
+duplInheritedMember:src/Overlay/OverlayTemperature.h
+duplInheritedMember:src/Overlay/OverlayText.h
 
 # MsgCmdStatusParser is the one command without options, so it instantiates the parameter
 # parser with MSG_CMD_STATUS_PARSER_PARAMETER_TABLE_SIZE = 0 and its table is an empty
 # std::array. cppcheck then reports the indexing in getParameterTableElement() as out of
 # bounds for that instantiation. Its only caller is the loop over ParameterTable.size(),
 # which does not run for an empty table, so the index it complains about is never formed.
-containerOutOfBounds:firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h
+containerOutOfBounds:src/Communication/MessageParser/Base/MsgParameterParser.h

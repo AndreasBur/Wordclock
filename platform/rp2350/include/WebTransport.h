@@ -5,7 +5,7 @@
  * \file
  * \brief What WebFrontend needs from this backend's server.
  *
- * The backend half of the contract in firmware/inc/Communication/WebFrontend/WebFrontend.h: where a
+ * The backend half of the contract in src/Communication/WebFrontend/WebFrontend.h: where a
  * response body goes, and where a line or a frame goes. Everything above it - the catalog, the
  * letter grid, the rate limit, the frame comparison - is the firmware's and is not repeated here.
  *

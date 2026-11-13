@@ -12,7 +12,7 @@ backticks is kept whole, and \\code ... \\endcode and the lines of a list are le
 Without it, the files are only read, and a file in which a line is not so fails. Utl and MaxMatrix
 have the same tool.
 
-The headers and sources of firmware/ and platform/ are read, but for the tests, which keep their
+The headers and sources of src/ and platform/ are read, but for the tests, which keep their
 // comments.
 
 Usage:
@@ -93,7 +93,7 @@ def main():
     fix = '--fix' in arguments
     files = [argument for argument in arguments if argument != '--fix']
     if not files:
-        patterns = ['firmware/*.h', 'firmware/*.cpp', 'platform/*.h', 'platform/*.cpp',
+        patterns = ['src/*.h', 'src/*.cpp', 'platform/*.h', 'platform/*.cpp',
                     'platform/avr-dx/include/stl/*']
         files = [path for path in subprocess.run(['git', 'ls-files', *patterns], capture_output=True,
                                                  text=True, check=True).stdout.split()
