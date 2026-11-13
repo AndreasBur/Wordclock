@@ -134,9 +134,10 @@ cmake --workflow --preset default  # configure, build and run the tests in one
 and the `ci-` variants, which are the same with warnings as errors.
 
 Everything else - the analysers, the host suites, the PlatformIO builds, the web smoke test -
-is a target of the `Makefile`, and so is each preset: `make` lists them. Every workflow step
+is a target of the `Makefile`, which is the template's, or of `tools/project.mk`, which holds
+Wordclock's own and which the Makefile includes; `make` lists them all. Every workflow step
 that builds or checks something is `make <target>` and nothing else, so a flag belongs in
-`CMakePresets.json` and a command in the `Makefile`, never in a workflow; the reason for a
+`CMakePresets.json` and a command in `tools/project.mk`, never in a workflow; the reason for a
 command is written beside it there. Before pushing, run the targets of what changed - `make
 lint` takes seconds, `make check` is all of CI and takes minutes, most of them PlatformIO.
 

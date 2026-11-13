@@ -87,7 +87,7 @@ jobs:
       # No display needed: the tests drive the firmware core and the pixel buffer, and the
       # window that renders it is never constructed.
       - name: Build and test
-        run: make simulator
+        run: make tests
 
   # The simulator, its tests and both backends' host suites once more, compiled by clang instead
   # of GCC. Two compilers disagree about what deserves a warning: clang reported a uint16_t made
@@ -106,7 +106,7 @@ jobs:
           packages: cmake ninja-build libwxgtk3.2-dev clang
 
       - name: Simulator, core tests and both backends' host tests
-        run: make clang
+        run: make clang host-clang
 
   # The panel and the console in a real browser, with the simulator behind them as the firmware:
   # each page at a phone's width and a desktop's loads its first frame without a console error,

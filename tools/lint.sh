@@ -40,7 +40,7 @@ main() {
   local sources
   list_files sources '\.(h|cpp|ino)$' "${paths[@]}"
   local scripts
-  list_files scripts '\.sh$' 'tools/*.sh'
+  list_files scripts '\.sh$' '*.sh'
 
   local failed=0
   # The lines that continue a command of a Doxygen block start under its text,
