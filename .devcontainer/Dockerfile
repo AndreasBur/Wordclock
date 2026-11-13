@@ -168,13 +168,14 @@ RUN /tmp/llvm-headers.sh "${LLVM_MAJOR}" "/opt/llvm-${LLVM_MAJOR}/include" && \
 # The package cache is a named volume, and an empty one takes its ownership from the path
 # it covers - so the path has to exist and belong to the remote user first, or PlatformIO
 # cannot write the ~1.5 GB of toolchain into it.
-RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio
+RUN install -d -o vscode -g vscode -m 0755 /home/vscode/.platformio /home/vscode/.cache/uv
 
-# The same arrangement for the two logins a rebuild would otherwise throw away: Codex, whose
-# extension the shared feature installs into every variant, and gh, which every push and
-# every pull request goes through. Mode 0700 rather than 0755, because what these hold is a
+# The same arrangement for the Codex, Claude Code and gh logins and shell history a rebuild
+# would otherwise throw away. Mode 0700 rather than 0755, because what these hold is a
 # credential and not a cache - and gh refuses to read a config directory others can enter.
 RUN install -d -o vscode -g vscode -m 0700 /home/vscode/.codex && \
+    install -d -o vscode -g vscode -m 0700 /home/vscode/.claude && \
+    install -d -o vscode -g vscode -m 0700 /home/vscode/.commandhistory && \
     install -d -o vscode -g vscode -m 0700 /home/vscode/.config/gh
 
 # GitHub's SSH host key, so that the first git operation in a fresh container verifies
