@@ -232,13 +232,15 @@ class SerialPort {
    *
    * \param[in] number The number.
    */
-  void print(long number) { PrintNumber(number); }  // NOLINT(readability-identifier-naming)
+  void print(long number) {  // NOLINT(readability-identifier-naming,runtime/int)
+    PrintNumber(number);
+  }
   /*!
    * \brief Queues `number` in decimal.
    *
    * \param[in] number The number.
    */
-  void print(unsigned long number) {  // NOLINT(readability-identifier-naming)
+  void print(unsigned long number) {  // NOLINT(readability-identifier-naming,runtime/int)
     PrintUnsignedNumber(number);
   }
 

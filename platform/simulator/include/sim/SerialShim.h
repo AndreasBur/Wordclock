@@ -51,7 +51,8 @@ class SerialShim {
 
   // Nothing until the web front end installs itself, which is a clock with no browsers
   // watching and the case the simulator ran in until now.
-  void (*line_sink_)(char const*){nullptr};
+  using LineSink = void (*)(char const*);
+  LineSink line_sink_{nullptr};
 
   // Not constexpr, unlike the firmware's singletons: wxString has no constexpr
   // constructor.

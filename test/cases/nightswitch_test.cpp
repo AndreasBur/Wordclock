@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The window, the midnight wrap, the strip's supply, and who wins between the timer and a hand.
 
 #include "NightSwitch.h"
@@ -7,8 +10,8 @@
 #include "Pixels.h"
 #include "Power.h"
 #include "RealTimeClock.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 // One tick of the night switch at a given time. Its own task rather than the scheduler's,

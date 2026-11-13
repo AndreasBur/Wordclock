@@ -30,7 +30,6 @@
  */
 class AnimationSqueeze : public Animation {
  public:
- public:
   /*!
    * \brief The side the letters are eaten away from, selected for each word change.
    *

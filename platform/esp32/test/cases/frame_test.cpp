@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * What Pixels::Render() puts on the wire, checked byte for byte against a captured
  * transmission. The RMT calls are stubbed here rather than in stubs.cpp because this test
@@ -10,7 +13,7 @@
 
 #include "Arduino.h"
 #include "Pixels.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 static byte captured[512];
 static size_t captured_size = 0;

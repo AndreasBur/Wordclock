@@ -1,14 +1,17 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The simulator's web host, over a real socket on loopback.
 
 #include "sim/WebHost.h"
 
-#include <chrono>
-#include <future>
-#include <iostream>
-#include <thread>
+#include <chrono>    // NOLINT(build/include_order)
+#include <future>    // NOLINT(build/include_order)
+#include <iostream>  // NOLINT(build/include_order)
+#include <thread>    // NOLINT(build/include_order)
 
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 #ifndef _WIN32
 #include <arpa/inet.h>

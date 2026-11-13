@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The four wordings, the five-minute raster, and what the clock refuses.
 
 #include "Clock.h"
@@ -6,8 +9,8 @@
 #include "DisplayManager.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 // Whether a word is part of what the clock would light for a time, which is what the
 // regional wordings differ in.

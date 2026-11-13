@@ -20,7 +20,6 @@
  * FontCharHorizontal and FontCharVertical derive from it and add the pixels.
  */
 class FontChar {
- public:
  private:
   byte width_;
 
@@ -33,7 +32,7 @@ class FontChar {
    *
    * \param[in] width The width in columns.
    */
-  constexpr FontChar(byte width) : width_(width) {}
+  explicit constexpr FontChar(byte width) : width_(width) {}
 
  public:
   /*! \brief Returns the width of the glyph in columns. */
@@ -58,7 +57,6 @@ class FontChar {
  */
 template <typename RowType, byte RowsSize>
 class FontCharHorizontal : public FontChar {
- public:
  private:
   using RowsType = std::array<RowType, RowsSize>;
   RowsType rows_;
@@ -158,7 +156,6 @@ class FontCharHorizontal : public FontChar {
  */
 template <typename ColumnType, byte ColumnsSize>
 class FontCharVertical : public FontChar {
- public:
  private:
   using ColumnsType = std::array<ColumnType, ColumnsSize>;
   ColumnsType columns_;

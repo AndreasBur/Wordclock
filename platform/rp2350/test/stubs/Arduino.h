@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Stand-in for the arduino-pico core, enough of it to compile and link the backend on the
  * host. Serial here is the *hardware* port: platform/rp2350/include/Arduino.h shadows this
@@ -38,7 +41,7 @@ char* itoa(int, char*, int);
 struct Stream {
   std::string Incoming;
   std::string Written;
-  void begin(unsigned long) {}
+  void begin(unsigned long) {}  // NOLINT(runtime/int)
   int available() { return static_cast<int>(Incoming.size()); }
   int read() {
     if (Incoming.empty()) return -1;
@@ -68,8 +71,8 @@ struct Rp2040Class {
 extern Rp2040Class rp2040;
 
 /* Milliseconds since the start, which the test advances itself rather than measuring. */
-extern unsigned long TestMillis;
-unsigned long millis();
+extern unsigned long TestMillis;  // NOLINT(runtime/int)
+unsigned long millis();           // NOLINT(runtime/int)
 extern Stream Serial;
 // NOLINTEND(readability-identifier-naming)
 #endif  // WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_ARDUINO_H_

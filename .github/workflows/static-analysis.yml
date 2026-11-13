@@ -245,12 +245,13 @@ jobs:
             build/fuzz/work/*/log.txt
           if-no-files-found: ignore
 
-  # The shell scripts, the Python ones and the workflows, which build, test and check everything
-  # else: shellcheck over every .sh, ruff over every .py with the checks pyproject.toml selects,
-  # and actionlint over .github/workflows with what .github/actionlint.yaml adds. shellcheck from
-  # the archive, the other two at the versions uv.lock pins. Seconds, not minutes.
+  # The layout of the C++ sources, clang-format's and cpplint's, and the scripts and workflows that
+  # build, test and check everything else: shellcheck over every .sh, ruff over every .py with the
+  # checks pyproject.toml selects, actionlint over .github/workflows with what
+  # .github/actionlint.yaml adds. All at the versions uv.lock pins; shellcheck from the archive as
+  # well, for actionlint's checks of the run: scripts. Seconds, not minutes.
   scripts:
-    name: Scripts
+    name: Style and scripts
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
@@ -263,8 +264,8 @@ jobs:
 
       - uses: ./.github/actions/uv-sync
 
-      - name: shellcheck, ruff and actionlint
-        run: make scripts
+      - name: clang-format, cpplint, shellcheck, ruff and actionlint
+        run: make style
 
   # The two pages a clock serves, which only a browser had ever read: html-validate over each as
   # a whole document, eslint over the scripts inline in them. Node at the major version the dev

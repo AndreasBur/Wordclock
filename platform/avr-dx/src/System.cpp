@@ -33,7 +33,8 @@ constexpr uint16_t kBytesPerKibibyte{1024u};
  * that detail into the interface.
  * The ones it would make const drive the hardware, which a const would deny.
  */
-// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
+// NOLINTBEGIN(readability-make-member-function-const)
 StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const {
   char stack_mark;
   /*
@@ -66,4 +67,5 @@ void System::PerformPendingRestart() {
   // device runs.
   _PROTECTED_WRITE(RSTCTRL.SWRR, RSTCTRL_SWRST_bm);
 }
-// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTEND(readability-make-member-function-const)
+// NOLINTEND(readability-convert-member-functions-to-static)

@@ -49,14 +49,13 @@ class Font {
     return font_table_element;
   }
 
- protected:
  public:
   /*!
    * \brief Makes a font that reads `font_table`.
    *
    * \param[in] font_table The glyph table. The font keeps a reference to it, not a copy.
    */
-  constexpr Font(FontTableType const& font_table) : font_table_(font_table) {}
+  explicit constexpr Font(FontTableType const& font_table) : font_table_(font_table) {}
 
   /*! \brief Destroys the font. */
   ~Font() = default;

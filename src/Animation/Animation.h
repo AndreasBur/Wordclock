@@ -33,7 +33,6 @@ class Animation {
     kSetTime    /*!< Running, in the phase that puts the new time on the display. */
   };
 
- private:
  protected:
   /*! \brief The odd factor of the hash in SelectByTime(). */
   static constexpr byte kSelectHashFactor{181u};

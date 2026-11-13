@@ -143,7 +143,7 @@ class WordclockSerial {
    *
    * \param[in] baud_rate The baud rate.
    */
-  void begin(unsigned long baud_rate);  // NOLINT(readability-identifier-naming)
+  void begin(unsigned long baud_rate);  // NOLINT(readability-identifier-naming,runtime/int)
 
   /*!
    * \brief Installs the function every finished output line goes to.

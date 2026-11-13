@@ -171,7 +171,7 @@ class Display {
   DisplayWords words_;
   DisplayBrightness brightness_;
 
-  Display(Pixel color);
+  explicit Display(Pixel color);
   Display(byte red, byte green, byte blue);
   ~Display() = default;
 

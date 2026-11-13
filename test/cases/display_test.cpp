@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // What reaches the pixels: the word-set latch, the fade, the colour channels and the letter table.
 
 #include "Display.h"
@@ -11,8 +14,8 @@
 #include "GammaCorrection.h"
 #include "Pixels.h"
 #include "RealTimeClock.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 // Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
 // dimmed copy, and what this would check is the strip's master.

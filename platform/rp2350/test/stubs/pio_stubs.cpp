@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The PIO and DMA calls, for the tests and the host process that do not inspect the frame.
 // frame_test.cpp defines its own instead, so it can keep what was transmitted.
 #include <hardware/clocks.h>

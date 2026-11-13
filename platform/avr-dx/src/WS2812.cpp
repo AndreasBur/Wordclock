@@ -136,7 +136,8 @@ void WS2812::InitLookUpTable() {
  * that detail into the interface.
  * The ones it would make const drive the hardware, which a const would deny.
  */
-// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
+// NOLINTBEGIN(readability-make-member-function-const)
 void WS2812::Init() {
   InitUsart();
   InitEventSystem();
@@ -186,4 +187,5 @@ StdReturnType WS2812::Send(byte const* frame, uint16_t length) {
 
   return kEOk;
 }
-// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTEND(readability-make-member-function-const)
+// NOLINTEND(readability-convert-member-functions-to-static)

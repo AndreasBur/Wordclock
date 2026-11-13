@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Stands in for the Arduino core's Update object, which is what writes the other app
  * partition. What the cases here can check is the sequence the backend drives it through -

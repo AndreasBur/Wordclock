@@ -26,7 +26,7 @@
 
 #if (ANIMATION_SHIFT_HORIZONTAL == STD_ON && ANIMATION_SHIFT_VERTICAL == STD_ON)
 #error \
-    "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"
+    "AnimationShift: ANIMATION_SHIFT_HORIZONTAL or ANIMATION_SHIFT_VERTICAL has to be STD_ON, but not both"  // NOLINT(whitespace/line_length)
 #endif
 
 /*!
@@ -44,7 +44,6 @@
  * idle.
  */
 class AnimationShift : public Animation {
- public:
  private:
   Transformation wc_transformation_;
   ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};

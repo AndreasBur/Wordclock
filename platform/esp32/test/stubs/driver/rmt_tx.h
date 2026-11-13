@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_DRIVER_RMT_TX_H_
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_DRIVER_RMT_TX_H_
 /* Under the framework's names, because it stands in for the framework's header. */
@@ -5,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "esp_err.h"
+#include "esp_err.h"  // NOLINT(build/include_subdir): ESP-IDF's own spelling
 typedef int gpio_num_t;
 typedef enum { RMT_CLK_SRC_DEFAULT = 0 } rmt_clock_source_t;
 typedef struct rmt_channel_t* rmt_channel_handle_t;

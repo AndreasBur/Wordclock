@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * The hardware port itself, plus the one C function the core would provide.
  *
@@ -23,6 +26,7 @@ void gpio_set_dir(uint, bool) {}
 void gpio_put(uint, bool) {}
 
 char* itoa(int value, char* buffer, int) {
-  snprintf(buffer, 12, "%d", value);
+  // The caller's buffer, whose size itoa() is not told: 12 holds every int with its sign.
+  snprintf(buffer, 12, "%d", value);  // NOLINT(runtime/printf)
   return buffer;
 }

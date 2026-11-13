@@ -36,7 +36,7 @@ HOST_SUITES := platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
 .PHONY: help check lint run clean \
         simulator clang avr esp32 rp2350 host-esp32 host-rp2350 web \
-        tidy tidy-avr tidy-esp32 tidy-rp2350 cppcheck scripts docs web-lint \
+        tidy tidy-avr tidy-esp32 tidy-rp2350 cppcheck style fmt docs web-lint \
         sanitizers coverage fuzz
 
 help: ## This list
@@ -52,7 +52,7 @@ check: STRICT := 1
 check: ## What CI runs, all of it
 check: lint simulator clang avr host-esp32 host-rp2350 web tidy tidy-avr \
        sanitizers coverage esp32 rp2350 tidy-esp32 tidy-rp2350 fuzz
-lint: scripts docs cppcheck web-lint ## The checks that need no build: seconds
+lint: style docs cppcheck web-lint ## The checks that need no build: seconds
 
 ## Builds, each with its tests
 
@@ -177,21 +177,22 @@ cppcheck: ## cppcheck over the firmware core
 	    "$${includes[@]}" -Iplatform/simulator/include/sim -Iplatform/simulator/include \
 	    src
 
-# shellcheck over every .sh, ruff over every .py with the checks pyproject.toml selects, and
-# actionlint over .github/workflows with what .github/actionlint.yaml adds - which runs
-# shellcheck over every run: script as well, the one on PATH.
-scripts: ## shellcheck, ruff and actionlint over the scripts and the workflows
-	git ls-files -z '*.sh' | xargs -0 shellcheck
-	$(UV_RUN) ruff check
-	$(UV_RUN) actionlint
+# The template's tools/lint.sh: clang-format and the indentation of the Doxygen blocks, cpplint
+# with what CPPLINT.cfg filters, shellcheck over tools/, ruff over every .py with the checks
+# pyproject.toml selects, and actionlint over the workflows. Then shellcheck over the scripts
+# outside tools/, which tools/lint.sh does not reach: the host suites' run.sh above all.
+style: ## clang-format, cpplint, shellcheck, ruff and actionlint: tools/lint.sh
+	tools/lint.sh
+	git ls-files -z '*.sh' ':!tools/*' | xargs -0 $(UV_RUN) shellcheck
+
+fmt: ## Format the C++ sources and the Doxygen blocks in place
+	tools/lint.sh --fix
 
 # Once per backend, over src/ and that backend: a \param that names no parameter, a command
 # Doxygen does not know, an entity without a block or a block that leaves something out.
-# docs/documentation.md says what a block holds. Then the indentation of a line that continues a
-# command, which goes under the command's text.
-docs: ## The Doxygen blocks, per backend, and their indentation
+# docs/documentation.md says what a block holds.
+docs: ## The Doxygen blocks, per backend
 	python3 tools/docs.py
-	python3 tools/doc-indent.py
 
 # html-validate over both pages as whole documents, and eslint over the scripts inline in them;
 # what each checks and leaves out is in .htmlvalidate.mjs and eslint.config.mjs. The packages

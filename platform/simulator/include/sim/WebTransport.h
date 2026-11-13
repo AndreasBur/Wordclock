@@ -23,8 +23,8 @@
 // and this header is reached before that one on the way in from WebHost.cpp.
 #include "arduino/Types.h"
 
-#include <stddef.h>
-#include <string>
+#include <stddef.h>  // NOLINT(build/include_order)
+#include <string>  // NOLINT(build/include_order)
 // clang-format on
 
 /*!

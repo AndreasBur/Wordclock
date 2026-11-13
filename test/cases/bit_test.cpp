@@ -1,11 +1,14 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Single bits and bit groups, through the static functions and through a held Bit<T>.
 
 #include "Bit.h"
 
 #include <stdint.h>
 
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 /*
  * The masks have to work where a 64-bit one hid the problem: the top bit of a uint16_t, which

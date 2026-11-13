@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Definitions for the framework stand-ins in stubs/, so the backend links on the host.
  * Only the objects and calls that no test wants to observe live here; a test that needs to
@@ -14,8 +17,8 @@
 TwoWire Wire;
 Rp2040Class rp2040;
 
-unsigned long TestMillis = 0u;
-unsigned long millis() { return TestMillis; }
+unsigned long TestMillis = 0u;                 // NOLINT(runtime/int)
+unsigned long millis() { return TestMillis; }  // NOLINT(runtime/int)
 MDNSStub MDNS;
 WiFiStub WiFi;
 NTPClassStub NTP;

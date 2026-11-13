@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Stand-in for the ESP32 Arduino core, enough of it to compile and link the backend on
  * the host. Serial here is the *hardware* port: platform/esp32/include/Arduino.h shadows
@@ -40,7 +43,7 @@ void configTzTime(char const*, char const*, char const* = nullptr);
 struct Stream {
   std::string Incoming;
   std::string Written;
-  void begin(unsigned long) {}
+  void begin(unsigned long) {}  // NOLINT(runtime/int)
   int available() { return static_cast<int>(Incoming.size()); }
   int read() {
     if (Incoming.empty()) return -1;
@@ -69,8 +72,8 @@ struct EspClass {
 extern EspClass ESP;
 
 /* Milliseconds since the start, which the test advances itself rather than measuring. */
-extern unsigned long TestMillis;
-unsigned long millis();
+extern unsigned long TestMillis;  // NOLINT(runtime/int)
+unsigned long millis();           // NOLINT(runtime/int)
 extern Stream Serial;
 // NOLINTEND(readability-identifier-naming)
 #endif  // WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_ARDUINO_H_

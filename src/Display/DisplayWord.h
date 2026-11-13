@@ -19,7 +19,6 @@
  * DisplayCharacters. Nothing here checks that the word fits the grid.
  */
 class DisplayWord {
- public:
  private:
   byte column_;
   byte row_;

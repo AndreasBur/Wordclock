@@ -42,7 +42,6 @@
  * idle.
  */
 class AnimationMatrix : public Animation {
- public:
  private:
   /* number of frames a column stays dark before its drop enters the display */
   static constexpr byte kMaxStartDelay{DISPLAY_NUMBER_OF_ROWS};

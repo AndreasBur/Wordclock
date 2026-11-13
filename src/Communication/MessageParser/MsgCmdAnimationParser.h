@@ -170,7 +170,7 @@ class MsgCmdAnimationParser
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  MsgCmdAnimationParser(char const* parameter)
+  explicit MsgCmdAnimationParser(char const* parameter)
       : MsgParameterParser(kParameterTable, parameter),
         animation_id_(),
         mode_(),

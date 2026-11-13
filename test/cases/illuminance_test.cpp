@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * What the light sensor's reading does to the display's brightness.
  *
@@ -13,8 +16,8 @@
 #include "Illuminance.h"
 
 #include "DisplayBrightness.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 /*

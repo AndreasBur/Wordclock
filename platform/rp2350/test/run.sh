@@ -48,7 +48,7 @@ fi
 mkdir -p "$CACHE"
 
 # The platform's own headers first: its Arduino.h shadows the stub and has to win.
-INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$SHARED_TEST_DIR" -I"$TEST_DIR/stubs" -I"$ROOT/src")
+INCLUDES=(-I"$PLATFORM_DIR/include" -I"$ROOT/platform/arduino/include" -I"$TEST_DIR" -I"$ROOT" -I"$TEST_DIR/stubs" -I"$ROOT/src")
 directories="$(find "$ROOT/src" -type d)"
 while IFS= read -r directory; do INCLUDES+=(-I"$directory"); done <<< "$directories"
 

@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * Checks the one thing the whole web console rests on: that an injected character takes
  * exactly the same path through Communication as one typed on the wire, and that answers
@@ -14,7 +17,7 @@
 #include "MsgCmdRemoteProcedureCallParser.h"
 #include "Uptime.h"
 #include "Version.h"
-#include "check.h"
+#include "platform/test/check.h"
 
 static std::vector<std::string> lines;
 static void CollectLine(char const* line) { lines.emplace_back(line); }

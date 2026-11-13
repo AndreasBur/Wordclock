@@ -127,7 +127,7 @@ class MsgCmdParser {
    * \param[in] message The message, without its end-of-message character. The parser keeps a
    *                    reference to it, not a copy.
    */
-  constexpr MsgCmdParser(Message const& message) : error_(), incoming_message_(message) {}
+  explicit constexpr MsgCmdParser(Message const& message) : error_(), incoming_message_(message) {}
 
   /*! \brief Destroys the parser. */
   ~MsgCmdParser() = default;

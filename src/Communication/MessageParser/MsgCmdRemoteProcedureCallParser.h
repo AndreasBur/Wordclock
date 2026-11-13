@@ -202,7 +202,7 @@ class MsgCmdRemoteProcedureCallParser
    * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
    *                      pointer and reads it in Parse().
    */
-  constexpr MsgCmdRemoteProcedureCallParser(char const* parameter)
+  explicit constexpr MsgCmdRemoteProcedureCallParser(char const* parameter)
       : MsgParameterParser(kParameterTable, parameter) {}
 
   /*! \brief Destroys the parser. */

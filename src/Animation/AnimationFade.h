@@ -27,7 +27,6 @@
  * lights the words of the new time whole and makes the animation idle.
  */
 class AnimationFade : public Animation {
- public:
  private:
   /*
    * How far the fade has got, in what Display calls a fade level: 255 is the display as

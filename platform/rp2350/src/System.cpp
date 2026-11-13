@@ -174,7 +174,8 @@ StdReturnType CopyIfItFits(char const* value, char* string, size_t capacity) {
  * that detail into the interface.
  * The ones it would make const drive the hardware, which a const would deny.
  */
-// NOLINTBEGIN(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
+// NOLINTBEGIN(readability-make-member-function-const)
 StdReturnType System::GetFreeMemoryInKibibytes(uint16_t& free_memory) const {
   free_memory = static_cast<uint16_t>(rp2040.getFreeHeap() / kBytesPerKibibyte);
   return kEOk;
@@ -385,4 +386,5 @@ StdReturnType System::SetConsolePassword(char const* password) {
 
   return WriteStoredString(kConsolePasswordKey, password) ? kEOk : kENotOk;
 }
-// NOLINTEND(readability-convert-member-functions-to-static, readability-make-member-function-const)
+// NOLINTEND(readability-make-member-function-const)
+// NOLINTEND(readability-convert-member-functions-to-static)

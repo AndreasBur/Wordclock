@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
  * The assertion these tests share, its tally, and the fixtures more than one case needs.
  *
@@ -9,8 +12,8 @@
  * inline throughout, so every case file can include this and still link: one variable and
  * one function, however many translation units.
  */
-#ifndef WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_
-#define WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_
+#ifndef WORDCLOCK_TEST_CHECK_H_
+#define WORDCLOCK_TEST_CHECK_H_
 
 #include <array>
 #include <iostream>
@@ -123,4 +126,4 @@ inline PixelBufferType DrawClockFace(byte hour, byte minute) {
   return ReadPixels();
 }
 
-#endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_
+#endif  // WORDCLOCK_TEST_CHECK_H_

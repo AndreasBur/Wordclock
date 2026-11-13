@@ -90,7 +90,7 @@ class MsgCmdOverlayParser
    *                      pointer and reads it in Parse().
    */
   // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
-  constexpr MsgCmdOverlayParser(char const* parameter)
+  explicit constexpr MsgCmdOverlayParser(char const* parameter)
       : MsgParameterParserType(kParameterTable, parameter) {
     /*
      * Protected rather than private with the derived class as a friend, which is what

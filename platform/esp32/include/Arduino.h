@@ -36,7 +36,7 @@
  */
 #ifndef WORDCLOCK_CORE_ARDUINO_H
 #error \
-    "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."
+    "Arduino.h: WORDCLOCK_CORE_ARDUINO_H is not set. scripts/firmware_includes.py defines it; a build that bypasses that script cannot find the Arduino core's own header."  // NOLINT(whitespace/line_length)
 #endif
 
 /*
@@ -83,7 +83,9 @@ inline Stream& HardwarePort() { return Serial; }
  *
  * \param[in] baud_rate The baud rate.
  */
-inline void HardwarePortBegin(unsigned long baud_rate) { Serial.begin(baud_rate); }
+inline void HardwarePortBegin(unsigned long baud_rate) {  // NOLINT(runtime/int)
+  Serial.begin(baud_rate);
+}
 
 }  // namespace wordclock_platform
 

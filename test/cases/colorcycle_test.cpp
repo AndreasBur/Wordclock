@@ -1,3 +1,6 @@
+// Copyright 2026 Andreas Burnickl
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // The wheel, what it leaves alone, and what the supply is told about it.
 
 #include "ColorCycle.h"
@@ -6,8 +9,8 @@
 #include "Display.h"
 #include "DisplayCurrentLimit.h"
 #include "Pixels.h"
-#include "cases.h"
-#include "check.h"
+#include "test/cases.h"
+#include "test/check.h"
 
 namespace {
 /*

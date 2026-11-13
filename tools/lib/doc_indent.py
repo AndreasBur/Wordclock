@@ -12,7 +12,8 @@ continues one starts where the text after the command starts:
 clang-format keeps such a line as it is, but when it breaks one that has grown too long, the
 new line starts at the margin again; so tools/lint.sh runs this after clang-format with --fix,
 and with --check fails where a line is not indented so. The paragraph after a command is
-rewrapped to 80 columns, counted in characters as clang-format counts them; \\code ...
+rewrapped to the ColumnLimit of .clang-format, 80 as Google's style has it unless the project
+sets another, counted in characters as clang-format counts them; \\code ...
 \\endcode and the lines of a list are left as they are. The block ends where */ stands, at
 the start of a line or after its text, as the comment does.
 
@@ -26,7 +27,16 @@ import re
 import sys
 from pathlib import Path
 
-WIDTH = 80
+
+def column_limit():
+    """The ColumnLimit of the repository's .clang-format, which clang-format wraps the rest of
+    the comment to; 80, Google's, where it sets none."""
+    style = Path(__file__).resolve().parents[2] / '.clang-format'
+    found = re.findall(r'^ColumnLimit:\s*(\d+)\s*$', style.read_text(), re.MULTILINE)
+    return int(found[-1]) if found else 80
+
+
+WIDTH = column_limit()
 COMMAND = (r'\\(?:param(?:\[[a-z,]+\])?[ ]+\S+|tparam[ ]+\S+|retval[ ]+\S+'
            r'|return|pre|post|note|warning|stddiff|see|brief)')
 # ASCII: a byte of UTF-8 is never white space, as it is not for clang-format.
