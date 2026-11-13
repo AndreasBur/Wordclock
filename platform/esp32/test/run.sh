@@ -73,9 +73,9 @@ if "$COMPILER" --version | grep -q clang; then FLAGS+=(-Wno-unknown-warning-opti
 # compiled whole. This backend asks, the same way platformio.ini does for the real build.
 FLAGS+=(-DWEB_FRONTEND_SUPPORT=STD_ON)
 
-# Whatever HOST_TESTS_CXXFLAGS holds is added as well. It is how the coverage job in ci.yml
-# builds these tests with --coverage; tools/coverage.py reads what the run leaves beside the
-# objects. Unquoted on purpose, so that it splits into its flags.
+# Whatever HOST_TESTS_CXXFLAGS holds is added as well. It is how coverage_suites() of
+# tools/project.sh builds these tests with --coverage; tools/coverage.sh reads what the run leaves
+# beside the objects. Unquoted on purpose, so that it splits into its flags.
 # shellcheck disable=SC2206
 FLAGS+=(${HOST_TESTS_CXXFLAGS:-})
 

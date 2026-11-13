@@ -172,7 +172,7 @@ added went on passing them, and `tools/docs.py` then died with a `FileNotFoundEr
 traceback weeks later, on the first day someone edited a Doxygen block.
 
 The shared settings install `clangd` and configure it to read CMake's
-`build/compile_commands.json`; C/C++ Tools remains installed for debugging but
+`build/host/compile_commands.json`; C/C++ Tools remains installed for debugging but
 does not provide IntelliSense. Doxygen Documentation Generator writes the skeleton
 of a Doxygen block in the style of `docs/documentation.md` when you type `/*!` and
 Enter above a declaration.

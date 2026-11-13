@@ -14,10 +14,8 @@ enable_testing()
 # the firmware core.
 option(WORDCLOCK_BUILD_TESTS "Build the platform test executable" ON)
 
-# Off by default because it takes clang and instruments every object of the build with
-# libFuzzer, AddressSanitizer and UndefinedBehaviorSanitizer - a build of its own, not an
-# addition to the one the simulator is run from. See test/fuzz.
-option(WORDCLOCK_BUILD_FUZZERS "Build the libFuzzer targets of the simulator (needs clang)" OFF)
+# WORDCLOCK_SANITIZE, WORDCLOCK_COVERAGE and WORDCLOCK_FUZZ, which the presets of those names
+# turn on, are cmake/checks.cmake's, included by the simulator's build, the one they instrument.
 
 set(PLATFORM simulator CACHE STRING "Target platform: simulator | esp32 | avr-dx")
 

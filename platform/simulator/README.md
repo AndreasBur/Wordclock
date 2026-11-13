@@ -130,9 +130,9 @@ Requires CMake ≥ 3.25 for the presets, a C++17 compiler and wxWidgets 3.x (GTK
 sudo apt install cmake ninja-build libwxgtk3.2-dev
 
 # From the repository root — the preset selects this backend, PLATFORM=simulator:
-cmake --preset simulator
-cmake --build --preset simulator
-./build/bin/Wordclock
+cmake --preset default
+cmake --build --preset default
+./build/host/bin/Wordclock
 ```
 
 wxWidgets is located via `find_package(wxWidgets)`, so the same
@@ -142,7 +142,7 @@ per-platform edits. This is also the build that runs inside the container.
 ### Tests
 
 ```bash
-ctest --preset simulator
+ctest --preset default
 ```
 
 [test/](../../test/) at the root holds the regression tests of the firmware core. They build

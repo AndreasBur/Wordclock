@@ -1,218 +1,214 @@
 {
-    "version": 6,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 25,
-        "patch": 0
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "description": "Ninja, a compile database for clangd and clang-tidy, and warnings that do not stop a build here: a warning stops a merge in CI, and nobody in the middle of debugging.",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF"
+      }
     },
-    "configurePresets": [
-        {
-            "name": "base",
-            "hidden": true,
-            "description": "Ninja, a compile database for clangd and clang-tidy, and warnings that do not stop a build here: a warning stops a merge in CI and nobody in the middle of debugging.",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_COMPILE_WARNING_AS_ERROR": "OFF"
-            }
-        },
-        {
-            "name": "warnings-as-errors",
-            "hidden": true,
-            "description": "What the ci- presets add: every warning of platform/warnings.txt fails the build.",
-            "cacheVariables": {
-                "CMAKE_COMPILE_WARNING_AS_ERROR": "ON"
-            }
-        },
-        {
-            "name": "simulator",
-            "displayName": "Simulator",
-            "description": "The wxWidgets window, the web pages behind it and the core tests, into build/ - where clangd and every note look for them. GCC named, so that a build directory some editor once configured with another compiler does not quietly stay that way: the clang preset is the clang build.",
-            "inherits": "base",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "PLATFORM": "simulator",
-                "CMAKE_CXX_COMPILER": "g++"
-            }
-        },
-        {
-            "name": "clang",
-            "displayName": "Simulator with clang",
-            "description": "The same with clang, which reports some conversions GCC lets pass.",
-            "inherits": "simulator",
-            "binaryDir": "${sourceDir}/build-clang",
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "clang++"
-            }
-        },
-        {
-            "name": "avr",
-            "displayName": "AVR Dx",
-            "description": "The AVR128DA48 image, cross-compiled. AVR_MCU, AVR_F_CPU and AVR_DFP can be given with -D as before.",
-            "inherits": "base",
-            "binaryDir": "${sourceDir}/build-avr",
-            "toolchainFile": "${sourceDir}/platform/avr-dx/toolchain-avr.cmake",
-            "cacheVariables": {
-                "PLATFORM": "avr-dx"
-            }
-        },
-        {
-            "name": "sanitizers",
-            "displayName": "Simulator tests under ASan and UBSan",
-            "description": "-fno-sanitize-recover=all, so that a finding fails the run instead of being a line in a log that passed.",
-            "inherits": "simulator",
-            "binaryDir": "${sourceDir}/build-san",
-            "cacheVariables": {
-                "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer",
-                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-            }
-        },
-        {
-            "name": "coverage",
-            "displayName": "Simulator tests with --coverage",
-            "description": "-O0 because an optimised build folds lines together, which leaves gcov's count of a line hard to read; tools/coverage.py reads the result.",
-            "inherits": "simulator",
-            "binaryDir": "${sourceDir}/build-cov",
-            "cacheVariables": {
-                "CMAKE_CXX_FLAGS": "--coverage -O0",
-                "CMAKE_EXE_LINKER_FLAGS": "--coverage"
-            }
-        },
-        {
-            "name": "fuzz",
-            "displayName": "Fuzzers",
-            "description": "The libFuzzer targets of test/fuzz, which take clang; run them with that directory's run.sh.",
-            "inherits": "clang",
-            "binaryDir": "${sourceDir}/build-fuzz",
-            "cacheVariables": {
-                "WORDCLOCK_BUILD_FUZZERS": "ON"
-            }
-        },
-        {
-            "name": "ci-simulator",
-            "displayName": "Simulator, warnings as errors",
-            "inherits": ["warnings-as-errors", "simulator"]
-        },
-        {
-            "name": "ci-clang",
-            "displayName": "Simulator with clang, warnings as errors",
-            "inherits": ["warnings-as-errors", "clang"]
-        },
-        {
-            "name": "ci-avr",
-            "displayName": "AVR Dx, warnings as errors",
-            "description": "Nothing else compiles a line of platform/avr-dx, so a warning there is seen here or nowhere.",
-            "inherits": ["warnings-as-errors", "avr"]
-        }
-    ],
-    "buildPresets": [
-        { "name": "simulator", "configurePreset": "simulator" },
-        { "name": "clang", "configurePreset": "clang" },
-        { "name": "avr", "configurePreset": "avr" },
-        { "name": "sanitizers", "configurePreset": "sanitizers", "targets": ["WordclockTests"] },
-        { "name": "coverage", "configurePreset": "coverage", "targets": ["WordclockTests"] },
-        { "name": "fuzz", "configurePreset": "fuzz", "targets": ["CommandFuzz", "SettingsFuzz"] },
-        { "name": "ci-simulator", "configurePreset": "ci-simulator" },
-        { "name": "ci-clang", "configurePreset": "ci-clang" },
-        { "name": "ci-avr", "configurePreset": "ci-avr" }
-    ],
-    "testPresets": [
-        {
-            "name": "base",
-            "hidden": true,
-            "output": { "outputOnFailure": true },
-            "execution": { "noTestsAction": "error" }
-        },
-        { "name": "simulator", "inherits": "base", "configurePreset": "simulator" },
-        { "name": "clang", "inherits": "base", "configurePreset": "clang" },
-        {
-            "name": "avr",
-            "description": "The documented sizes and the stack, checked against the image just built.",
-            "inherits": "base",
-            "configurePreset": "avr"
-        },
-        {
-            "name": "sanitizers",
-            "inherits": "base",
-            "configurePreset": "sanitizers",
-            "environment": { "UBSAN_OPTIONS": "print_stacktrace=1" }
-        },
-        { "name": "coverage", "inherits": "base", "configurePreset": "coverage" },
-        { "name": "ci-simulator", "inherits": "base", "configurePreset": "ci-simulator" },
-        { "name": "ci-clang", "inherits": "base", "configurePreset": "ci-clang" },
-        { "name": "ci-avr", "inherits": "base", "configurePreset": "ci-avr" }
-    ],
-    "workflowPresets": [
-        {
-            "name": "simulator",
-            "steps": [
-                { "type": "configure", "name": "simulator" },
-                { "type": "build", "name": "simulator" },
-                { "type": "test", "name": "simulator" }
-            ]
-        },
-        {
-            "name": "clang",
-            "steps": [
-                { "type": "configure", "name": "clang" },
-                { "type": "build", "name": "clang" },
-                { "type": "test", "name": "clang" }
-            ]
-        },
-        {
-            "name": "avr",
-            "steps": [
-                { "type": "configure", "name": "avr" },
-                { "type": "build", "name": "avr" },
-                { "type": "test", "name": "avr" }
-            ]
-        },
-        {
-            "name": "sanitizers",
-            "steps": [
-                { "type": "configure", "name": "sanitizers" },
-                { "type": "build", "name": "sanitizers" },
-                { "type": "test", "name": "sanitizers" }
-            ]
-        },
-        {
-            "name": "coverage",
-            "steps": [
-                { "type": "configure", "name": "coverage" },
-                { "type": "build", "name": "coverage" },
-                { "type": "test", "name": "coverage" }
-            ]
-        },
-        {
-            "name": "fuzz",
-            "steps": [
-                { "type": "configure", "name": "fuzz" },
-                { "type": "build", "name": "fuzz" }
-            ]
-        },
-        {
-            "name": "ci-simulator",
-            "steps": [
-                { "type": "configure", "name": "ci-simulator" },
-                { "type": "build", "name": "ci-simulator" },
-                { "type": "test", "name": "ci-simulator" }
-            ]
-        },
-        {
-            "name": "ci-clang",
-            "steps": [
-                { "type": "configure", "name": "ci-clang" },
-                { "type": "build", "name": "ci-clang" },
-                { "type": "test", "name": "ci-clang" }
-            ]
-        },
-        {
-            "name": "ci-avr",
-            "steps": [
-                { "type": "configure", "name": "ci-avr" },
-                { "type": "build", "name": "ci-avr" },
-                { "type": "test", "name": "ci-avr" }
-            ]
-        }
-    ]
+    {
+      "name": "warnings-as-errors",
+      "hidden": true,
+      "description": "What the ci- presets add: every warning of cmake/checks.cmake fails the build.",
+      "cacheVariables": { "CMAKE_COMPILE_WARNING_AS_ERROR": "ON" }
+    },
+    {
+      "name": "default",
+      "displayName": "Tests",
+      "description": "The tests on the host, by GCC, into build/host, where clangd looks. GCC named, so that a directory an editor once configured with another compiler does not quietly stay so: the clang preset is the clang build.",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/host",
+      "cacheVariables": { "CMAKE_CXX_COMPILER": "g++" }
+    },
+    {
+      "name": "clang",
+      "displayName": "Tests by clang",
+      "description": "The same tests by clang: two compilers disagree about what deserves a warning.",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/clang",
+      "cacheVariables": { "CMAKE_CXX_COMPILER": "clang++" }
+    },
+    {
+      "name": "sanitize",
+      "displayName": "Tests under ASan and UBSan",
+      "inherits": "default",
+      "binaryDir": "${sourceDir}/build/sanitize",
+      "cacheVariables": { "WORDCLOCK_SANITIZE": "ON" }
+    },
+    {
+      "name": "coverage",
+      "displayName": "Tests with coverage",
+      "inherits": "default",
+      "binaryDir": "${sourceDir}/build/coverage",
+      "cacheVariables": { "WORDCLOCK_COVERAGE": "ON" }
+    },
+    {
+      "name": "fuzz",
+      "displayName": "Fuzzers",
+      "description": "The fuzzers of test/fuzz/ by clang, which brings libFuzzer, under ASan and UBSan; optimized, as a fuzzer is worth the inputs it gets through, with debug information for what it finds. tools/fuzz.sh runs them.",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/fuzz",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "WORDCLOCK_FUZZ": "ON"
+      }
+    },
+    {
+      "name": "ci-default",
+      "inherits": ["warnings-as-errors", "default"]
+    },
+    {
+      "name": "ci-clang",
+      "inherits": ["warnings-as-errors", "clang"]
+    },
+    {
+      "name": "avr",
+      "displayName": "AVR Dx",
+      "description": "Wordclock's own until tools/ build the target avr128da48: the AVR128DA48 image, cross-compiled. AVR_MCU, AVR_F_CPU and AVR_DFP can be given with -D as before.",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build-avr",
+      "toolchainFile": "${sourceDir}/platform/avr-dx/toolchain-avr.cmake",
+      "cacheVariables": { "PLATFORM": "avr-dx", "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "ci-avr",
+      "displayName": "AVR Dx, warnings as errors",
+      "description": "Nothing else compiles a line of platform/avr-dx, so a warning there is seen here or nowhere.",
+      "inherits": ["warnings-as-errors", "avr"]
+    }
+  ],
+  "buildPresets": [
+    { "name": "default", "configurePreset": "default" },
+    { "name": "clang", "configurePreset": "clang" },
+    { "name": "sanitize", "configurePreset": "sanitize" },
+    { "name": "coverage", "configurePreset": "coverage" },
+    { "name": "fuzz", "configurePreset": "fuzz" },
+    { "name": "ci-default", "configurePreset": "ci-default" },
+    { "name": "ci-clang", "configurePreset": "ci-clang" },
+    { "name": "avr", "configurePreset": "avr" },
+    { "name": "ci-avr", "configurePreset": "ci-avr" }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clang",
+      "configurePreset": "clang",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "sanitize",
+      "configurePreset": "sanitize",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "coverage",
+      "configurePreset": "coverage",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "ci-default",
+      "configurePreset": "ci-default",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "ci-clang",
+      "configurePreset": "ci-clang",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "avr",
+      "description": "The documented sizes and the stack, checked against the image just built.",
+      "configurePreset": "avr",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "ci-avr",
+      "configurePreset": "ci-avr",
+      "output": { "outputOnFailure": true }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "default",
+      "steps": [
+        { "type": "configure", "name": "default" },
+        { "type": "build", "name": "default" },
+        { "type": "test", "name": "default" }
+      ]
+    },
+    {
+      "name": "clang",
+      "steps": [
+        { "type": "configure", "name": "clang" },
+        { "type": "build", "name": "clang" },
+        { "type": "test", "name": "clang" }
+      ]
+    },
+    {
+      "name": "sanitize",
+      "steps": [
+        { "type": "configure", "name": "sanitize" },
+        { "type": "build", "name": "sanitize" },
+        { "type": "test", "name": "sanitize" }
+      ]
+    },
+    {
+      "name": "coverage",
+      "steps": [
+        { "type": "configure", "name": "coverage" },
+        { "type": "build", "name": "coverage" },
+        { "type": "test", "name": "coverage" }
+      ]
+    },
+    {
+      "name": "fuzz",
+      "steps": [
+        { "type": "configure", "name": "fuzz" },
+        { "type": "build", "name": "fuzz" }
+      ]
+    },
+    {
+      "name": "ci-default",
+      "steps": [
+        { "type": "configure", "name": "ci-default" },
+        { "type": "build", "name": "ci-default" },
+        { "type": "test", "name": "ci-default" }
+      ]
+    },
+    {
+      "name": "ci-clang",
+      "steps": [
+        { "type": "configure", "name": "ci-clang" },
+        { "type": "build", "name": "ci-clang" },
+        { "type": "test", "name": "ci-clang" }
+      ]
+    },
+    {
+      "name": "avr",
+      "steps": [
+        { "type": "configure", "name": "avr" },
+        { "type": "build", "name": "avr" },
+        { "type": "test", "name": "avr" }
+      ]
+    },
+    {
+      "name": "ci-avr",
+      "steps": [
+        { "type": "configure", "name": "ci-avr" },
+        { "type": "build", "name": "ci-avr" },
+        { "type": "test", "name": "ci-avr" }
+      ]
+    }
+  ]
 }

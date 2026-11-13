@@ -8,7 +8,7 @@
             "name": "Debug Simulator (gdb)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/Wordclock",
+            "program": "${workspaceFolder}/build/host/bin/Wordclock",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

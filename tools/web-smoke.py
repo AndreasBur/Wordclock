@@ -21,7 +21,7 @@ whatever the outcome.
 
 Run with the tool environment, which has Playwright at the version uv.lock pins:
 
-    uv run tools/web-smoke.py build/bin/Wordclock
+    uv run tools/web-smoke.py build/host/bin/Wordclock
 """
 
 import argparse
@@ -158,7 +158,7 @@ def check_page(browser, name, path, ready, view, viewport, scheme):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('simulator', type=Path, help='the simulator binary, build/bin/Wordclock')
+    parser.add_argument('simulator', type=Path, help='the simulator binary, build/host/bin/Wordclock')
     args = parser.parse_args()
     binary = args.simulator.resolve()
     if not binary.is_file():

@@ -68,7 +68,7 @@ spricht deutsch.
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
 | [platform/arduino/](platform/arduino/) | What the two Arduino backends share: the real-time clock on the system clock, and the BH1750 and DS3231 drivers, written once against `Wire`. Each backend opens the bus its core's way in its own `I2cBus.cpp`. |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
-| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first, and [coverage.py](tools/coverage.py), which reports the lines of `src/` that no test runs. |
+| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first; beside them the template's scripts, [coverage.sh](tools/coverage.sh) and [fuzz.sh](tools/fuzz.sh) among them, which `tools/project.sh` tells what Wordclock is. |
 
 The tool that generates the bitmap font tables lives in its own repository,
 [theAndreas/FontCreator](https://github.com/theAndreas/FontCreator) — see
@@ -98,9 +98,9 @@ Without a container the same works, through the presets of
 calls as well:
 
 ```bash
-cmake --workflow --preset simulator    # configure, build, test - into build/
-./build/bin/Wordclock
-cmake --list-presets=all               # avr, clang, sanitizers, coverage, fuzz, ci-*
+cmake --workflow --preset default      # configure, build, test - into build/host/
+./build/host/bin/Wordclock
+cmake --list-presets=all               # avr, clang, sanitize, coverage, fuzz, ci-*
 ```
 
 Or through the [Makefile](Makefile), which is the index over the presets and everything that
@@ -137,7 +137,7 @@ The pages in [web/](web/) need a clock behind them to show anything, and **the s
 one**: it serves them itself, on localhost, from the binary that draws the window.
 
 ```bash
-cmake --build --preset simulator && ./build/bin/Wordclock     # http://localhost:8080/
+cmake --build --preset default && ./build/host/bin/Wordclock     # http://localhost:8080/
 ```
 
 The panel is at `/` and the console at `/console`, answered out of the same
@@ -190,9 +190,9 @@ under the sanitizers, and a fuzzer for what no test thought of:
 | Job | `make` | What it does |
 |-----|--------|--------------|
 | clang-tidy | `tidy` | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
-| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `src/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
+| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and fails if together they reach less of the lines, branches and conditions of `src/` than `COVERAGE_MINIMUM` of [`tools/project.sh`](tools/project.sh) says; a table of what none of them runs goes into the job's summary. Through the template's [`tools/coverage.sh`](tools/coverage.sh), which takes the host suites from `coverage_suites()` |
 | sanitizers | `sanitizers` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
-| fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`test/fuzz/`](test/fuzz/run.sh) |
+| fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers are in [`test/fuzz/`](test/fuzz/), their options beside them, and [`tools/fuzz.sh`](tools/fuzz.sh) runs them |
 | cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 | Scripts | `scripts` | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
 | Web page linters | `web-lint` | [html-validate](https://html-validate.org/) over both pages as whole documents and eslint over the scripts inline in them, at the versions [`package-lock.json`](package-lock.json) pins. What each checks and leaves out is in [`.htmlvalidate.mjs`](.htmlvalidate.mjs) and [`eslint.config.mjs`](eslint.config.mjs) |
@@ -213,7 +213,7 @@ make check                    # every job of both workflows, warnings as errors
 make fuzz FUZZ_SECONDS=300    # longer than the three minutes a pull request gets
 ```
 
-The fuzzers go on from the corpus the run before left in `build-fuzz/work`.
+The fuzzers go on from the corpus the run before left in `build/fuzz/work`.
 
 ## License
 

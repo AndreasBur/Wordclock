@@ -1,0 +1,3 @@
+# The input is a web socket frame, which the firmware refuses above
+# WEB_FRONTEND_MAX_FRAME_LENGTH: longer ones would only test the refusal.
+-max_len=192

@@ -134,9 +134,9 @@ it happened in.
 | **The overlay configuration is stored**, all three slots, the text as a fixed field | [Persistence.h](../src/Persistence/Persistence.h) |
 | **An installable console**, with the limit above as the more interesting half of the answer | [manifest.webmanifest](../web/manifest.webmanifest), [web/README.md](../web/README.md) |
 | **One accessor per operation, and both check** — the `*Fast` twins are gone | the [platform contract](../platform/avr-dx/README.md), measured in [decisions.md](decisions.md#the-fast-accessor-pair) |
-| **A coverage report** on every pull request, all three test suites together and no threshold | [coverage.py](../tools/coverage.py) |
+| **A coverage report** on every pull request, all three test suites together; a minimum since Wordclock came onto the template | [coverage.sh](../tools/coverage.sh) |
 | **The sanitizers and one warning list** — ASan and UBSan over every suite; every build of ours compiles with the same warnings, `-Wconversion` among them | [warnings.txt](../platform/warnings.txt), the sanitizers job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
-| **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../test/fuzz/run.sh) |
+| **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../test/fuzz/) |
 | **No heap on the AVR, and its stack is checked** against the RAM it has, on every build | [avr-stack.py](../tools/avr-stack.py), the [AVR notes](../platform/avr-dx/README.md) |
 | **The host builds again with clang**, the backends' host suites included | the clang job in [ci.yml](../.github/workflows/ci.yml) |
 | **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |

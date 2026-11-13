@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Wordclock LANGUAGES CXX)
 
+# The template's checks: the options the presets sanitize, coverage and fuzz turn on, the
+# instrumentation they ask for in CHECK_INSTRUMENT, and add_fuzzers().
+include(${CMAKE_SOURCE_DIR}/cmake/checks.cmake)
+
 # --------------------------------------------------------------------------
 # Global settings
 # --------------------------------------------------------------------------
@@ -14,7 +18,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # bin/ under the build directory, which is what the README and every note in this repository
-# tell a reader to run: build/bin/Wordclock.
+# tell a reader to run: build/host/bin/Wordclock, in the default preset.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # --------------------------------------------------------------------------
@@ -132,6 +136,11 @@ endif()
 
 target_compile_definitions(WordclockBuildSettings INTERFACE ${PIXELS_DEFINE})
 
+# What the presets sanitize, coverage and fuzz instrument with, on every object of this build and
+# not on the tests alone: the branches coverage counts and libFuzzer steers by are the core's.
+target_compile_options(WordclockBuildSettings INTERFACE ${CHECK_INSTRUMENT})
+target_link_options(WordclockBuildSettings INTERFACE ${CHECK_INSTRUMENT})
+
 # The firmware's web front end, compiled in. This backend serves the same two pages a clock
 # does - which is the whole point of it being here rather than only on the boards: the pages
 # can be opened from the binary that already draws the window, with no board and no separate
@@ -194,26 +203,15 @@ endif()
 # --------------------------------------------------------------------------
 # Fuzzers
 # --------------------------------------------------------------------------
-# One executable per file in test/fuzz, each linked against the same core and shims as the
-# tests. The core has to be instrumented as well, not only the fuzz target: libFuzzer steers by
-# the branches of the code it reaches, and those are in the core. So the flags go on
-# WordclockBuildSettings, which every object of this build compiles with.
-if(WORDCLOCK_BUILD_FUZZERS)
-    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        message(FATAL_ERROR
-            "WORDCLOCK_BUILD_FUZZERS needs clang, which brings libFuzzer:\n"
-            "  cmake --preset fuzz")
-    endif()
-    set(FUZZ_SANITIZERS -fsanitize=address,undefined -fno-sanitize-recover=all)
-    target_compile_options(WordclockBuildSettings INTERFACE -fsanitize=fuzzer-no-link ${FUZZ_SANITIZERS})
-    target_link_options(WordclockBuildSettings INTERFACE ${FUZZ_SANITIZERS})
-
-    file(GLOB FUZZ_TARGETS CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/test/fuzz/*Fuzz.cpp)
-    foreach(source ${FUZZ_TARGETS})
-        get_filename_component(name ${source} NAME_WE)
-        add_executable(${name} ${source})
-        target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/test/fuzz)
-        target_link_libraries(${name} PRIVATE WordclockCore WordclockShims)
-        target_link_options(${name} PRIVATE -fsanitize=fuzzer)
-    endforeach()
+# One executable per *Fuzz.cpp of test/fuzz, by add_fuzzers() of cmake/checks.cmake, into fuzz/
+# of the build, where tools/fuzz.sh runs them. Each is linked against the same core and shims as
+# the tests, gathered into one library, as add_fuzzers() takes one: a static one, because the
+# objects of an OBJECT library reach only what links it directly. The core is instrumented as
+# well, through CHECK_INSTRUMENT on WordclockBuildSettings above.
+if(WORDCLOCK_FUZZ)
+    add_library(WordclockFuzzBase STATIC
+        $<TARGET_OBJECTS:WordclockCore> $<TARGET_OBJECTS:WordclockShims>)
+    target_link_libraries(WordclockFuzzBase PUBLIC WordclockBuildSettings)
+    target_include_directories(WordclockFuzzBase PUBLIC ${CMAKE_SOURCE_DIR}/test/fuzz)
 endif()
+add_fuzzers(DIRECTORY ${CMAKE_SOURCE_DIR}/test/fuzz LIBRARY WordclockFuzzBase)

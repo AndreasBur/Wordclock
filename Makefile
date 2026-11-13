@@ -25,14 +25,12 @@ STRICT ?= $(CI)
 PRESET = $(if $(STRICT),ci-)
 UV_RUN ?= uv run --frozen
 
-# The flags CMakePresets.json gives the sanitizers preset, once more for the host suites, which
+# The flags cmake/checks.cmake gives the sanitize preset, once more for the host suites, which
 # are not CMake builds and take theirs through HOST_TESTS_CXXFLAGS.
 SANITIZE := -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
-COVERAGE := --coverage -O0
 
-# How long each fuzzer runs, and where the corpus it goes on from is kept.
-FUZZ_SECONDS ?= 180
-FUZZ_WORK ?= build-fuzz/work
+# How long each fuzzer runs; tools/fuzz.sh reads it, and keeps what each found in build/fuzz/work.
+export FUZZ_SECONDS ?= 180
 
 HOST_SUITES := platform/esp32/.pio/host-tests platform/rp2350/.pio/host-tests
 
@@ -58,13 +56,13 @@ lint: scripts docs cppcheck web-lint ## The checks that need no build: seconds
 
 ## Builds, each with its tests
 
-simulator: ## The simulator and the core tests, into build/
-	cmake --workflow --preset $(PRESET)simulator
+simulator: ## The simulator and the core tests, into build/host/
+	cmake --workflow --preset $(PRESET)default
 
 run: ## Build the simulator and start it - the window, and the pages on localhost:8080
-	cmake --preset $(PRESET)simulator
-	cmake --build --preset $(PRESET)simulator --target Wordclock
-	./build/bin/Wordclock
+	cmake --preset $(PRESET)default
+	cmake --build --preset $(PRESET)default --target Wordclock
+	./build/host/bin/Wordclock
 
 clang: ## The simulator, core tests and both host suites compiled by clang
 	cmake --workflow --preset $(PRESET)clang
@@ -95,9 +93,9 @@ host-rp2350: ## The RP2350 backend's host tests, with g++
 	platform/rp2350/test/run.sh
 
 web: ## Both web pages in headless Chromium, against the simulator
-	cmake --preset $(PRESET)simulator
-	cmake --build --preset $(PRESET)simulator --target Wordclock
-	$(UV_RUN) python tools/web-smoke.py build/bin/Wordclock
+	cmake --preset $(PRESET)default
+	cmake --build --preset $(PRESET)default --target Wordclock
+	$(UV_RUN) python tools/web-smoke.py build/host/bin/Wordclock
 
 ## Analysers
 
@@ -105,23 +103,23 @@ web: ## Both web pages in headless Chromium, against the simulator
 # the build but compile_commands.json, which every preset writes. Which checks, and why the rest
 # are off, is in .clang-tidy; WarningsAsErrors is set there, so a finding fails.
 tidy: ## clang-tidy and the standalone headers: the core, the simulator and the host tests
-	cmake --preset $(PRESET)simulator
+	cmake --preset $(PRESET)default
 # The one exception to "not built". WebPage.h holds the two pages as arrays and is generated
 # rather than checked in, so a translation unit that includes it does not compile until the rule
 # has run - and clang-tidy reports that as the file being missing, which reads like a bad include
 # path rather than a build step that was skipped. It is a python script and costs no build time.
-	cmake --build --preset $(PRESET)simulator --target WordclockWebPage
-	run-clang-tidy -p build -quiet -j "$$(nproc)" '^$(CURDIR)/src/|platform/simulator/src'
+	cmake --build --preset $(PRESET)default --target WordclockWebPage
+	run-clang-tidy -p build/host -quiet -j "$$(nproc)" '^$(CURDIR)/src/|platform/simulator/src'
 # Every header compiled as the only include of an empty file, by the compiler and with the flags
 # the database records. A header that leans on what its includers happen to include first builds
 # everywhere until one of them stops - tools/self-contained-headers.py says why that is not a
 # finding any analyser above can make. Each backend's target runs it again with its own compiler,
 # because the #if branches a header takes are the target's.
-	python3 tools/self-contained-headers.py build src platform/simulator/include
+	python3 tools/self-contained-headers.py build/host src platform/simulator/include
 # The names are the same everywhere, the tests and the window included, which the run above
 # leaves out: what the other checks would say about test scaffolding is not worth answering, but
 # a test written in the old names reads as the old code. Seconds, not minutes - one check.
-	run-clang-tidy -p build -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
+	run-clang-tidy -p build/host -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
 	    '^$(CURDIR)/test/|platform/simulator/Wordclock'
 # The backends' host tests are compiled by their own run.sh and by nothing CMake or PlatformIO
 # sees, so their names are read through the compile database run.sh writes. That takes python3
@@ -209,27 +207,27 @@ node_modules/.package-lock.json: package.json package-lock.json
 ## The three suites, instrumented
 
 sanitizers: ## Core tests and both host suites under ASan and UBSan
-	cmake --workflow --preset sanitizers
+	cmake --workflow --preset sanitize
 	UBSAN_OPTIONS=print_stacktrace=1 HOST_TESTS_CXXFLAGS="$(SANITIZE)" platform/esp32/test/run.sh
 	UBSAN_OPTIONS=print_stacktrace=1 HOST_TESTS_CXXFLAGS="$(SANITIZE)" platform/rp2350/test/run.sh
 
-# Into the job's summary as well when there is one, which is CI's.
-coverage: ## Core tests and both host suites with --coverage, and the report
-	cmake --workflow --preset coverage
-	HOST_TESTS_CXXFLAGS="$(COVERAGE)" platform/esp32/test/run.sh
-	HOST_TESTS_CXXFLAGS="$(COVERAGE)" platform/rp2350/test/run.sh
-	python3 tools/coverage.py $(if $(GITHUB_STEP_SUMMARY),--summary "$(GITHUB_STEP_SUMMARY)") \
-	    build-cov $(HOST_SUITES)
+# The host suites through coverage_suites() of tools/project.sh, counted with the core tests
+# against COVERAGE_MINIMUM. Into the job's summary as well when there is one, which is CI's.
+coverage: ## Core tests and both host suites with --coverage, against COVERAGE_MINIMUM
+	tools/coverage.sh
+	if [[ -n "$${GITHUB_STEP_SUMMARY:-}" ]]; then \
+	    { echo '```text'; cat build/coverage/coverage.txt; echo '```'; } >> "$$GITHUB_STEP_SUMMARY"; \
+	fi
 
 # The fuzzers' names here and not under tidy: they are in no build but this one.
-fuzz: ## The fuzzers, FUZZ_SECONDS each, going on from the corpus in FUZZ_WORK
+fuzz: ## The fuzzers, FUZZ_SECONDS each, going on from the corpus in build/fuzz/work
 	cmake --workflow --preset fuzz
-	run-clang-tidy -p build-fuzz -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
+	run-clang-tidy -p build/fuzz -quiet -j "$$(nproc)" -checks='-*,readability-identifier-naming' \
 	    'test/fuzz'
-	test/fuzz/run.sh build-fuzz $(FUZZ_SECONDS) $(FUZZ_WORK)
+	tools/fuzz.sh
 
 ## Housekeeping
 
 clean: ## Every build directory, the PlatformIO images and the host suites' builds
-	rm -rf build build-avr build-clang build-san build-cov build-fuzz \
+	rm -rf build build-avr \
 	    platform/esp32/.pio/build platform/rp2350/.pio/build $(HOST_SUITES)

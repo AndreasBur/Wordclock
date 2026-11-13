@@ -1,5 +1,7 @@
-# clangd reads build/compile_commands.json and .clang-tidy on its own; this file adds what
-# .clang-tidy passes as ExtraArgs, which clangd does not read: the checks of the Doxygen blocks,
-# so that the editor shows what static-analysis.yml reports. See docs/documentation.md.
+# clangd reads .clang-tidy on its own; this file names the database, that of the default preset
+# in build/host, and adds what .clang-tidy passes as ExtraArgs, which clangd does not read: the
+# checks of the Doxygen blocks, so that the editor shows what static-analysis.yml reports. See
+# docs/documentation.md.
 CompileFlags:
+  CompilationDatabase: build/host
   Add: [-Wdocumentation, -Wdocumentation-unknown-command]
