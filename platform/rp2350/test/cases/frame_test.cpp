@@ -11,13 +11,13 @@
 #include <hardware/dma.h>
 #include <hardware/pio.h>
 
+#include <cstdio>
+#include <cstring>
+
 #include "Arduino.h"
 #include "Pixels.h"
 #include "WS2812Pio.h"
 #include "check.h"
-
-#include <cstdio>
-#include <cstring>
 
 static uint32_t captured[256];
 static size_t captured_count = 0;
@@ -38,37 +38,40 @@ static bool state_machine_claimed = false;
 static int programs_loaded = 0;
 static bool dma_channel_free = true;
 
-int pio_add_program(PIO, const pio_program_t*) { programs_loaded++; return 0; }
-void pio_remove_program(PIO, const pio_program_t*, uint) { programs_loaded--; }
+int pio_add_program(PIO, pio_program_t const*) {
+  programs_loaded++;
+  return 0;
+}
+void pio_remove_program(PIO, pio_program_t const*, uint) { programs_loaded--; }
 bool pio_sm_is_claimed(PIO, uint) { return state_machine_claimed; }
 void pio_sm_claim(PIO, uint) { state_machine_claimed = true; }
 void pio_sm_unclaim(PIO, uint) { state_machine_claimed = false; }
 pio_sm_config pio_get_default_sm_config(void) { return {}; }
-void sm_config_set_wrap(pio_sm_config*, uint, uint) { }
-void sm_config_set_sideset(pio_sm_config*, uint, bool, bool) { }
-void sm_config_set_sideset_pins(pio_sm_config*, uint) { }
-void sm_config_set_out_shift(pio_sm_config*, bool, bool, uint) { }
-void sm_config_set_fifo_join(pio_sm_config*, pio_fifo_join) { }
-void sm_config_set_clkdiv(pio_sm_config*, float) { }
-void pio_gpio_init(PIO, uint) { }
-void pio_sm_set_consecutive_pindirs(PIO, uint, uint, uint, bool) { }
-void pio_sm_init(PIO, uint, uint, const pio_sm_config*) { }
-void pio_sm_set_enabled(PIO, uint, bool) { }
+void sm_config_set_wrap(pio_sm_config*, uint, uint) {}
+void sm_config_set_sideset(pio_sm_config*, uint, bool, bool) {}
+void sm_config_set_sideset_pins(pio_sm_config*, uint) {}
+void sm_config_set_out_shift(pio_sm_config*, bool, bool, uint) {}
+void sm_config_set_fifo_join(pio_sm_config*, pio_fifo_join) {}
+void sm_config_set_clkdiv(pio_sm_config*, float) {}
+void pio_gpio_init(PIO, uint) {}
+void pio_sm_set_consecutive_pindirs(PIO, uint, uint, uint, bool) {}
+void pio_sm_init(PIO, uint, uint, pio_sm_config const*) {}
+void pio_sm_set_enabled(PIO, uint, bool) {}
 uint pio_get_dreq(PIO, uint, bool) { return 0u; }
 uint32_t clock_get_hz(clock_handle_t) { return 150u * 1000u * 1000u; }
 
 int dma_claim_unused_channel(bool) { return dma_channel_free ? 0 : -1; }
 dma_channel_config dma_channel_get_default_config(uint) { return {}; }
-void channel_config_set_transfer_data_size(dma_channel_config*, dma_channel_transfer_size) { }
-void channel_config_set_read_increment(dma_channel_config*, bool) { }
-void channel_config_set_write_increment(dma_channel_config*, bool) { }
-void channel_config_set_dreq(dma_channel_config*, uint) { }
+void channel_config_set_transfer_data_size(dma_channel_config*, dma_channel_transfer_size) {}
+void channel_config_set_read_increment(dma_channel_config*, bool) {}
+void channel_config_set_write_increment(dma_channel_config*, bool) {}
+void channel_config_set_dreq(dma_channel_config*, uint) {}
 bool dma_channel_is_busy(uint) { return false; }
 
-void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void* source, uint count, bool)
-{
-    captured_count = count;
-    memcpy(captured, source, count * sizeof(uint32_t));
+void dma_channel_configure(uint, dma_channel_config const*, void volatile*, void const* source,
+                           uint count, bool) {
+  captured_count = count;
+  memcpy(captured, source, count * sizeof(uint32_t));
 }
 
 /*
@@ -78,61 +81,62 @@ void dma_channel_configure(uint, const dma_channel_config*, volatile void*, cons
  * order and not against itself.
  */
 static byte Green(uint32_t word) { return static_cast<byte>((word >> 24u) & 0xFFu); }
-static byte Red(uint32_t word)   { return static_cast<byte>((word >> 16u) & 0xFFu); }
-static byte Blue(uint32_t word)  { return static_cast<byte>((word >> 8u) & 0xFFu); }
+static byte Red(uint32_t word) { return static_cast<byte>((word >> 16u) & 0xFFu); }
+static byte Blue(uint32_t word) { return static_cast<byte>((word >> 8u) & 0xFFu); }
 
-int main()
-{
-    /*
-     * Before the frame, because the transmitter is a singleton that, once ready, stays so. The
-     * state machine used to be taken without asking the SDK, so a library that had claimed it
-     * shared it with the strip; and a call that found no DMA channel left the program loaded.
-     */
-    WS2812Pio& transmitter = WS2812Pio::GetInstance();
-    state_machine_claimed = true;
-    transmitter.Init(10);
-    Check(!transmitter.IsReady() && programs_loaded == 0,
-          "a state machine claimed elsewhere is left alone, and nothing is loaded");
+int main() {
+  /*
+   * Before the frame, because the transmitter is a singleton that, once ready, stays so. The
+   * state machine used to be taken without asking the SDK, so a library that had claimed it
+   * shared it with the strip; and a call that found no DMA channel left the program loaded.
+   */
+  WS2812Pio& transmitter = WS2812Pio::GetInstance();
+  state_machine_claimed = true;
+  transmitter.Init(10);
+  Check(!transmitter.IsReady() && programs_loaded == 0,
+        "a state machine claimed elsewhere is left alone, and nothing is loaded");
 
-    state_machine_claimed = false;
-    dma_channel_free = false;
-    transmitter.Init(10);
-    Check(!transmitter.IsReady() && programs_loaded == 0 && !state_machine_claimed,
-          "a call that finds no DMA channel gives back the program and the state machine");
-    dma_channel_free = true;
+  state_machine_claimed = false;
+  dma_channel_free = false;
+  transmitter.Init(10);
+  Check(!transmitter.IsReady() && programs_loaded == 0 && !state_machine_claimed,
+        "a call that finds no DMA channel gives back the program and the state machine");
+  dma_channel_free = true;
 
-    Pixels& p = Pixels::GetInstance();
-    p.Init(10);
-    Check(transmitter.IsReady() && programs_loaded == 1 && state_machine_claimed,
-          "a call that succeeds holds the state machine and the program");
+  Pixels& p = Pixels::GetInstance();
+  p.Init(10);
+  Check(transmitter.IsReady() && programs_loaded == 1 && state_machine_claimed,
+        "a call that succeeds holds the state machine and the program");
 
-    p.ClearPixels();
-    p.SetPixel(0u, 10u, 20u, 30u);      // Red=10, Green=20, Blue=30
-    p.SetPixel(12u, 1u, 2u, 3u);        // row 1, column 1 -> word 12
-    p.Render();
+  p.ClearPixels();
+  p.SetPixel(0u, 10u, 20u, 30u);  // Red=10, Green=20, Blue=30
+  p.SetPixel(12u, 1u, 2u, 3u);    // row 1, column 1 -> word 12
+  p.Render();
 
-    Check(captured_count == 110u, "frame is one word per LED");
-    Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
-          "pixel 0 goes out as green, red, blue from the top of the word");
-    Check(Green(captured[12]) == 2u && Red(captured[12]) == 1u && Blue(captured[12]) == 3u,
-          "pixel 12 goes out as green, red, blue in word 12");
-    // The eight low bits are never shifted out - autopull refills after 24 - so nothing
-    // may depend on them, and nothing here checks them.
-    Check(!p.IsDirty(), "render clears the dirty flag");
+  Check(captured_count == 110u, "frame is one word per LED");
+  Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
+        "pixel 0 goes out as green, red, blue from the top of the word");
+  Check(Green(captured[12]) == 2u && Red(captured[12]) == 1u && Blue(captured[12]) == 3u,
+        "pixel 12 goes out as green, red, blue in word 12");
+  // The eight low bits are never shifted out - autopull refills after 24 - so nothing
+  // may depend on them, and nothing here checks them.
+  Check(!p.IsDirty(), "render clears the dirty flag");
 
-    captured_count = 0;
-    p.Render();
-    Check(captured_count == 0u, "an unchanged frame is not retransmitted");
+  captured_count = 0;
+  p.Render();
+  Check(captured_count == 0u, "an unchanged frame is not retransmitted");
 
-    p.DisablePixels();
-    p.Render();
-    bool all_dark = true;
-    for(size_t i = 0; i < captured_count; i++) { if((captured[i] & 0xFFFFFF00u) != 0u) all_dark = false; }
-    Check(all_dark, "disablePixels blanks the frame");
+  p.DisablePixels();
+  p.Render();
+  bool all_dark = true;
+  for (size_t i = 0; i < captured_count; i++) {
+    if ((captured[i] & 0xFFFFFF00u) != 0u) all_dark = false;
+  }
+  Check(all_dark, "disablePixels blanks the frame");
 
-    p.EnablePixels();
-    p.Render();
-    Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
-          "enablePixels restores it without a redraw");
-    return Report();
+  p.EnablePixels();
+  p.Render();
+  Check(Green(captured[0]) == 20u && Red(captured[0]) == 10u && Blue(captured[0]) == 30u,
+        "enablePixels restores it without a redraw");
+  return Report();
 }

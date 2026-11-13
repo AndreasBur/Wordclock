@@ -36,15 +36,15 @@ the line it is for.
 ## The block
 
 ```cpp
-    /*!
-     * \brief Lights the pixel at `column` and `row` in the colour of the display.
-     *
-     * \param[in] column The column of the grid, counted from 0.
-     * \param[in] row The row of the grid, counted from 0.
-     * \return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left as
-     *         they were.
-     */
-    StdReturnType SetPixel(byte column, byte row);
+  /*!
+   * \brief Lights the pixel at `column` and `row` in the colour of the display.
+   *
+   * \param[in] column The column of the grid, counted from 0.
+   * \param[in] row The row of the grid, counted from 0.
+   * \return kEOk, or kENotOk if `column` or `row` lies off the grid; the pixels are then left as
+   *         they were.
+   */
+  StdReturnType SetPixel(byte column, byte row);
 ```
 
 - `/*!` on a line of its own, each further line starting with ` * `, and ` */` on a line of its

@@ -22,17 +22,17 @@ inline int failures = 0;
 
 // The description first and the verdict in a fixed column, so a run reads as a list of
 // what was checked rather than as a list of results.
-inline void Check(bool ok, const char* what)
-{
-    printf("%-56s %s\n", what, ok ? "ok" : "FAIL");
-    if(!ok) { failures++; }
+inline void Check(bool ok, char const* what) {
+  printf("%-56s %s\n", what, ok ? "ok" : "FAIL");
+  if (!ok) {
+    failures++;
+  }
 }
 
 /* What main() ends with: the line a reader looks for, and the exit code run.sh reads. */
-inline int Report()
-{
-    printf("\n%s\n", (failures == 0) ? "all checks passed" : "FAILURES");
-    return (failures == 0) ? 0 : 1;
+inline int Report() {
+  printf("\n%s\n", (failures == 0) ? "all checks passed" : "FAILURES");
+  return (failures == 0) ? 0 : 1;
 }
 
 #endif  // WORDCLOCK_PLATFORM_TEST_CHECK_H_

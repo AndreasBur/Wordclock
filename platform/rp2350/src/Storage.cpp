@@ -18,10 +18,12 @@
  * and Persistence reads before it ever writes.
  */
 
+// clang-format off
 /* Ahead of Storage.h, which pulls in the Arduino.h that binds Serial to a macro. */
 #include <LittleFS.h>
 
 #include "Storage.h"
+// clang-format on
 
 namespace {
 constexpr char kBlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
@@ -32,27 +34,23 @@ constexpr char kBlobPath[]{"/" STORAGE_NAMESPACE "/" STORAGE_KEY};
  * into a stall. Formatting on a failed mount is what makes a first boot work on a chip
  * whose flash has never held one.
  */
-bool IsFilesystemReady()
-{
-    static bool was_tried{false};
-    static bool is_mounted{false};
+bool IsFilesystemReady() {
+  static bool was_tried{false};
+  static bool is_mounted{false};
 
-    if(!was_tried) {
-        was_tried = true;
-        is_mounted = LittleFS.begin();
-    }
+  if (!was_tried) {
+    was_tried = true;
+    is_mounted = LittleFS.begin();
+  }
 
-    return is_mounted;
+  return is_mounted;
 }
 
 // The directory the blob lives in. mkdir() on an existing one is not an error worth
 // reporting - the open that follows is what decides.
-void EnsureDirectory()
-{
-    LittleFS.mkdir("/" STORAGE_NAMESPACE);
-}
+void EnsureDirectory() { LittleFS.mkdir("/" STORAGE_NAMESPACE); }
 
-} // namespace
+}  // namespace
 
 /*
  * Instance methods, though some of them read no member: they are the interface the
@@ -62,53 +60,72 @@ void EnsureDirectory()
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-StdReturnType Storage::Read(byte* buffer, size_t size) const
-{
-    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
-    if(!IsFilesystemReady()) { return kENotOk; }
+StdReturnType Storage::Read(byte* buffer, size_t size) const {
+  if ((buffer == nullptr) || (size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
+  if (!IsFilesystemReady()) {
+    return kENotOk;
+  }
 
-    File blob = LittleFS.open(kBlobPath, "r");
-    if(!blob) { return kENotOk; }
+  File blob = LittleFS.open(kBlobPath, "r");
+  if (!blob) {
+    return kENotOk;
+  }
 
-    if(blob.size() != size) {
-        blob.close();
-        return kENotOk;
-    }
-
-    const size_t read = blob.read(buffer, size);
+  if (blob.size() != size) {
     blob.close();
+    return kENotOk;
+  }
 
-    if(read != size) { return kENotOk; }
+  size_t const read = blob.read(buffer, size);
+  blob.close();
 
-    return kEOk;
+  if (read != size) {
+    return kENotOk;
+  }
+
+  return kEOk;
 }
 
-StdReturnType Storage::Write(const byte* buffer, size_t size)
-{
-    if((buffer == nullptr) || (size == 0u) || (size > kCapacity)) { return kENotOk; }
-    if(!IsFilesystemReady()) { return kENotOk; }
+StdReturnType Storage::Write(byte const* buffer, size_t size) {
+  if ((buffer == nullptr) || (size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
+  if (!IsFilesystemReady()) {
+    return kENotOk;
+  }
 
-    EnsureDirectory();
+  EnsureDirectory();
 
-    File blob = LittleFS.open(kBlobPath, "w");
-    if(!blob) { return kENotOk; }
+  File blob = LittleFS.open(kBlobPath, "w");
+  if (!blob) {
+    return kENotOk;
+  }
 
-    const size_t written = blob.write(buffer, size);
-    blob.close();
+  size_t const written = blob.write(buffer, size);
+  blob.close();
 
-    if(written != size) { return kENotOk; }
+  if (written != size) {
+    return kENotOk;
+  }
 
-    return kEOk;
+  return kEOk;
 }
 
-StdReturnType Storage::Clear()
-{
-    if(!IsFilesystemReady()) { return kENotOk; }
+StdReturnType Storage::Clear() {
+  if (!IsFilesystemReady()) {
+    return kENotOk;
+  }
 
-    if(!LittleFS.exists(kBlobPath)) { return kEOk; }
-
-    if(!LittleFS.remove(kBlobPath)) { return kENotOk; }
-
+  if (!LittleFS.exists(kBlobPath)) {
     return kEOk;
+  }
+
+  if (!LittleFS.remove(kBlobPath)) {
+    return kENotOk;
+  }
+
+  return kEOk;
 }
 // NOLINTEND(readability-convert-member-functions-to-static)

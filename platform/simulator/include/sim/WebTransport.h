@@ -17,6 +17,7 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_
 
+// clang-format off
 #include "StandardTypes.h"
 // Where this backend's `byte` comes from - the two on hardware get it from the Arduino core,
 // and this header is reached before that one on the way in from WebHost.cpp.
@@ -24,6 +25,7 @@
 
 #include <stddef.h>
 #include <string>
+// clang-format on
 
 /*!
  * \brief One route's answer, being written: the body of a response, which the core writes into and
@@ -36,41 +38,40 @@
  * largest thing it writes is a page out of flash, so a length up front is simpler than a chunked
  * encoding and is what Finish() sends.
  */
-class WebResponseBody
-{
-  private:
-    int socket_;
-    const char* content_type_;
-    std::string collected_;
+class WebResponseBody {
+ private:
+  int socket_;
+  char const* content_type_;
+  std::string collected_;
 
-  public:
-    /*!
-     * \brief Opens the answer to the request that came in on `socket`.
-     *
-     * \param[in] socket The connection the request came in on.
-     * \param[in] content_type The content type of the body, terminated.
-     * \note `content_type` is kept as a pointer and only read by Finish(), so it has to stay valid
-     *       until then.
-     */
-    WebResponseBody(int socket, const char* content_type);
+ public:
+  /*!
+   * \brief Opens the answer to the request that came in on `socket`.
+   *
+   * \param[in] socket The connection the request came in on.
+   * \param[in] content_type The content type of the body, terminated.
+   * \note `content_type` is kept as a pointer and only read by Finish(), so it has to stay valid
+   *       until then.
+   */
+  WebResponseBody(int socket, char const* content_type);
 
-    /*!
-     * \brief Adds `length` bytes of `data` to the body.
-     *
-     * In the simulator, nothing is sent before Finish().
-     *
-     * \param[in] data The bytes; they need not be terminated.
-     * \param[in] length The number of bytes.
-     */
-    void Write(const char* data, size_t length);
+  /*!
+   * \brief Adds `length` bytes of `data` to the body.
+   *
+   * In the simulator, nothing is sent before Finish().
+   *
+   * \param[in] data The bytes; they need not be terminated.
+   * \param[in] length The number of bytes.
+   */
+  void Write(char const* data, size_t length);
 
-    /*!
-     * \brief Ends the body, and has the answer sent.
-     *
-     * Called once, after the last Write(). In the simulator, it sends the status 200, the content
-     * type, the length and the body collected, at once, on the caller's thread.
-     */
-    void Finish();
+  /*!
+   * \brief Ends the body, and has the answer sent.
+   *
+   * Called once, after the last Write(). In the simulator, it sends the status 200, the content
+   * type, the length and the body collected, at once, on the caller's thread.
+   */
+  void Finish();
 };
 
 /*!
@@ -83,33 +84,32 @@ class WebResponseBody
  * The client list is WebHost's, since nothing here comes with one. What is sent goes out at
  * once, on the caller's thread.
  */
-class WebTransport
-{
-  public:
-    /*! \brief Returns the one transport. */
-    static WebTransport& GetInstance();
+class WebTransport {
+ public:
+  /*! \brief Returns the one transport. */
+  static WebTransport& GetInstance();
 
-    /*! \brief Returns whether the server is listening for connections. */
-    bool IsListening() const;
+  /*! \brief Returns whether the server is listening for connections. */
+  bool IsListening() const;
 
-    /*! \brief Returns whether a client is connected to the web socket. */
-    bool HasClients() const;
+  /*! \brief Returns whether a client is connected to the web socket. */
+  bool HasClients() const;
 
-    /*!
-     * \brief Sends `length` bytes of `text` to every client of the web socket, as a text frame.
-     *
-     * \param[in] text The text, as UTF-8, which a text frame has to be; it need not be terminated.
-     * \param[in] length The number of bytes.
-     */
-    void SendText(const char* text, size_t length);
+  /*!
+   * \brief Sends `length` bytes of `text` to every client of the web socket, as a text frame.
+   *
+   * \param[in] text The text, as UTF-8, which a text frame has to be; it need not be terminated.
+   * \param[in] length The number of bytes.
+   */
+  void SendText(char const* text, size_t length);
 
-    /*!
-     * \brief Sends `length` bytes of `bytes` to every client of the web socket, as a binary frame.
-     *
-     * \param[in] bytes The bytes.
-     * \param[in] length The number of bytes.
-     */
-    void SendBinary(const byte* bytes, size_t length);
+  /*!
+   * \brief Sends `length` bytes of `bytes` to every client of the web socket, as a binary frame.
+   *
+   * \param[in] bytes The bytes.
+   * \param[in] length The number of bytes.
+   */
+  void SendBinary(byte const* bytes, size_t length);
 };
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_SIM_WEBTRANSPORT_H_

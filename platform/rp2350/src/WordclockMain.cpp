@@ -21,27 +21,25 @@
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-void WordclockMain::Init()
-{
-    /*
-     * Before the display, and that order is the hardware's rather than a preference: the call
-     * below claims the strip's data line, and a frame reaching DIN before the 5 V is up pushes
-     * current into a dead rail through the LED's own protection diode. The reset leaves the
-     * supply off, so this is the call that asks for it.
-     */
-    PowerSwitch::GetInstance().Init();
-    Display::GetInstance().Init();
-    /*
-     * After the display, because restoring the brightness recalculates what reaches the
-     * LEDs, and before the first task, so the strip's first frame already carries the
-     * stored colour.
-     */
-    Persistence::GetInstance().Load();
+void WordclockMain::Init() {
+  /*
+   * Before the display, and that order is the hardware's rather than a preference: the call
+   * below claims the strip's data line, and a frame reaching DIN before the 5 V is up pushes
+   * current into a dead rail through the LED's own protection diode. The reset leaves the
+   * supply off, so this is the call that asks for it.
+   */
+  PowerSwitch::GetInstance().Init();
+  Display::GetInstance().Init();
+  /*
+   * After the display, because restoring the brightness recalculates what reaches the
+   * LEDs, and before the first task, so the strip's first frame already carries the
+   * stored colour.
+   */
+  Persistence::GetInstance().Load();
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-void WordclockMain::Task()
-{
-    RealTimeClock::GetInstance().Task();
-    wc_scheduler_.Task();
+void WordclockMain::Task() {
+  RealTimeClock::GetInstance().Task();
+  wc_scheduler_.Task();
 }

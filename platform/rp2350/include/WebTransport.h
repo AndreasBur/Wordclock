@@ -22,10 +22,10 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBTRANSPORT_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBTRANSPORT_H_
 
-#include "StandardTypes.h"
-#include "Arduino.h"
-
 #include <stddef.h>
+
+#include "Arduino.h"
+#include "StandardTypes.h"
 
 class AsyncWebServerRequest;
 class AsyncResponseStream;
@@ -41,41 +41,40 @@ class AsyncResponseStream;
  * rather than pushed to: the stream collects what is written and Finish() is what hands it to the
  * request, after which the library sends it.
  */
-class WebResponseBody
-{
-  private:
-    AsyncWebServerRequest* request_;
-    AsyncResponseStream* stream_;
+class WebResponseBody {
+ private:
+  AsyncWebServerRequest* request_;
+  AsyncResponseStream* stream_;
 
-  public:
-    /*!
-     * \brief Opens the answer to `request`, and sets its content type.
-     *
-     * It opens the stream with `beginResponseStream()`.
-     *
-     * \param[in] request The request of ESPAsyncWebServer the answer is for.
-     * \param[in] content_type The content type of the body, terminated.
-     */
-    WebResponseBody(AsyncWebServerRequest* request, const char* content_type);
+ public:
+  /*!
+   * \brief Opens the answer to `request`, and sets its content type.
+   *
+   * It opens the stream with `beginResponseStream()`.
+   *
+   * \param[in] request The request of ESPAsyncWebServer the answer is for.
+   * \param[in] content_type The content type of the body, terminated.
+   */
+  WebResponseBody(AsyncWebServerRequest* request, char const* content_type);
 
-    /*!
-     * \brief Adds `length` bytes of `data` to the body.
-     *
-     * On the RP2350, written into the stream, which holds it until Finish(); what the stream
-     * answers is not checked.
-     *
-     * \param[in] data The bytes; they need not be terminated.
-     * \param[in] length The number of bytes.
-     */
-    void Write(const char* data, size_t length);
+  /*!
+   * \brief Adds `length` bytes of `data` to the body.
+   *
+   * On the RP2350, written into the stream, which holds it until Finish(); what the stream
+   * answers is not checked.
+   *
+   * \param[in] data The bytes; they need not be terminated.
+   * \param[in] length The number of bytes.
+   */
+  void Write(char const* data, size_t length);
 
-    /*!
-     * \brief Ends the body, and has the answer sent.
-     *
-     * Called once, after the last Write(). On the RP2350 it hands the stream to the request with
-     * `send()`, and the library sends it.
-     */
-    void Finish();
+  /*!
+   * \brief Ends the body, and has the answer sent.
+   *
+   * Called once, after the last Write(). On the RP2350 it hands the stream to the request with
+   * `send()`, and the library sends it.
+   */
+  void Finish();
 };
 
 /*!
@@ -89,37 +88,36 @@ class WebResponseBody
  * counts it and broadcasts to it, so HasClients() is that count and there is no table here that
  * could disagree with it. IsListening() is true from the end of WebInterface::Begin() on.
  */
-class WebTransport
-{
-  public:
-    /*! \brief Returns the one transport. */
-    static WebTransport& GetInstance();
+class WebTransport {
+ public:
+  /*! \brief Returns the one transport. */
+  static WebTransport& GetInstance();
 
-    /*! \brief Returns whether the server is listening for connections. */
-    bool IsListening() const;
+  /*! \brief Returns whether the server is listening for connections. */
+  bool IsListening() const;
 
-    /*! \brief Returns whether a client is connected to the web socket. */
-    bool HasClients() const;
+  /*! \brief Returns whether a client is connected to the web socket. */
+  bool HasClients() const;
 
-    /*!
-     * \brief Sends `length` bytes of `text` to every client of the web socket, as a text frame.
-     *
-     * On the RP2350, with `AsyncWebSocket::textAll()`, whose answer is not checked.
-     *
-     * \param[in] text The text, as UTF-8, which a text frame has to be; it need not be terminated.
-     * \param[in] length The number of bytes.
-     */
-    void SendText(const char* text, size_t length);
+  /*!
+   * \brief Sends `length` bytes of `text` to every client of the web socket, as a text frame.
+   *
+   * On the RP2350, with `AsyncWebSocket::textAll()`, whose answer is not checked.
+   *
+   * \param[in] text The text, as UTF-8, which a text frame has to be; it need not be terminated.
+   * \param[in] length The number of bytes.
+   */
+  void SendText(char const* text, size_t length);
 
-    /*!
-     * \brief Sends `length` bytes of `bytes` to every client of the web socket, as a binary frame.
-     *
-     * On the RP2350, with `AsyncWebSocket::binaryAll()`, whose answer is not checked.
-     *
-     * \param[in] bytes The bytes.
-     * \param[in] length The number of bytes.
-     */
-    void SendBinary(const byte* bytes, size_t length);
+  /*!
+   * \brief Sends `length` bytes of `bytes` to every client of the web socket, as a binary frame.
+   *
+   * On the RP2350, with `AsyncWebSocket::binaryAll()`, whose answer is not checked.
+   *
+   * \param[in] bytes The bytes.
+   * \param[in] length The number of bytes.
+   */
+  void SendBinary(byte const* bytes, size_t length);
 };
 
 #endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_WEBTRANSPORT_H_

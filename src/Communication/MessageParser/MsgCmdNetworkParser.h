@@ -21,16 +21,16 @@
 #ifndef WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
 #define WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_
 
-#include "StandardTypes.h"
+#include <string.h>
+
 #include "Arduino.h"
 #include "MsgParameterParser.h"
+#include "StandardTypes.h"
 #include "StringTools.h"
 #include "System.h"
 
-#include <string.h>
-
 /*! \brief The number of options in the parameter table of the network command. */
-#define MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE                 2u
+#define MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE 2u
 
 /*!
  * \brief The parser of command 13, the network command: sets the network the clock joins.
@@ -59,110 +59,115 @@
  * An empty pass phrase is a pass phrase all the same, at the end of the line too: `13 -SOpenNet -P`
  * joins an open network, and `13 -S -P` forgets the network.
  */
-class MsgCmdNetworkParser : public MsgParameterParser<MsgCmdNetworkParser, MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE>
-{
-  private:
-    friend class MsgParameterParser;
+class MsgCmdNetworkParser
+    : public MsgParameterParser<MsgCmdNetworkParser, MSG_CMD_NETWORK_PARSER_PARAMETER_TABLE_SIZE> {
+ private:
+  friend class MsgParameterParser;
 
-    static constexpr char kSsidShortName{'S'};
-    static constexpr char kPasswordShortName{'P'};
+  static constexpr char kSsidShortName{'S'};
+  static constexpr char kPasswordShortName{'P'};
 
-    static constexpr ParameterTableType kParameterTable PROGMEM {
-        ParameterTableElementType(kSsidShortName, MsgParameter::ArgumentTypeType::kString),
-        ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)
-    };
+  static constexpr ParameterTableType kParameterTable PROGMEM{
+      ParameterTableElementType(kSsidShortName, MsgParameter::ArgumentTypeType::kString),
+      ParameterTableElementType(kPasswordShortName, MsgParameter::ArgumentTypeType::kString)};
 
-    char ssid_[System::kSsidStringLength]{0u};
-    char password_[System::kPasswordStringLength]{0u};
-    bool ssid_given_{false};
-    bool password_given_{false};
-    StdReturnType return_value_{kEOk};
+  char ssid_[System::kSsidStringLength]{0u};
+  char password_[System::kPasswordStringLength]{0u};
+  bool ssid_given_{false};
+  bool password_given_{false};
+  StdReturnType return_value_{kEOk};
 
-    static void HandleParameter(char parameter_short_name, byte argument) { UNUSED(parameter_short_name); UNUSED(argument); }
-    void HandleParameter(char parameter_short_name, const char* argument, PositionType length)
-    {
-        if(parameter_short_name == kSsidShortName) {
-            StringTools::StringCopy(ssid_, argument, Minimum(length, sizeof(ssid_)));
-            TrimTrailingBlanks(ssid_);
-            ssid_given_ = true;
-        }
-        if(parameter_short_name == kPasswordShortName) {
-            StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
-            TrimTrailingBlanks(password_);
-            password_given_ = true;
-        }
+  static void HandleParameter(char parameter_short_name, byte argument) {
+    UNUSED(parameter_short_name);
+    UNUSED(argument);
+  }
+  void HandleParameter(char parameter_short_name, char const* argument, PositionType length) {
+    if (parameter_short_name == kSsidShortName) {
+      StringTools::StringCopy(ssid_, argument, Minimum(length, sizeof(ssid_)));
+      TrimTrailingBlanks(ssid_);
+      ssid_given_ = true;
+    }
+    if (parameter_short_name == kPasswordShortName) {
+      StringTools::StringCopy(password_, argument, Minimum(length, sizeof(password_)));
+      TrimTrailingBlanks(password_);
+      password_given_ = true;
+    }
+  }
+
+  static constexpr size_t Minimum(size_t left, size_t right) {
+    return (left < right) ? left : right;
+  }
+
+  /*
+   * A string argument runs to the next option, so it carries the space that separates
+   * them. A network called "Home " is not what anybody typed, and joining it would fail
+   * in a way that names nothing - so a trailing blank is taken off here. It also means a
+   * name or a pass phrase cannot end in a space over this interface, which is written
+   * down in the command reference.
+   */
+  static void TrimTrailingBlanks(char* string) {
+    for (size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
+      string[index - 1u] = STD_NULL_CHARACTER;
+    }
+  }
+
+ public:
+  /*!
+   * \brief Makes the parser for the options in `parameter`.
+   *
+   * \param[in] parameter The parameter string, terminated by a null character; the parser keeps the
+   *                      pointer and reads it in Parse().
+   */
+  constexpr MsgCmdNetworkParser(char const* parameter)
+      : MsgParameterParser(kParameterTable, parameter) {}
+
+  /*! \brief Destroys the parser. */
+  ~MsgCmdNetworkParser() = default;
+
+  /*!
+   * \brief Sends the answer: the fields that follow the command number.
+   *
+   * It sends `S=<name> Error=<error>`: it names the network and says whether there is one, and
+   * never the pass phrase. `S` is the name System has stored, empty for a clock with no network.
+   * `Error` is 0, or 8 if the command was refused. A space follows each field but the last;
+   * MsgCmdParser ends the line.
+   */
+  void SendAnswer() const {
+    char stored_ssid[System::kSsidStringLength]{};
+
+    // An empty name is a clock with no network, which is the state the access point
+    // stands in for - the same empty field the status command answers with.
+    System::GetInstance().GetNetworkSsid(stored_ssid);
+
+    SendAnswerParameter(kSsidShortName, stored_ssid);
+    // Last field before the command parser's terminating println(), so no trailing
+    // separator space.
+    error_.Send(return_value_, false);
+  }
+
+  /*!
+   * \brief Completes the command once Parse() has read its options.
+   *
+   * It stores the name and the pass phrase through System::SetNetworkCredentials() if the
+   * command carried both, and keeps what that returned for the answer.
+   *
+   * Both halves or neither: a command that carried only one of them would either join a
+   * network with the previous pass phrase or store a pass phrase for the previous network, and
+   * both of those are a clock that goes quiet. So one alone is refused, and the stored pair is
+   * left as it was. Without either it does nothing.
+   */
+  void Process() {
+    if (!ssid_given_ && !password_given_) {
+      return;
     }
 
-    static constexpr size_t Minimum(size_t left, size_t right) { return (left < right) ? left : right; }
-
-    /*
-     * A string argument runs to the next option, so it carries the space that separates
-     * them. A network called "Home " is not what anybody typed, and joining it would fail
-     * in a way that names nothing - so a trailing blank is taken off here. It also means a
-     * name or a pass phrase cannot end in a space over this interface, which is written
-     * down in the command reference.
-     */
-    static void TrimTrailingBlanks(char* string) {
-        for(size_t index = strlen(string); (index > 0u) && (string[index - 1u] == ' '); index--) {
-            string[index - 1u] = STD_NULL_CHARACTER;
-        }
+    if (!ssid_given_ || !password_given_) {
+      return_value_ = kENotOk;
+      return;
     }
 
-  public:
-    /*!
-     * \brief Makes the parser for the options in `parameter`.
-     *
-     * \param[in] parameter The parameter string, terminated by a null character; the parser keeps
-     *                      the pointer and reads it in Parse().
-     */
-    constexpr MsgCmdNetworkParser(const char* parameter) : MsgParameterParser(kParameterTable, parameter) { }
-
-    /*! \brief Destroys the parser. */
-    ~MsgCmdNetworkParser() = default;
-
-    /*!
-     * \brief Sends the answer: the fields that follow the command number.
-     *
-     * It sends `S=<name> Error=<error>`: it names the network and says whether there is one, and
-     * never the pass phrase. `S` is the name System has stored, empty for a clock with no network.
-     * `Error` is 0, or 8 if the command was refused. A space follows each field but the last;
-     * MsgCmdParser ends the line.
-     */
-    void SendAnswer() const {
-        char stored_ssid[System::kSsidStringLength]{};
-
-        // An empty name is a clock with no network, which is the state the access point
-        // stands in for - the same empty field the status command answers with.
-        System::GetInstance().GetNetworkSsid(stored_ssid);
-
-        SendAnswerParameter(kSsidShortName, stored_ssid);
-        // Last field before the command parser's terminating println(), so no trailing
-        // separator space.
-        error_.Send(return_value_, false);
-    }
-
-    /*!
-     * \brief Completes the command once Parse() has read its options.
-     *
-     * It stores the name and the pass phrase through System::SetNetworkCredentials() if the
-     * command carried both, and keeps what that returned for the answer.
-     *
-     * Both halves or neither: a command that carried only one of them would either join a
-     * network with the previous pass phrase or store a pass phrase for the previous network, and
-     * both of those are a clock that goes quiet. So one alone is refused, and the stored pair is
-     * left as it was. Without either it does nothing.
-     */
-    void Process()
-    {
-        if(!ssid_given_ && !password_given_) { return; }
-
-        if(!ssid_given_ || !password_given_) {
-            return_value_ = kENotOk;
-            return;
-        }
-
-        return_value_ = System::GetInstance().SetNetworkCredentials(ssid_, password_);
-    }
+    return_value_ = System::GetInstance().SetNetworkCredentials(ssid_, password_);
+  }
 };
 
 #endif  // WORDCLOCK_SRC_COMMUNICATION_MESSAGEPARSER_MSGCMDNETWORKPARSER_H_

@@ -6,12 +6,13 @@
  * \brief The firmware, brought up and ticked, see WordclockMain.h.
  */
 
+#include "WordclockMain.h"
+
 #include "Arduino.h"
 #include "Display.h"
 #include "Persistence.h"
 #include "PowerSwitch.h"
 #include "RealTimeClock.h"
-#include "WordclockMain.h"
 
 /*
  * An instance method, though it reads no member: main() brings the firmware up through
@@ -20,16 +21,14 @@
  * would carry that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-void WordclockMain::Init()
-{
-    PowerSwitch::GetInstance().Init();
-    Display::GetInstance().Init();
-    Persistence::GetInstance().Load();
+void WordclockMain::Init() {
+  PowerSwitch::GetInstance().Init();
+  Display::GetInstance().Init();
+  Persistence::GetInstance().Load();
 }
 // NOLINTEND(readability-convert-member-functions-to-static)
 
-void WordclockMain::Task()
-{
-    RealTimeClock::GetInstance().Task();
-    wc_scheduler_.Task();
+void WordclockMain::Task() {
+  RealTimeClock::GetInstance().Task();
+  wc_scheduler_.Task();
 }

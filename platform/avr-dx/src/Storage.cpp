@@ -6,11 +6,12 @@
  * \brief Where the settings survive a restart, in the on-chip EEPROM, see Storage.h.
  */
 
+#include "Storage.h"
+
 #include <avr/eeprom.h>
 #include <avr/io.h>
 
 #include "Arduino.h"
-#include "Storage.h"
 
 namespace {
 /* The length byte, and the blob behind it. */
@@ -27,7 +28,7 @@ static_assert((STORAGE_EEPROM_ADDRESS + 1u + STORAGE_CAPACITY) <= EEPROM_SIZE,
 // NOLINTNEXTLINE(performance-no-int-to-ptr)
 byte* ToEepromAddress(uint16_t offset) { return reinterpret_cast<byte*>(offset); }
 
-} // namespace
+}  // namespace
 
 /*
  * Instance methods, though some of them read no member: they are the interface the
@@ -37,37 +38,44 @@ byte* ToEepromAddress(uint16_t offset) { return reinterpret_cast<byte*>(offset);
  * that detail into the interface.
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
-StdReturnType Storage::Read(byte* data, size_t size) const
-{
-    if(data == nullptr) { return kENotOk; }
-    if((size == 0u) || (size > kCapacity)) { return kENotOk; }
+StdReturnType Storage::Read(byte* data, size_t size) const {
+  if (data == nullptr) {
+    return kENotOk;
+  }
+  if ((size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
 
-    const byte stored_length = eeprom_read_byte(ToEepromAddress(kLengthAddress));
+  byte const stored_length = eeprom_read_byte(ToEepromAddress(kLengthAddress));
 
-    if(stored_length != static_cast<byte>(size)) { return kENotOk; }
+  if (stored_length != static_cast<byte>(size)) {
+    return kENotOk;
+  }
 
-    eeprom_read_block(data, ToEepromAddress(kDataAddress), size);
+  eeprom_read_block(data, ToEepromAddress(kDataAddress), size);
 
-    return kEOk;
+  return kEOk;
 }
 
-StdReturnType Storage::Write(const byte* data, size_t size)
-{
-    if(data == nullptr) { return kENotOk; }
-    if((size == 0u) || (size > kCapacity)) { return kENotOk; }
+StdReturnType Storage::Write(byte const* data, size_t size) {
+  if (data == nullptr) {
+    return kENotOk;
+  }
+  if ((size == 0u) || (size > kCapacity)) {
+    return kENotOk;
+  }
 
-    // update rather than write: it leaves bytes that already match untouched, and the
-    // settings are saved on every change.
-    eeprom_update_block(data, ToEepromAddress(kDataAddress), size);
-    eeprom_update_byte(ToEepromAddress(kLengthAddress), static_cast<byte>(size));
+  // update rather than write: it leaves bytes that already match untouched, and the
+  // settings are saved on every change.
+  eeprom_update_block(data, ToEepromAddress(kDataAddress), size);
+  eeprom_update_byte(ToEepromAddress(kLengthAddress), static_cast<byte>(size));
 
-    return kEOk;
+  return kEOk;
 }
 
-StdReturnType Storage::Clear()
-{
-    eeprom_update_byte(ToEepromAddress(kLengthAddress), kLengthEmpty);
+StdReturnType Storage::Clear() {
+  eeprom_update_byte(ToEepromAddress(kLengthAddress), kLengthEmpty);
 
-    return kEOk;
+  return kEOk;
 }
 // NOLINTEND(readability-convert-member-functions-to-static)

@@ -14,27 +14,31 @@
  * loses the image between writing and reading it, and a command page that will not write.
  */
 struct PicoOtaStub {
-    bool AddSucceeds{true};
-    bool CommitSucceeds{true};
-    std::string Named;
-    std::string Committed;
+  bool AddSucceeds{true};
+  bool CommitSucceeds{true};
+  std::string Named;
+  std::string Committed;
 
-    void begin() {
-        Named.clear();
-        Committed.clear();
-    }
+  void begin() {
+    Named.clear();
+    Committed.clear();
+  }
 
-    bool addFile(const char* Path) {
-        if(!AddSucceeds) { return false; }
-        Named = Path;
-        return true;
+  bool addFile(char const* Path) {
+    if (!AddSucceeds) {
+      return false;
     }
+    Named = Path;
+    return true;
+  }
 
-    bool commit() {
-        if(!CommitSucceeds || Named.empty()) { return false; }
-        Committed = Named;
-        return true;
+  bool commit() {
+    if (!CommitSucceeds || Named.empty()) {
+      return false;
     }
+    Committed = Named;
+    return true;
+  }
 };
 
 extern PicoOtaStub picoOTA;

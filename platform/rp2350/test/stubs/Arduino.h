@@ -8,8 +8,9 @@
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
 #include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include <string>
 #include <vector>
 
@@ -19,27 +20,37 @@ typedef bool boolean;
 #define PROGMEM
 #define F(x) reinterpret_cast<const __FlashStringHelper*>(x)
 #define pgm_read_byte(x) (*(x))
-#define memcpy_P(x,y,z) memcpy((x),(y),(z))
-#define bitRead(v,b) (((v) >> (b)) & 0x01)
+#define memcpy_P(x, y, z) memcpy((x), (y), (z))
+#define bitRead(v, b) (((v) >> (b)) & 0x01)
 
 /* The Pico's default I2C0 pins, which is what the drivers ask for by name. */
 #define SDA 4
 #define SCL 5
 
 /* Where the core puts it, see WordclockSerial.h - a global one would be a second class. */
-namespace arduino { class __FlashStringHelper; }
+namespace arduino {
+class __FlashStringHelper;
+}
 using arduino::__FlashStringHelper;
 char* itoa(int, char*, int);
 
 /* The test drives Incoming and inspects Written. */
 struct Stream {
-    std::string Incoming;
-    std::string Written;
-    void begin(unsigned long) {}
-    int available() { return static_cast<int>(Incoming.size()); }
-    int read() { if(Incoming.empty()) return -1; int c = static_cast<unsigned char>(Incoming[0]); Incoming.erase(0,1); return c; }
-    size_t write(uint8_t b) { Written.push_back(static_cast<char>(b)); return 1; }
-    void flush() {}
+  std::string Incoming;
+  std::string Written;
+  void begin(unsigned long) {}
+  int available() { return static_cast<int>(Incoming.size()); }
+  int read() {
+    if (Incoming.empty()) return -1;
+    int c = static_cast<unsigned char>(Incoming[0]);
+    Incoming.erase(0, 1);
+    return c;
+  }
+  size_t write(uint8_t b) {
+    Written.push_back(static_cast<char>(b));
+    return 1;
+  }
+  void flush() {}
 };
 
 /*
@@ -49,10 +60,10 @@ struct Stream {
  * and the second one would have sent the browser nothing.
  */
 struct Rp2040Class {
-    bool Restarted{false};
+  bool Restarted{false};
 
-    uint32_t getFreeHeap() { return 0u; }
-    void restart() { Restarted = true; }
+  uint32_t getFreeHeap() { return 0u; }
+  void restart() { Restarted = true; }
 };
 extern Rp2040Class rp2040;
 

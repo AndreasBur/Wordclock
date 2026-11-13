@@ -17,58 +17,53 @@
 #include <stddef.h>
 #include <stdint.h>
 
-class UpdateClass
-{
-  public:
-    /* what the case sets */
-    bool RefuseBegin{false};
-    const char* Error{"none"};
+class UpdateClass {
+ public:
+  /* what the case sets */
+  bool RefuseBegin{false};
+  char const* Error{"none"};
 
-    /* what the case reads */
-    bool Begun{false};
-    bool Ended{false};
-    bool Aborted{false};
-    size_t Announced{0u};
-    size_t Written{0u};
+  /* what the case reads */
+  bool Begun{false};
+  bool Ended{false};
+  bool Aborted{false};
+  size_t Announced{0u};
+  size_t Written{0u};
 
-    void forget()
-    {
-        RefuseBegin = false;
-        Error = "none";
-        Begun = false;
-        Ended = false;
-        Aborted = false;
-        Announced = 0u;
-        Written = 0u;
-    }
+  void forget() {
+    RefuseBegin = false;
+    Error = "none";
+    Begun = false;
+    Ended = false;
+    Aborted = false;
+    Announced = 0u;
+    Written = 0u;
+  }
 
-    bool begin(size_t Size)
-    {
-        Announced = Size;
-        Begun = !RefuseBegin;
-        return Begun;
-    }
+  bool begin(size_t Size) {
+    Announced = Size;
+    Begun = !RefuseBegin;
+    return Begun;
+  }
 
-    size_t write(uint8_t*, size_t Length)
-    {
-        Written += Length;
-        return Length;
-    }
+  size_t write(uint8_t*, size_t Length) {
+    Written += Length;
+    return Length;
+  }
 
-    /*
-     * The framework refuses an image that is shorter than the size begin() was given, which
-     * is what a dropped connection leaves behind - so the stub refuses it too, or the case
-     * for a truncated upload would pass on a backend that never checked.
-     */
-    bool end(bool)
-    {
-        Ended = (Written == Announced);
-        return Ended;
-    }
+  /*
+   * The framework refuses an image that is shorter than the size begin() was given, which
+   * is what a dropped connection leaves behind - so the stub refuses it too, or the case
+   * for a truncated upload would pass on a backend that never checked.
+   */
+  bool end(bool) {
+    Ended = (Written == Announced);
+    return Ended;
+  }
 
-    void abort() { Aborted = true; }
+  void abort() { Aborted = true; }
 
-    const char* errorString() { return Error; }
+  char const* errorString() { return Error; }
 };
 
 extern UpdateClass Update;

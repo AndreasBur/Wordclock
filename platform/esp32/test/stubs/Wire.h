@@ -2,8 +2,9 @@
 #define WORDCLOCK_PLATFORM_ESP32_TEST_STUBS_WIRE_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include <vector>
 /*
  * Answers reads out of one buffer and keeps everything that was written, so a driver's
@@ -13,24 +14,35 @@
  * prepares nothing gets the silent bus the drivers have to cope with.
  */
 struct TwoWire {
-    std::vector<uint8_t> Response;
-    std::vector<uint8_t> Written;
-    size_t ReadPosition{0u};
-    int Sda{-1};
-    int Scl{-1};
-    uint32_t Clock{0u};
-    bool BeginAnswer{true};
+  std::vector<uint8_t> Response;
+  std::vector<uint8_t> Written;
+  size_t ReadPosition{0u};
+  int Sda{-1};
+  int Scl{-1};
+  uint32_t Clock{0u};
+  bool BeginAnswer{true};
 
-    void respondWith(std::vector<uint8_t> Bytes) { Response = Bytes; ReadPosition = 0u; }
-    size_t remaining() const { return Response.size() - ReadPosition; }
+  void respondWith(std::vector<uint8_t> Bytes) {
+    Response = Bytes;
+    ReadPosition = 0u;
+  }
+  size_t remaining() const { return Response.size() - ReadPosition; }
 
-    bool begin(int Pin_Sda, int Pin_Scl, uint32_t Hz) { Sda = Pin_Sda; Scl = Pin_Scl; Clock = Hz; return BeginAnswer; }
-    void beginTransmission(uint8_t Address) { Written.push_back(Address); }
-    size_t write(uint8_t Value) { Written.push_back(Value); return 1; }
-    uint8_t endTransmission() { return 0; }
-    size_t requestFrom(uint8_t, size_t Length) { return (remaining() < Length) ? 0u : Length; }
-    int read() { return (ReadPosition < Response.size()) ? Response[ReadPosition++] : 0; }
-    int available() { return static_cast<int>(remaining()); }
+  bool begin(int Pin_Sda, int Pin_Scl, uint32_t Hz) {
+    Sda = Pin_Sda;
+    Scl = Pin_Scl;
+    Clock = Hz;
+    return BeginAnswer;
+  }
+  void beginTransmission(uint8_t Address) { Written.push_back(Address); }
+  size_t write(uint8_t Value) {
+    Written.push_back(Value);
+    return 1;
+  }
+  uint8_t endTransmission() { return 0; }
+  size_t requestFrom(uint8_t, size_t Length) { return (remaining() < Length) ? 0u : Length; }
+  int read() { return (ReadPosition < Response.size()) ? Response[ReadPosition++] : 0; }
+  int available() { return static_cast<int>(remaining()); }
 };
 extern TwoWire Wire;
 // NOLINTEND(readability-identifier-naming)

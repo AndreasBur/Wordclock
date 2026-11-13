@@ -7,67 +7,67 @@
  */
 
 #include "AnimationSnake.h"
+
 #include "Bit.h"
-#include "Display.h"
 #include "Clock.h"
+#include "Display.h"
 
-void AnimationSnake::Init()
-{
-    Animation::Init(StateType::kIdle);
-    Reset();
+void AnimationSnake::Init() {
+  Animation::Init(StateType::kIdle);
+  Reset();
 }
 
-StdReturnType AnimationSnake::SetTime(byte hour, byte minute)
-{
-    StdReturnType return_value{kENotOk};
+StdReturnType AnimationSnake::SetTime(byte hour, byte minute) {
+  StdReturnType return_value{kENotOk};
 
-    if(Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk && state_ == StateType::kIdle) {
-        return_value = kEOk;
-        snake_begin_index_ = 0u;
-        snake_end_index_ = 0u;
-        state_ = StateType::kSetTime;
-    }
-    return return_value;
-}
-
-void AnimationSnake::Task()
-{
-    if(state_ == StateType::kSetTime) {
-        byte snake_end_index_trans = TransformToSerpentine(snake_end_index_);
-        Display::GetInstance().SetPixel(TransformToSerpentine(snake_begin_index_));
-
-        if((snake_begin_index_ - snake_end_index_) == ANIMATION_SNAKE_LENGTH ||
-           (snake_begin_index_ >= DISPLAY_NUMBER_OF_LEDS - 1u && snake_end_index_ < DISPLAY_NUMBER_OF_LEDS))
-        {
-            if(IsPixelPartOfClockWords(clock_words_table_, snake_end_index_trans) == false) Display::GetInstance().ClearPixel(snake_end_index_trans);
-            snake_end_index_++;
-        }
-        if(snake_begin_index_ < DISPLAY_NUMBER_OF_LEDS - 1u) snake_begin_index_++;
-        if(snake_end_index_ >= DISPLAY_NUMBER_OF_LEDS) FinishWithClockWords(clock_words_table_);
-    }
-}
-
-void AnimationSnake::Reset()
-{
+  if (Clock::GetInstance().GetClockWords(hour, minute, clock_words_table_) == kEOk &&
+      state_ == StateType::kIdle) {
+    return_value = kEOk;
     snake_begin_index_ = 0u;
     snake_end_index_ = 0u;
-    snake_state_ = SnakeStateType::kToRight;
+    state_ = StateType::kSetTime;
+  }
+  return return_value;
 }
 
-byte AnimationSnake::TransformToSerpentine(byte column, byte row)
-{
-    byte index;
+void AnimationSnake::Task() {
+  if (state_ == StateType::kSetTime) {
+    byte snake_end_index_trans = TransformToSerpentine(snake_end_index_);
+    Display::GetInstance().SetPixel(TransformToSerpentine(snake_begin_index_));
 
-    if(!Bit<byte>::ReadBit(row, 0u)) index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + column);
-    else index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + (DISPLAY_NUMBER_OF_COLUMNS - column - 1u));
-
-    return index;
+    if ((snake_begin_index_ - snake_end_index_) == ANIMATION_SNAKE_LENGTH ||
+        (snake_begin_index_ >= DISPLAY_NUMBER_OF_LEDS - 1u &&
+         snake_end_index_ < DISPLAY_NUMBER_OF_LEDS)) {
+      if (IsPixelPartOfClockWords(clock_words_table_, snake_end_index_trans) == false)
+        Display::GetInstance().ClearPixel(snake_end_index_trans);
+      snake_end_index_++;
+    }
+    if (snake_begin_index_ < DISPLAY_NUMBER_OF_LEDS - 1u) snake_begin_index_++;
+    if (snake_end_index_ >= DISPLAY_NUMBER_OF_LEDS) FinishWithClockWords(clock_words_table_);
+  }
 }
 
-byte AnimationSnake::TransformToSerpentine(byte index)
-{
-    byte column = Display::GetInstance().IndexToColumn(index);
-    byte row = Display::GetInstance().IndexToRow(index);
+void AnimationSnake::Reset() {
+  snake_begin_index_ = 0u;
+  snake_end_index_ = 0u;
+  snake_state_ = SnakeStateType::kToRight;
+}
 
-    return TransformToSerpentine(column, row);
+byte AnimationSnake::TransformToSerpentine(byte column, byte row) {
+  byte index;
+
+  if (!Bit<byte>::ReadBit(row, 0u))
+    index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) + column);
+  else
+    index = static_cast<byte>((row * DISPLAY_NUMBER_OF_COLUMNS) +
+                              (DISPLAY_NUMBER_OF_COLUMNS - column - 1u));
+
+  return index;
+}
+
+byte AnimationSnake::TransformToSerpentine(byte index) {
+  byte column = Display::GetInstance().IndexToColumn(index);
+  byte row = Display::GetInstance().IndexToRow(index);
+
+  return TransformToSerpentine(column, row);
 }

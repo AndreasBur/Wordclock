@@ -7,28 +7,29 @@
  */
 
 #include "MsgCmdParser.h"
-#include "MsgCmdRemoteProcedureCallParser.h"
-#include "MsgCmdDisplayColorParser.h"
-#include "MsgCmdDisplayBrightnessParser.h"
-#include "MsgCmdDisplayPixelParser.h"
+
+#include "MsgCmdAnimationParser.h"
 #include "MsgCmdClockModeParser.h"
-#include "MsgCmdStatusParser.h"
-#include "MsgCmdNetworkParser.h"
 #include "MsgCmdColorCycleParser.h"
 #include "MsgCmdConsoleParser.h"
-#include "MsgCmdNightSwitchParser.h"
-#include "MsgCmdAnimationParser.h"
-#include "MsgCmdTimeParser.h"
 #include "MsgCmdDateParser.h"
+#include "MsgCmdDisplayBrightnessParser.h"
+#include "MsgCmdDisplayColorParser.h"
+#include "MsgCmdDisplayPixelParser.h"
+#include "MsgCmdNetworkParser.h"
+#include "MsgCmdNightSwitchParser.h"
+#include "MsgCmdRemoteProcedureCallParser.h"
+#include "MsgCmdStatusParser.h"
+#include "MsgCmdTimeParser.h"
 #include "Overlays.h"
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-# include "MsgCmdOverlayDateParser.h"
+#include "MsgCmdOverlayDateParser.h"
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-# include "MsgCmdOverlayTemperatureParser.h"
+#include "MsgCmdOverlayTemperatureParser.h"
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-# include "MsgCmdOverlayTextParser.h"
+#include "MsgCmdOverlayTextParser.h"
 #endif
 
 namespace {
@@ -38,47 +39,79 @@ namespace {
  * the dispatch below stays a flat table instead of a copy-pasted if/else chain.
  */
 template <typename ParserType>
-void DispatchCommand(const char* parameter)
-{
-    ParserType parser(parameter);
-    parser.Parse();
-    parser.Process();
-    parser.SendAnswer();
+void DispatchCommand(char const* parameter) {
+  ParserType parser(parameter);
+  parser.Parse();
+  parser.Process();
+  parser.SendAnswer();
 }
-}
+}  // namespace
 
-void MsgCmdParser::Parse()
-{
-    CommandType command = GetCommand();
-    const char* parameter = GetParameter();
+void MsgCmdParser::Parse() {
+  CommandType command = GetCommand();
+  char const* parameter = GetParameter();
 
-    if(command != CommandType::kNone) SendAnswer(command);
+  if (command != CommandType::kNone) SendAnswer(command);
 
-    switch(command) {
-        case CommandType::kRemoteProcedureCall: DispatchCommand<MsgCmdRemoteProcedureCallParser>(parameter); break;
-        case CommandType::kDisplayColor:         DispatchCommand<MsgCmdDisplayColorParser>(parameter);        break;
-        case CommandType::kDisplayBrightness:    DispatchCommand<MsgCmdDisplayBrightnessParser>(parameter);   break;
-        case CommandType::kDisplayPixel:         DispatchCommand<MsgCmdDisplayPixelParser>(parameter);        break;
-        case CommandType::kAnimation:             DispatchCommand<MsgCmdAnimationParser>(parameter);           break;
-        case CommandType::kClockMode:            DispatchCommand<MsgCmdClockModeParser>(parameter);           break;
-        case CommandType::kTime:                  DispatchCommand<MsgCmdTimeParser>(parameter);                break;
-        case CommandType::kDate:                  DispatchCommand<MsgCmdDateParser>(parameter);                break;
-        case CommandType::kStatus:                DispatchCommand<MsgCmdStatusParser>(parameter);              break;
-        case CommandType::kNetwork:               DispatchCommand<MsgCmdNetworkParser>(parameter);             break;
-        case CommandType::kNightSwitch:          DispatchCommand<MsgCmdNightSwitchParser>(parameter);         break;
-        case CommandType::kColorCycle:           DispatchCommand<MsgCmdColorCycleParser>(parameter);          break;
-        case CommandType::kConsole:               DispatchCommand<MsgCmdConsoleParser>(parameter);             break;
+  switch (command) {
+    case CommandType::kRemoteProcedureCall:
+      DispatchCommand<MsgCmdRemoteProcedureCallParser>(parameter);
+      break;
+    case CommandType::kDisplayColor:
+      DispatchCommand<MsgCmdDisplayColorParser>(parameter);
+      break;
+    case CommandType::kDisplayBrightness:
+      DispatchCommand<MsgCmdDisplayBrightnessParser>(parameter);
+      break;
+    case CommandType::kDisplayPixel:
+      DispatchCommand<MsgCmdDisplayPixelParser>(parameter);
+      break;
+    case CommandType::kAnimation:
+      DispatchCommand<MsgCmdAnimationParser>(parameter);
+      break;
+    case CommandType::kClockMode:
+      DispatchCommand<MsgCmdClockModeParser>(parameter);
+      break;
+    case CommandType::kTime:
+      DispatchCommand<MsgCmdTimeParser>(parameter);
+      break;
+    case CommandType::kDate:
+      DispatchCommand<MsgCmdDateParser>(parameter);
+      break;
+    case CommandType::kStatus:
+      DispatchCommand<MsgCmdStatusParser>(parameter);
+      break;
+    case CommandType::kNetwork:
+      DispatchCommand<MsgCmdNetworkParser>(parameter);
+      break;
+    case CommandType::kNightSwitch:
+      DispatchCommand<MsgCmdNightSwitchParser>(parameter);
+      break;
+    case CommandType::kColorCycle:
+      DispatchCommand<MsgCmdColorCycleParser>(parameter);
+      break;
+    case CommandType::kConsole:
+      DispatchCommand<MsgCmdConsoleParser>(parameter);
+      break;
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-        case CommandType::kOverlayDate:          DispatchCommand<MsgCmdOverlayDateParser>(parameter);         break;
+    case CommandType::kOverlayDate:
+      DispatchCommand<MsgCmdOverlayDateParser>(parameter);
+      break;
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-        case CommandType::kOverlayTemperature:   DispatchCommand<MsgCmdOverlayTemperatureParser>(parameter);  break;
+    case CommandType::kOverlayTemperature:
+      DispatchCommand<MsgCmdOverlayTemperatureParser>(parameter);
+      break;
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-        case CommandType::kOverlayText:          DispatchCommand<MsgCmdOverlayTextParser>(parameter);         break;
+    case CommandType::kOverlayText:
+      DispatchCommand<MsgCmdOverlayTextParser>(parameter);
+      break;
 #endif
-        default:                            error_.Send(ErrorMessage::ErrorType::kWrongCommand, false);        break;
-    }
+    default:
+      error_.Send(ErrorMessage::ErrorType::kWrongCommand, false);
+      break;
+  }
 
-    Serial.println();
+  Serial.println();
 }

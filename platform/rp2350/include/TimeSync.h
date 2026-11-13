@@ -19,6 +19,7 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_
 
+// clang-format off
 // Ahead of WiFiNTP.h, which calls ::hostByName without including what declares it: the
 // framework's header compiles only behind a WiFi.h that its includer brought along.
 #include <WiFi.h>
@@ -28,6 +29,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+// clang-format on
 
 /*! \brief The two halves of the time synchronisation: the zone rule and the time servers. */
 namespace wordclock_time {
@@ -38,10 +40,9 @@ namespace wordclock_time {
  * localtime() is UTC and the display would show the wrong hour for as long as that lasted. setup()
  * calls it once.
  */
-inline void ApplyTimeZone()
-{
-    setenv("TZ", WORDCLOCK_TIMEZONE, 1);
-    tzset();
+inline void ApplyTimeZone() {
+  setenv("TZ", WORDCLOCK_TIMEZONE, 1);
+  tzset();
 }
 
 /*!
@@ -54,11 +55,10 @@ inline void ApplyTimeZone()
  * \pre The link is up. The core resolves the server names here rather than at the first poll, so a
  *      call made too early returns having started nothing.
  */
-inline void StartTimeServers()
-{
-    NTP.begin(WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
+inline void StartTimeServers() {
+  NTP.begin(WORDCLOCK_NTP_SERVER_PRIMARY, WORDCLOCK_NTP_SERVER_SECONDARY);
 }
 
-} // namespace wordclock_time
+}  // namespace wordclock_time
 
 #endif  // WORDCLOCK_PLATFORM_RP2350_INCLUDE_TIMESYNC_H_

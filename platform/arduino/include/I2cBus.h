@@ -14,31 +14,29 @@
 #ifndef WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
 #define WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*! \brief The I2C bus, as far as opening it goes. */
-class I2cBus
-{
-  public:
-    /*!
-     * \brief Opens the bus on `pin_sda` and `pin_scl` at `frequency_hz`.
-     *
-     * Each driver calls it until it has succeeded once, so whichever runs first opens the bus and
-     * the other finds it running. There is one bus, so both have to name the same pins.
-     *
-     * On the ESP32, `Wire.begin()` takes all three and answers whether the bus opened. On the
-     * RP2350 the pins and the clock are set one call each and none of them answers, so the bus
-     * counts as open once they have run; a pin the core will not take, or one the second driver
-     * names differently on the running bus, ends in the SDK's `panic()`, which halts the chip.
-     *
-     * \param[in] pin_sda The pin of the data line.
-     * \param[in] pin_scl The pin of the clock line.
-     * \param[in] frequency_hz The clock of the bus, in Hz.
-     * \return kEOk, or kENotOk if the core says the bus did not open - which the RP2350's never
-     *         does.
-     */
-    static StdReturnType Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz);
+class I2cBus {
+ public:
+  /*!
+   * \brief Opens the bus on `pin_sda` and `pin_scl` at `frequency_hz`.
+   *
+   * Each driver calls it until it has succeeded once, so whichever runs first opens the bus and
+   * the other finds it running. There is one bus, so both have to name the same pins.
+   *
+   * On the ESP32, `Wire.begin()` takes all three and answers whether the bus opened. On the
+   * RP2350 the pins and the clock are set one call each and none of them answers, so the bus
+   * counts as open once they have run; a pin the core will not take, or one the second driver
+   * names differently on the running bus, ends in the SDK's `panic()`, which halts the chip.
+   *
+   * \param[in] pin_sda The pin of the data line.
+   * \param[in] pin_scl The pin of the clock line.
+   * \param[in] frequency_hz The clock of the bus, in Hz.
+   * \return kEOk, or kENotOk if the core says the bus did not open - which the RP2350's never does.
+   */
+  static StdReturnType Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz);
 };
 
 #endif  // WORDCLOCK_PLATFORM_ARDUINO_INCLUDE_I2CBUS_H_

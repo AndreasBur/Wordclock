@@ -23,76 +23,77 @@
 
 inline int failures{0};
 
-inline void Expect(bool condition, const char* description)
-{
-    if(condition) { return; }
+inline void Expect(bool condition, char const* description) {
+  if (condition) {
+    return;
+  }
 
-    std::cerr << "FAILED: " << description << '\n';
-    failures++;
+  std::cerr << "FAILED: " << description << '\n';
+  failures++;
 }
 
-inline ClockWords WordsAt(byte hour, byte minute)
-{
-    ClockWords words;
-    Expect(Clock::GetInstance().GetClockWords(hour, minute, words) == kEOk,
-           "valid time must produce clock words");
-    return words;
+inline ClockWords WordsAt(byte hour, byte minute) {
+  ClockWords words;
+  Expect(Clock::GetInstance().GetClockWords(hour, minute, words) == kEOk,
+         "valid time must produce clock words");
+  return words;
 }
 
 using PixelBufferType = std::array<Pixels::PixelType, PIXELS_NUMBER_OF_PIXELS>;
 
-inline PixelBufferType ReadPixels()
-{
-    PixelBufferType pixels;
+inline PixelBufferType ReadPixels() {
+  PixelBufferType pixels;
 
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        pixels[index] = Pixels::GetInstance().GetPixel(index);
-    }
-    return pixels;
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+    pixels[index] = Pixels::GetInstance().GetPixel(index);
+  }
+  return pixels;
 }
 
 /* Pixel has no operator==, and comparing the three channels is all this needs. */
-inline bool ArePixelsEqual(const PixelBufferType& left, const PixelBufferType& right)
-{
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        if(left[index].GetRed()   != right[index].GetRed()   ||
-           left[index].GetGreen() != right[index].GetGreen() ||
-           left[index].GetBlue()  != right[index].GetBlue()) { return false; }
+inline bool ArePixelsEqual(PixelBufferType const& left, PixelBufferType const& right) {
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+    if (left[index].GetRed() != right[index].GetRed() ||
+        left[index].GetGreen() != right[index].GetGreen() ||
+        left[index].GetBlue() != right[index].GetBlue()) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
-inline bool IsAnyPixelLit(const PixelBufferType& pixels)
-{
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        if(pixels[index].GetRed() != 0u || pixels[index].GetGreen() != 0u ||
-           pixels[index].GetBlue() != 0u) { return true; }
+inline bool IsAnyPixelLit(PixelBufferType const& pixels) {
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+    if (pixels[index].GetRed() != 0u || pixels[index].GetGreen() != 0u ||
+        pixels[index].GetBlue() != 0u) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 // What would reach the LEDs, which is not what ReadPixels() shows: that reads the buffer,
 // and the brightness is folded in on the way out.
-inline PixelBufferType ReadOutputPixels()
-{
-    PixelBufferType pixels;
+inline PixelBufferType ReadOutputPixels() {
+  PixelBufferType pixels;
 
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        pixels[index] = Pixels::GetInstance().GetOutputPixel(index);
-    }
-    return pixels;
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+    pixels[index] = Pixels::GetInstance().GetOutputPixel(index);
+  }
+  return pixels;
 }
 
 // The difference is the whole of what switching the display off does, so a test that
 // asked the buffer would see nothing.
-inline bool IsAnyOutputPixelLit()
-{
-    for(byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
-        const Pixels::PixelType pixel = Pixels::GetInstance().GetOutputPixel(index);
+inline bool IsAnyOutputPixelLit() {
+  for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
+    Pixels::PixelType const pixel = Pixels::GetInstance().GetOutputPixel(index);
 
-        if(pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u) { return true; }
+    if (pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 /*
@@ -100,28 +101,26 @@ inline bool IsAnyOutputPixelLit()
  * Naming one ties the case to the switch that compiles that animation in, and with the
  * cursor switched off the test suite stopped compiling.
  */
-inline Animations::AnimationIdType FirstAnimation()
-{
-    return static_cast<Animations::AnimationIdType>(ToUnderlying(Animations::AnimationIdType::kNone) + 1u);
+inline Animations::AnimationIdType FirstAnimation() {
+  return static_cast<Animations::AnimationIdType>(ToUnderlying(Animations::AnimationIdType::kNone) +
+                                                  1u);
 }
 
-inline void SetTime(byte hour, byte minute, byte second)
-{
-    RealTimeClock::GetInstance().SetTime(ClockTime(hour, minute, second));
+inline void SetTime(byte hour, byte minute, byte second) {
+  RealTimeClock::GetInstance().SetTime(ClockTime(hour, minute, second));
 }
 
 // More than one case needs a clock face on the display before it can say what changed
 // about it, so it lives here rather than in whichever file got it first.
 // Draws a time the way the clock does when no animation is selected: the reference every
 // animation has to arrive at.
-inline PixelBufferType DrawClockFace(byte hour, byte minute)
-{
-    Display& display = Display::GetInstance();
+inline PixelBufferType DrawClockFace(byte hour, byte minute) {
+  Display& display = Display::GetInstance();
 
-    display.Clear();
-    Expect(Clock::GetInstance().SetTime(hour, minute) == kEOk, "clock face time must be accepted");
-    display.Show();
-    return ReadPixels();
+  display.Clear();
+  Expect(Clock::GetInstance().SetTime(hour, minute) == kEOk, "clock face time must be accepted");
+  display.Show();
+  return ReadPixels();
 }
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_TESTS_CHECK_H_

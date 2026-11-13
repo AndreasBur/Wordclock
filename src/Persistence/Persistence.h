@@ -28,8 +28,8 @@
 #ifndef WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
 #define WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_
 
-#include "StandardTypes.h"
 #include "Arduino.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The cycle of the persistence's task, in scheduler ticks, so 200 * 10 ms = 2 s between
@@ -39,7 +39,7 @@
  * collapses into a single write, and a period in which nothing changed costs a struct comparison.
  * The scheduler counts cycles in a byte, so this cannot be raised past 255.
  */
-#define PERSISTENCE_TASK_CYCLE                          200u
+#define PERSISTENCE_TASK_CYCLE 200u
 
 /*!
  * \brief Keeps the configuration across a restart: restores it at the start and writes it to the
@@ -48,85 +48,84 @@
  * The settings are read from the modules that own them, not kept here; the time and the date are
  * not stored.
  */
-class Persistence
-{
-  private:
-    static constexpr byte kTaskCycle{PERSISTENCE_TASK_CYCLE};
+class Persistence {
+ private:
+  static constexpr byte kTaskCycle{PERSISTENCE_TASK_CYCLE};
 
-    Persistence() { }
-    ~Persistence() = default;
+  Persistence() {}
+  ~Persistence() = default;
 
-  public:
-    /*! \brief Returns the one persistence of the firmware. */
-    static Persistence& GetInstance() {
-        static Persistence singleton_instance;
-        return singleton_instance;
-    }
+ public:
+  /*! \brief Returns the one persistence of the firmware. */
+  static Persistence& GetInstance() {
+    static Persistence singleton_instance;
+    return singleton_instance;
+  }
 
-    /*! \brief Returns the scheduler ticks between two calls of Task(), PERSISTENCE_TASK_CYCLE. */
-    static constexpr byte GetTaskCycle() { return kTaskCycle; }
+  /*! \brief Returns the scheduler ticks between two calls of Task(), PERSISTENCE_TASK_CYCLE. */
+  static constexpr byte GetTaskCycle() { return kTaskCycle; }
 
-    /*!
-     * \brief Restores the stored configuration, if there is a usable one.
-     *
-     * Called once by the platform's entry point, after the display is up: the settings it restores
-     * reach the display through the modules' own setters.
-     *
-     * A blob that cannot be used is thrown away rather than left in place: it would otherwise be
-     * read and rejected on every start, and the store has nothing to offer that a fresh write does
-     * not. Nothing stored at all takes the same path, where clearing is a no-op.
-     *
-     * What is remembered as "last written" afterwards is what the modules actually hold, not what
-     * the blob said. A value one of them rejected therefore shows up as a difference on the next
-     * task and gets corrected in the store, instead of being read and rejected forever.
-     *
-     * \return kEOk if a stored configuration was applied, or kENotOk if the store could not be read
-     *         or holds no blob of this format, with its magic, version and checksum; the modules
-     *         then keep the settings they have, and the store is emptied.
-     */
-    static StdReturnType Load();
+  /*!
+   * \brief Restores the stored configuration, if there is a usable one.
+   *
+   * Called once by the platform's entry point, after the display is up: the settings it restores
+   * reach the display through the modules' own setters.
+   *
+   * A blob that cannot be used is thrown away rather than left in place: it would otherwise be
+   * read and rejected on every start, and the store has nothing to offer that a fresh write does
+   * not. Nothing stored at all takes the same path, where clearing is a no-op.
+   *
+   * What is remembered as "last written" afterwards is what the modules actually hold, not what
+   * the blob said. A value one of them rejected therefore shows up as a difference on the next
+   * task and gets corrected in the store, instead of being read and rejected forever.
+   *
+   * \return kEOk if a stored configuration was applied, or kENotOk if the store could not be read
+   *         or holds no blob of this format, with its magic, version and checksum; the modules then
+   *         keep the settings they have, and the store is emptied.
+   */
+  static StdReturnType Load();
 
-    /*!
-     * \brief Writes the configuration if it changed since the last write.
-     *
-     * The scheduler calls it every PERSISTENCE_TASK_CYCLE ticks. A failed write is not remembered
-     * as written, so the next task tries again rather than treating the change as stored.
-     */
-    static void Task();
+  /*!
+   * \brief Writes the configuration if it changed since the last write.
+   *
+   * The scheduler calls it every PERSISTENCE_TASK_CYCLE ticks. A failed write is not remembered
+   * as written, so the next task tries again rather than treating the change as stored.
+   */
+  static void Task();
 
-    /*!
-     * \brief Writes the configuration now.
-     *
-     * Now rather than within the next period. What that period is there for is rationing a burst
-     * of commands, which is exactly what a caller asking for this is not doing - it is about to
-     * pull the plug.
-     *
-     * Unconditionally, unlike Task(): "nothing changed since the last write" is a state the caller
-     * cannot check for itself.
-     *
-     * \return kEOk if the store took the configuration, or kENotOk if it did not; Task() then still
-     *         compares against the configuration that was last written.
-     */
-    static StdReturnType Save();
+  /*!
+   * \brief Writes the configuration now.
+   *
+   * Now rather than within the next period. What that period is there for is rationing a burst
+   * of commands, which is exactly what a caller asking for this is not doing - it is about to
+   * pull the plug.
+   *
+   * Unconditionally, unlike Task(): "nothing changed since the last write" is a state the caller
+   * cannot check for itself.
+   *
+   * \return kEOk if the store took the configuration, or kENotOk if it did not; Task() then still
+   *         compares against the configuration that was last written.
+   */
+  static StdReturnType Save();
 
-    /*!
-     * \brief Puts the configuration back to what a clock starts with.
-     *
-     * Every module back to what it starts with, and the store emptied. Emptied rather than written
-     * with the defaults: an empty store is what a clock that was never configured has, and Load()
-     * already treats the two the same.
-     *
-     * Each module answers for its own defaults, the same way the configuration is read from each
-     * of them rather than from a copy kept here - so a setting added to one of them is reset by the
-     * module that owns it and not forgotten in a list over here.
-     *
-     * What is remembered as "last written" afterwards is what the modules now hold, so the next
-     * task does not write the defaults straight back into the store that was just emptied.
-     *
-     * \return kEOk if the store was emptied, or kENotOk if it was not; the modules are reset all
-     *         the same.
-     */
-    static StdReturnType Reset();
+  /*!
+   * \brief Puts the configuration back to what a clock starts with.
+   *
+   * Every module back to what it starts with, and the store emptied. Emptied rather than written
+   * with the defaults: an empty store is what a clock that was never configured has, and Load()
+   * already treats the two the same.
+   *
+   * Each module answers for its own defaults, the same way the configuration is read from each
+   * of them rather than from a copy kept here - so a setting added to one of them is reset by the
+   * module that owns it and not forgotten in a list over here.
+   *
+   * What is remembered as "last written" afterwards is what the modules now hold, so the next
+   * task does not write the defaults straight back into the store that was just emptied.
+   *
+   * \return kEOk if the store was emptied, or kENotOk if it was not; the modules are reset all the
+   *         same.
+   */
+  static StdReturnType Reset();
 };
 
 #endif  // WORDCLOCK_SRC_PERSISTENCE_PERSISTENCE_H_

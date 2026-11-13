@@ -11,7 +11,6 @@
 
 #include <Wire.h>
 
-StdReturnType I2cBus::Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz)
-{
-    return Wire.begin(pin_sda, pin_scl, frequency_hz) ? kEOk : kENotOk;
+StdReturnType I2cBus::Open(byte pin_sda, byte pin_scl, uint32_t frequency_hz) {
+  return Wire.begin(pin_sda, pin_scl, frequency_hz) ? kEOk : kENotOk;
 }

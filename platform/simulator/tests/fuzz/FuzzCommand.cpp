@@ -15,23 +15,23 @@
  * frames in them.
  */
 
-#include "fuzz.h"
-
-#include "WebFrontend.h"
-
 #include <cstddef>
 #include <cstdint>
 
+#include "WebFrontend.h"
+#include "fuzz.h"
+
 namespace {
 constexpr unsigned kTicksAfterTheLastLine{8u};
-} // namespace
+}  // namespace
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) // NOLINT(readability-identifier-naming)
+extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data,
+                                      size_t size)  // NOLINT(readability-identifier-naming)
 {
-    StartFromANewClock();
+  StartFromANewClock();
 
-    WebFrontend::InjectCommand(reinterpret_cast<const char*>(data), size);
-    RunUntilThePortIsRead();
-    RunTicks(kTicksAfterTheLastLine);
-    return 0;
+  WebFrontend::InjectCommand(reinterpret_cast<char const*>(data), size);
+  RunUntilThePortIsRead();
+  RunTicks(kTicksAfterTheLastLine);
+  return 0;
 }

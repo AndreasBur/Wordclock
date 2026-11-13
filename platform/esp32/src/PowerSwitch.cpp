@@ -6,15 +6,17 @@
  * \brief The supply port, driven through the core's own GPIO calls, see PowerSwitch.h.
  */
 
-#include "Arduino.h"
 #include "PowerSwitch.h"
 
-void PowerSwitch::Init()
-{
-    if(!IsFitted()) { return; }
+#include "Arduino.h"
 
-    pinMode(POWER_SWITCH_PIN, OUTPUT);
-    SwitchSupplyOn();
+void PowerSwitch::Init() {
+  if (!IsFitted()) {
+    return;
+  }
+
+  pinMode(POWER_SWITCH_PIN, OUTPUT);
+  SwitchSupplyOn();
 }
 
 /*
@@ -22,9 +24,10 @@ void PowerSwitch::Init()
  * so on is high - the level reaches the gate of the small-signal MOSFET, not the high side
  * one, which is why the sense is not inverted here.
  */
-void PowerSwitch::DriveSupply(bool on)
-{
-    if(!IsFitted()) { return; }
+void PowerSwitch::DriveSupply(bool on) {
+  if (!IsFitted()) {
+    return;
+  }
 
-    digitalWrite(POWER_SWITCH_PIN, on ? HIGH : LOW);
+  digitalWrite(POWER_SWITCH_PIN, on ? HIGH : LOW);
 }

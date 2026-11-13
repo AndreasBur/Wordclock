@@ -9,10 +9,10 @@
 #ifndef WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
 #define WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_
 
-#include "StandardTypes.h"
+#include "Animation.h"
 #include "Arduino.h"
 #include "ClockWords.h"
-#include "Animation.h"
+#include "StandardTypes.h"
 
 /*!
  * \brief The cursor animation: a single pixel walks across all LEDs and leaves the letters of the
@@ -26,53 +26,51 @@
  * last step clears the display, lights the words of the new time whole and makes the animation
  * idle.
  */
-class AnimationCursor : public Animation
-{
-  public:
+class AnimationCursor : public Animation {
+ public:
+ private:
+  ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
+  byte current_pixel_index_{0u};
 
-  private:
-    ClockWords::WordsListType clock_words_table_{{DisplayWords::WordIdType::kNone}};
-    byte current_pixel_index_{0u};
+  void Reset();
 
-    void Reset();
+ public:
+  /*! \brief Makes the animation, with GetState() kNone until Init(). */
+  constexpr AnimationCursor() {}
 
-  public:
-    /*! \brief Makes the animation, with GetState() kNone until Init(). */
-    constexpr AnimationCursor() { }
+  /*! \brief Destroys the animation. */
+  ~AnimationCursor() = default;
 
-    /*! \brief Destroys the animation. */
-    ~AnimationCursor() = default;
+  /*!
+   * \brief Makes the animation idle and resets its progress.
+   *
+   * A running animation ends where it stands, and the display keeps what its last step drew.
+   */
+  void Init();
 
-    /*!
-     * \brief Makes the animation idle and resets its progress.
-     *
-     * A running animation ends where it stands, and the display keeps what its last step drew.
-     */
-    void Init();
+  /*!
+   * \brief Starts the animation towards the time `hour`:`minute`.
+   *
+   * It draws nothing itself.
+   *
+   * \param[in] hour The hour, 0 to 23.
+   * \param[in] minute The minute, 0 to 59.
+   * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is then
+   *         left as it was, or if it is not idle; a running one then runs on, but ends on the words
+   *         of `hour`:`minute`.
+   */
+  StdReturnType SetTime(byte hour, byte minute);
 
-    /*!
-     * \brief Starts the animation towards the time `hour`:`minute`.
-     *
-     * It draws nothing itself.
-     *
-     * \param[in] hour The hour, 0 to 23.
-     * \param[in] minute The minute, 0 to 59.
-     * \return kEOk, or kENotOk if `hour` is above 23 or `minute` above 59, and the animation is
-     *         then left as it was, or if it is not idle; a running one then runs on, but ends on
-     *         the words of `hour`:`minute`.
-     */
-    StdReturnType SetTime(byte hour, byte minute);
-
-    /*!
-     * \brief Takes one step of the animation; does nothing while it is idle.
-     *
-     * A step lights the pixel the cursor moves onto and turns off the one it leaves, unless that
-     * one is a letter of the new time. It takes one step per pixel and one more,
-     * DISPLAY_NUMBER_OF_PIXELS + 1 in all; the last one ends it.
-     *
-     * It writes the pixels of Display and leaves showing them to Show().
-     */
-    void Task();
+  /*!
+   * \brief Takes one step of the animation; does nothing while it is idle.
+   *
+   * A step lights the pixel the cursor moves onto and turns off the one it leaves, unless that
+   * one is a letter of the new time. It takes one step per pixel and one more,
+   * DISPLAY_NUMBER_OF_PIXELS + 1 in all; the last one ends it.
+   *
+   * It writes the pixels of Display and leaves showing them to Show().
+   */
+  void Task();
 };
 
 #endif  // WORDCLOCK_SRC_ANIMATION_ANIMATIONCURSOR_H_

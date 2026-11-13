@@ -37,11 +37,11 @@
  * the high side MOSFET when it is left unbuilt - so the firmware has to answer for a clock that has
  * none. STD_OFF here until the port is confirmed against the board, see the note on this file.
  */
-#define POWER_SWITCH_IS_FITTED                          STD_OFF
+#define POWER_SWITCH_IS_FITTED STD_OFF
 /*! \brief The port the switch is on. */
-#define POWER_SWITCH_PORT                               PORTD
+#define POWER_SWITCH_PORT PORTD
 /*! \brief The pin of POWER_SWITCH_PORT the switch is on; a placeholder, see the file's note. */
-#define POWER_SWITCH_PIN                                0u
+#define POWER_SWITCH_PIN 0u
 
 /*!
  * \brief The switch in the strip's 5 V supply.
@@ -53,81 +53,88 @@
  * On the AVR the switch is one port, active high, on PORTD pin POWER_SWITCH_PIN, and it is
  * declared not fitted.
  */
-class PowerSwitch
-{
-  private:
-    /*
-     * What the port was last driven to, rather than the port read back. A board with no
-     * switch fitted never has it driven at all, and then this is what the answer is about:
-     * whether the firmware believes the strip is powered.
-     */
-    bool supply_on_{false};
+class PowerSwitch {
+ private:
+  /*
+   * What the port was last driven to, rather than the port read back. A board with no
+   * switch fitted never has it driven at all, and then this is what the answer is about:
+   * whether the firmware believes the strip is powered.
+   */
+  bool supply_on_{false};
 
-    PowerSwitch() { }
-    ~PowerSwitch() = default;
+  PowerSwitch() {}
+  ~PowerSwitch() = default;
 
-    static void DriveSupply(bool on);
+  static void DriveSupply(bool on);
 
-  public:
-    /*! \brief Returns the one switch. */
-    static PowerSwitch& GetInstance() {
-        static PowerSwitch singleton_instance;
-        return singleton_instance;
+ public:
+  /*! \brief Returns the one switch. */
+  static PowerSwitch& GetInstance() {
+    static PowerSwitch singleton_instance;
+    return singleton_instance;
+  }
+
+  /*! \brief Returns whether the board has the switch, as POWER_SWITCH_IS_FITTED says. */
+  static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
+
+  /*!
+   * \brief Returns whether the strip's supply is on; always true where no switch is fitted.
+   *
+   * Where the switch is fitted, it answers what the port was last driven to: false until the
+   * supply is first switched on.
+   *
+   * A board built without the switch has the high side MOSFET bridged, so its strip is powered
+   * and cannot be anything else. Answering from the flag there would report a supply that is off
+   * while the LEDs are lit, which is worse than not having the switch.
+   *
+   * \return True while the supply is on.
+   */
+  bool IsSupplyOn() const {
+    if (!IsFitted()) {
+      return true;
     }
 
-    /*! \brief Returns whether the board has the switch, as POWER_SWITCH_IS_FITTED says. */
-    static constexpr bool IsFitted() { return POWER_SWITCH_IS_FITTED == STD_ON; }
+    return supply_on_;
+  }
 
-    /*!
-     * \brief Returns whether the strip's supply is on; always true where no switch is fitted.
-     *
-     * Where the switch is fitted, it answers what the port was last driven to: false until the
-     * supply is first switched on.
-     *
-     * A board built without the switch has the high side MOSFET bridged, so its strip is powered
-     * and cannot be anything else. Answering from the flag there would report a supply that is off
-     * while the LEDs are lit, which is worse than not having the switch.
-     *
-     * \return True while the supply is on.
-     */
-    bool IsSupplyOn() const {
-        if(!IsFitted()) { return true; }
+  /*!
+   * \brief Sets the switch up and switches the supply on.
+   *
+   * The application calls it once at start, before the strip's data line is claimed.
+   *
+   * Where the switch is fitted, it makes the port an output and switches the supply on, rather
+   * than leaving it where the reset found it: the pull down at the gate holds the stage off
+   * while the port is still an input, and a clock whose strip never gets its 5 V shows nothing
+   * at all. It has to run before the strip's data line is set up, as a frame reaching DIN before
+   * the supply is up pushes current into a dead rail through the LED's own protection diode.
+   *
+   * It does nothing where the switch is not fitted. The pin then belongs to whatever else the
+   * board put there, and driving it would be the one way this can do damage rather than
+   * nothing.
+   */
+  void Init();
 
-        return supply_on_;
-    }
+  /*!
+   * \brief Switches the strip's supply on.
+   *
+   * Where the switch is not fitted, it drives no port and only notes the state, which
+   * IsSupplyOn() then does not read.
+   */
+  void SwitchSupplyOn() {
+    DriveSupply(true);
+    supply_on_ = true;
+  }
 
-    /*!
-     * \brief Sets the switch up and switches the supply on.
-     *
-     * The application calls it once at start, before the strip's data line is claimed.
-     *
-     * Where the switch is fitted, it makes the port an output and switches the supply on, rather
-     * than leaving it where the reset found it: the pull down at the gate holds the stage off
-     * while the port is still an input, and a clock whose strip never gets its 5 V shows nothing
-     * at all. It has to run before the strip's data line is set up, as a frame reaching DIN before
-     * the supply is up pushes current into a dead rail through the LED's own protection diode.
-     *
-     * It does nothing where the switch is not fitted. The pin then belongs to whatever else the
-     * board put there, and driving it would be the one way this can do damage rather than
-     * nothing.
-     */
-    void Init();
-
-    /*!
-     * \brief Switches the strip's supply on.
-     *
-     * Where the switch is not fitted, it drives no port and only notes the state, which
-     * IsSupplyOn() then does not read.
-     */
-    void SwitchSupplyOn() { DriveSupply(true); supply_on_ = true; }
-
-    /*!
-     * \brief Switches the strip's supply off.
-     *
-     * Where the switch is not fitted, it drives no port and only notes the state, which
-     * IsSupplyOn() then does not read.
-     */
-    void SwitchSupplyOff() { DriveSupply(false); supply_on_ = false; }
+  /*!
+   * \brief Switches the strip's supply off.
+   *
+   * Where the switch is not fitted, it drives no port and only notes the state, which
+   * IsSupplyOn() then does not read.
+   */
+  void SwitchSupplyOff() {
+    DriveSupply(false);
+    supply_on_ = false;
+  }
 };
 
 #endif  // WORDCLOCK_PLATFORM_AVR_DX_INCLUDE_POWERSWITCH_H_

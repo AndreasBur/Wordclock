@@ -6,11 +6,13 @@
  * \brief Temperature of the DS3231 real time clock chip.
  */
 
+// clang-format off
 /* Ahead of DS3231.h, which pulls in the Arduino.h that binds Serial to a macro. */
 #include <Wire.h>
 
 #include "DS3231.h"
 #include "I2cBus.h"
+// clang-format on
 
 namespace {
 /* Wire reports zero from endTransmission() when the slave acknowledged. */
@@ -33,70 +35,98 @@ constexpr ClockDateTime::YearType kYearOfCentury{2000u};
 // first, and nothing reads the register back, so only the range has to match.
 constexpr byte kWeekdayOffset{1u};
 
-} // namespace
+}  // namespace
 
-void DS3231::Task()
-{
-    if(StartBus() == kENotOk) { return; }
+void DS3231::Task() {
+  if (StartBus() == kENotOk) {
+    return;
+  }
 
-    ReadTemperature();
+  ReadTemperature();
 }
 
-StdReturnType DS3231::GetDateTime(ClockDateTime& date_time)
-{
-    if(StartBus() == kENotOk) { return kENotOk; }
-    if(HasOscillatorStopped()) { return kENotOk; }
+StdReturnType DS3231::GetDateTime(ClockDateTime& date_time) {
+  if (StartBus() == kENotOk) {
+    return kENotOk;
+  }
+  if (HasOscillatorStopped()) {
+    return kENotOk;
+  }
 
-    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
-    if(ReadRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
+  byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+  if (ReadRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) {
+    return kENotOk;
+  }
 
-    ClockDateTime value;
-    StdReturnType return_value{kEOk};
+  ClockDateTime value;
+  StdReturnType return_value{kEOk};
 
-    if(value.SetTimeSecond(FromBcd(registers[kRegisterSeconds])) == kENotOk) { return_value = kENotOk; }
-    if(value.SetTimeMinute(FromBcd(registers[kRegisterMinutes])) == kENotOk) { return_value = kENotOk; }
-    if(value.SetTimeHour(FromBcd(registers[kRegisterHours] & DS3231_HOURS_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
-    if(value.SetDateDay(FromBcd(registers[kRegisterDay])) == kENotOk) { return_value = kENotOk; }
-    if(value.SetDateMonth(FromBcd(registers[kRegisterMonth] & DS3231_MONTH_VALUE_MASK)) == kENotOk) { return_value = kENotOk; }
-    if(value.SetDateYear(static_cast<ClockDateTime::YearType>(kYearOfCentury + FromBcd(registers[kRegisterYear]))) == kENotOk) { return_value = kENotOk; }
+  if (value.SetTimeSecond(FromBcd(registers[kRegisterSeconds])) == kENotOk) {
+    return_value = kENotOk;
+  }
+  if (value.SetTimeMinute(FromBcd(registers[kRegisterMinutes])) == kENotOk) {
+    return_value = kENotOk;
+  }
+  if (value.SetTimeHour(FromBcd(registers[kRegisterHours] & DS3231_HOURS_VALUE_MASK)) == kENotOk) {
+    return_value = kENotOk;
+  }
+  if (value.SetDateDay(FromBcd(registers[kRegisterDay])) == kENotOk) {
+    return_value = kENotOk;
+  }
+  if (value.SetDateMonth(FromBcd(registers[kRegisterMonth] & DS3231_MONTH_VALUE_MASK)) == kENotOk) {
+    return_value = kENotOk;
+  }
+  if (value.SetDateYear(static_cast<ClockDateTime::YearType>(
+          kYearOfCentury + FromBcd(registers[kRegisterYear]))) == kENotOk) {
+    return_value = kENotOk;
+  }
 
-    if(return_value == kENotOk) { return kENotOk; }
+  if (return_value == kENotOk) {
+    return kENotOk;
+  }
 
-    date_time = value;
-    return kEOk;
+  date_time = value;
+  return kEOk;
 }
 
-StdReturnType DS3231::SetDateTime(const ClockDateTime& date_time)
-{
-    if(StartBus() == kENotOk) { return kENotOk; }
+StdReturnType DS3231::SetDateTime(ClockDateTime const& date_time) {
+  if (StartBus() == kENotOk) {
+    return kENotOk;
+  }
 
-    byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
+  byte registers[DS3231_DATE_TIME_NUMBER_OF_BYTES]{};
 
-    registers[kRegisterSeconds] = ToBcd(date_time.GetTimeSecond());
-    registers[kRegisterMinutes] = ToBcd(date_time.GetTimeMinute());
-    registers[kRegisterHours] = ToBcd(date_time.GetTimeHour());
-    registers[kRegisterWeekday] = ToBcd(static_cast<byte>(ToUnderlying(date_time.GetDateWeekday()) + kWeekdayOffset));
-    registers[kRegisterDay] = ToBcd(date_time.GetDateDay());
-    registers[kRegisterMonth] = ToBcd(date_time.GetDateMonth());
-    registers[kRegisterYear] = ToBcd(static_cast<byte>(date_time.GetDateYear() - kYearOfCentury));
+  registers[kRegisterSeconds] = ToBcd(date_time.GetTimeSecond());
+  registers[kRegisterMinutes] = ToBcd(date_time.GetTimeMinute());
+  registers[kRegisterHours] = ToBcd(date_time.GetTimeHour());
+  registers[kRegisterWeekday] =
+      ToBcd(static_cast<byte>(ToUnderlying(date_time.GetDateWeekday()) + kWeekdayOffset));
+  registers[kRegisterDay] = ToBcd(date_time.GetDateDay());
+  registers[kRegisterMonth] = ToBcd(date_time.GetDateMonth());
+  registers[kRegisterYear] = ToBcd(static_cast<byte>(date_time.GetDateYear() - kYearOfCentury));
 
-    if(WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
+  if (WriteRegisters(DS3231_REG_SECONDS, registers, DS3231_DATE_TIME_NUMBER_OF_BYTES) == kENotOk) {
+    return kENotOk;
+  }
 
-    return ClearOscillatorStopped();
+  return ClearOscillatorStopped();
 }
 
 /*
  * Opens the I2C bus, once; kEOk if the bus is available. Shared with the light sensor, and
  * whichever of the two runs first opens it.
  */
-StdReturnType DS3231::StartBus()
-{
-    if(bus_started_) { return kEOk; }
-
-    if(I2cBus::Open(DS3231_I2C_PIN_SDA, DS3231_I2C_PIN_SCL, DS3231_I2C_FREQUENCY_HZ) == kENotOk) { return kENotOk; }
-
-    bus_started_ = true;
+StdReturnType DS3231::StartBus() {
+  if (bus_started_) {
     return kEOk;
+  }
+
+  if (I2cBus::Open(DS3231_I2C_PIN_SDA, DS3231_I2C_PIN_SCL, DS3231_I2C_FREQUENCY_HZ) == kENotOk) {
+    return kENotOk;
+  }
+
+  bus_started_ = true;
+  return kEOk;
 }
 
 /*
@@ -106,32 +136,41 @@ StdReturnType DS3231::StartBus()
  * by a plain read lands in the same place, and this way the code does not depend on the
  * Wire implementation's repeated-start support.
  */
-StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length)
-{
-    Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
-    Wire.write(static_cast<uint8_t>(register_address));
+StdReturnType DS3231::ReadRegisters(byte register_address, byte* values, byte length) {
+  Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
+  Wire.write(static_cast<uint8_t>(register_address));
 
-    if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
+  if (Wire.endTransmission() != kWireTransmissionSuccess) {
+    return kENotOk;
+  }
 
-    if(Wire.requestFrom(static_cast<uint8_t>(DS3231_I2C_ADDR), static_cast<size_t>(length)) != length) { return kENotOk; }
+  if (Wire.requestFrom(static_cast<uint8_t>(DS3231_I2C_ADDR), static_cast<size_t>(length)) !=
+      length) {
+    return kENotOk;
+  }
 
-    for(byte index = 0u; index < length; index++) { values[index] = static_cast<byte>(Wire.read()); }
+  for (byte index = 0u; index < length; index++) {
+    values[index] = static_cast<byte>(Wire.read());
+  }
 
-    return kEOk;
+  return kEOk;
 }
 
 // Writes a block of registers, starting at one of them; kEOk if the chip acknowledged the
 // whole transfer.
-StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, byte length)
-{
-    Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
-    Wire.write(static_cast<uint8_t>(register_address));
+StdReturnType DS3231::WriteRegisters(byte register_address, byte const* values, byte length) {
+  Wire.beginTransmission(static_cast<uint8_t>(DS3231_I2C_ADDR));
+  Wire.write(static_cast<uint8_t>(register_address));
 
-    for(byte index = 0u; index < length; index++) { Wire.write(static_cast<uint8_t>(values[index])); }
+  for (byte index = 0u; index < length; index++) {
+    Wire.write(static_cast<uint8_t>(values[index]));
+  }
 
-    if(Wire.endTransmission() != kWireTransmissionSuccess) { return kENotOk; }
+  if (Wire.endTransmission() != kWireTransmissionSuccess) {
+    return kENotOk;
+  }
 
-    return kEOk;
+  return kEOk;
 }
 
 /*
@@ -141,13 +180,14 @@ StdReturnType DS3231::WriteRegisters(byte register_address, const byte* values, 
  * that does not answer is treated the same way, because a time that cannot be read is no
  * better than one that cannot be believed.
  */
-bool DS3231::HasOscillatorStopped()
-{
-    byte status{0u};
+bool DS3231::HasOscillatorStopped() {
+  byte status{0u};
 
-    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return true; }
+  if (ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) {
+    return true;
+  }
 
-    return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
+  return (status & DS3231_STATUS_OSCILLATOR_STOPPED_MASK) != 0u;
 }
 
 /*
@@ -156,15 +196,16 @@ bool DS3231::HasOscillatorStopped()
  * setting beside this bit, and a clock that clobbered them would switch off somebody else's
  * alarm.
  */
-StdReturnType DS3231::ClearOscillatorStopped()
-{
-    byte status{0u};
+StdReturnType DS3231::ClearOscillatorStopped() {
+  byte status{0u};
 
-    if(ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) { return kENotOk; }
+  if (ReadRegisters(DS3231_REG_STATUS, &status, 1u) == kENotOk) {
+    return kENotOk;
+  }
 
-    status = static_cast<byte>(status & ~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
+  status = static_cast<byte>(status & ~DS3231_STATUS_OSCILLATOR_STOPPED_MASK);
 
-    return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
+  return WriteRegisters(DS3231_REG_STATUS, &status, 1u);
 }
 
 /*
@@ -174,13 +215,15 @@ StdReturnType DS3231::ClearOscillatorStopped()
  * answer than a value that is a few minutes old on something that changes as slowly as a
  * room does.
  */
-StdReturnType DS3231::ReadTemperature()
-{
-    byte registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
+StdReturnType DS3231::ReadTemperature() {
+  byte registers[DS3231_TEMPERATURE_NUMBER_OF_BYTES]{};
 
-    if(ReadRegisters(DS3231_REG_TEMPERATURE_MSB, registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) == kENotOk) { return kENotOk; }
+  if (ReadRegisters(DS3231_REG_TEMPERATURE_MSB, registers, DS3231_TEMPERATURE_NUMBER_OF_BYTES) ==
+      kENotOk) {
+    return kENotOk;
+  }
 
-    temperature_ = ToTenths(static_cast<int8_t>(registers[0u]), registers[1u]);
-    temperature_valid_ = true;
-    return kEOk;
+  temperature_ = ToTenths(static_cast<int8_t>(registers[0u]), registers[1u]);
+  temperature_valid_ = true;
+  return kEOk;
 }

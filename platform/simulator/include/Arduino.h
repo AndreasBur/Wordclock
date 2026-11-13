@@ -13,6 +13,7 @@
 #ifndef WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_
 #define WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_
 
+// clang-format off
 /*
  * Re-exported, all of them: this header exists to pull the pieces together, and what includes it
  * wants lives in them - `byte` above all. Without the pragma an include-cleaner credits `byte` to
@@ -28,6 +29,7 @@
 #include "arduino/Progmem.h"    // PROGMEM, F, pgm_read_byte, memcpy_P
 #include "arduino/Bits.h"       // bitRead
 #include "arduino/Itoa.h"       // itoa()
+// clang-format on
 // IWYU pragma: end_exports
 
 /*!
@@ -40,6 +42,6 @@
  * On Arduino, Serial is an object of the core; here it is a macro for SerialShim::GetInstance(),
  * and it has only the functions the firmware calls, without begin().
  */
-#define Serial                  SerialShim::GetInstance() // NOLINT(readability-identifier-naming)
+#define Serial SerialShim::GetInstance()  // NOLINT(readability-identifier-naming)
 
 #endif  // WORDCLOCK_PLATFORM_SIMULATOR_INCLUDE_ARDUINO_H_

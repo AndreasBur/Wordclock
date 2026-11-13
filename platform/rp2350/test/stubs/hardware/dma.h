@@ -2,18 +2,22 @@
 #define WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_
 /* Under the framework's names, because it stands in for the framework's header. */
 // NOLINTBEGIN(readability-identifier-naming)
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include "pio.h"
 typedef enum { DMA_SIZE_8 = 0, DMA_SIZE_16 = 1, DMA_SIZE_32 = 2 } dma_channel_transfer_size;
-typedef struct { uint32_t ctrl; } dma_channel_config;
+typedef struct {
+  uint32_t ctrl;
+} dma_channel_config;
 int dma_claim_unused_channel(bool);
 dma_channel_config dma_channel_get_default_config(uint);
 void channel_config_set_transfer_data_size(dma_channel_config*, dma_channel_transfer_size);
 void channel_config_set_read_increment(dma_channel_config*, bool);
 void channel_config_set_write_increment(dma_channel_config*, bool);
 void channel_config_set_dreq(dma_channel_config*, uint);
-void dma_channel_configure(uint, const dma_channel_config*, volatile void*, const void*, uint, bool);
+void dma_channel_configure(uint, dma_channel_config const*, void volatile*, void const*, uint,
+                           bool);
 bool dma_channel_is_busy(uint);
 // NOLINTEND(readability-identifier-naming)
 #endif  // WORDCLOCK_PLATFORM_RP2350_TEST_STUBS_HARDWARE_DMA_H_
