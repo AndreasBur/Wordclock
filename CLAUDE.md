@@ -171,8 +171,8 @@ against a build, each firmware CI job runs it for its own target, and `--fix` wr
 measured values in. One flag per target, and a target left out is simply skipped:
 
 ```bash
-tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf        # check
-tools/documented-sizes.py --elf build-avr/platform/avr-dx/Wordclock.elf --fix  # write
+tools/documented-sizes.py --elf build-avr/programs/Wordclock.elf        # check
+tools/documented-sizes.py --elf build-avr/programs/Wordclock.elf --fix  # write
 tools/documented-sizes.py --rp2350-elf platform/rp2350/.pio/build/wordclock/firmware.elf
 tools/documented-sizes.py --esp32-bin  platform/esp32/.pio/build/wordclock/firmware.bin \
                           --esp32-elf  platform/esp32/.pio/build/wordclock/firmware.elf

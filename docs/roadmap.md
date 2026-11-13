@@ -137,7 +137,7 @@ it happened in.
 | **A coverage report** on every pull request, all three test suites together; a minimum since Wordclock came onto the template | [coverage.sh](../tools/coverage.sh) |
 | **The sanitizers and one warning list** — ASan and UBSan over every suite; every build of ours compiles with the same warnings, `-Wconversion` among them | [warnings.txt](../platform/warnings.txt), the sanitizers job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **Fuzzing** the two ways data from outside reaches the firmware: a command line and a stored settings blob | [the fuzzers](../test/fuzz/) |
-| **No heap on the AVR, and its stack is checked** against the RAM it has, on every build | [avr-stack.py](../tools/avr-stack.py), the [AVR notes](../platform/avr-dx/README.md) |
+| **No heap on the AVR, and its stack is checked** against the RAM it has, on every build | [avr_stack.py](../tools/avr_stack.py), the [AVR notes](../platform/avr-dx/README.md) |
 | **The host builds again with clang**, the backends' host suites included | the clang job in [ci.yml](../.github/workflows/ci.yml) |
 | **The scripts are read**: shellcheck over the shell scripts, pyflakes' checks over the Python ones, actionlint over the workflows | [pyproject.toml](../pyproject.toml), [.github/actionlint.yaml](../.github/actionlint.yaml), the scripts job in [static-analysis.yml](../.github/workflows/static-analysis.yml) |
 | **One pinned environment for the Python tools** — PlatformIO, Playwright, ruff, actionlint — the same in the dev container and in CI | [pyproject.toml](../pyproject.toml) and `uv.lock`, the [uv-sync action](../.github/actions/uv-sync/action.yml) |

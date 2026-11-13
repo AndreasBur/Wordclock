@@ -31,7 +31,7 @@ main() {
   local program
   local mcu
   local elf
-  local graphs
+  local graphs=()
   for target in "${TARGETS[@]}"; do
     select_target "${target}"
     if [[ "${BUILD_SYSTEM}" != cmake ]]; then
@@ -57,9 +57,15 @@ main() {
       for program in "${programs[@]}"; do
         checked=1
         elf="$(target_elf "${variant}" "${program}")"
-        graphs="$(cmake_graphs "${variant}" "${program}")"
+        listed="$(cmake_graphs "${variant}" "${program}")"
+        if [[ -z "${listed}" ]]; then
+          err "${program} (${label}): no call graph of it in the build."
+          failed=1
+          continue
+        fi
+        mapfile -t graphs <<< "${listed}"
         echo "${program} (${label}):"
-        python3 "${ROOT_DIR}/tools/avr_stack.py" --mcu "${mcu}" "${elf}" "${graphs}" || failed=1
+        python3 "${ROOT_DIR}/tools/avr_stack.py" --mcu "${mcu}" "${elf}" "${graphs[@]}" || failed=1
       done
     done
   done

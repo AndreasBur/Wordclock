@@ -299,8 +299,13 @@ jobs:
       # call graph the link writes beside the image. Nothing on this part notices the stack
       # running into .bss - there is no guard. For both, the pull request that moved them is
       # the one moment it is cheap to find out. python3 is installed above for them.
-      - name: Build, and check the documented sizes and the stack
+      - name: Build, and check the documented sizes
         run: make avr
+
+      # The template's tools/stack.sh, which builds the target avr128da48 of tools/project.sh
+      # into build/targets/ and adds up its call graph.
+      - name: The deepest stack against the RAM it leaves
+        run: make stack
 
       # The .hex is what pymcuprog and avrdude write; the .elf goes with it because it is
       # the only one of the two that still knows the symbols, and a report about a clock in
@@ -310,6 +315,6 @@ jobs:
         with:
           name: avr128da48-firmware
           path: |
-            build-avr/platform/avr-dx/Wordclock.hex
-            build-avr/platform/avr-dx/Wordclock.elf
+            build-avr/programs/Wordclock.hex
+            build-avr/programs/Wordclock.elf
           if-no-files-found: error

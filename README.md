@@ -173,7 +173,7 @@ with clang:
 | RP2350 backend on the host | `host-rp2350` | [`platform/rp2350/test/run.sh`](platform/rp2350/test/run.sh) — the same arrangement for the Pico's backend |
 | ESP32 firmware | `esp32` | `pio run` for the board it actually runs on, and the sizes its README states against the image |
 | RP2350 firmware | `rp2350` | `pio run` for the Pico 2 W, and the sizes its notes state |
-| AVR Dx firmware | `avr` | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and [`tools/avr-stack.py`](tools/avr-stack.py): the deepest stack against the RAM the image leaves free |
+| AVR Dx firmware | `avr` | The cross build with `-Werror`, plus [`tools/documented-sizes.py`](tools/documented-sizes.py) against the image it just produced, and `make stack`, the template's [`tools/stack.sh`](tools/stack.sh): the deepest stack against the RAM the image leaves free |
 
 A firmware job looks redundant next to its host tests and is not: those compile
 the same sources with the host's compiler and libc, so anything the target's
