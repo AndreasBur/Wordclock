@@ -26,8 +26,8 @@ So the database is rewritten first, into a directory of its own, and only then r
 The checks are .clang-tidy's, the same ones the simulator is read with.
 
 Usage:
-    tools/cross-clang-tidy.py build-avr 'firmware/|platform/avr-dx/src'
-    tools/cross-clang-tidy.py platform/esp32 'firmware/|platform/esp32/src|platform/arduino/src'
+    tools/cross-clang-tidy.py build-avr "^$PWD/src/|platform/avr-dx/src"
+    tools/cross-clang-tidy.py platform/esp32 "^$PWD/src/|platform/esp32/src|platform/arduino/src"
 """
 
 import argparse

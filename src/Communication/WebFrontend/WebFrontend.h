@@ -30,7 +30,7 @@
  * \brief STD_ON builds in the web front end, WebFrontend.
  *
  * Off unless a backend turns it on from its own build, because every target compiles
- * firmware/src whole and only two of them have a radio to serve anything over. Off is
+ * src whole and only two of them have a radio to serve anything over. Off is
  * therefore the answer that keeps the AVR-Dx image exactly the size it was. Overridden with
  * -DWEB_FRONTEND_SUPPORT=STD_ON, the way DISPLAY_DATA_PIN is overridden, rather than by
  * editing here - all four targets share this header. The ESP32, the RP2350 and the simulator

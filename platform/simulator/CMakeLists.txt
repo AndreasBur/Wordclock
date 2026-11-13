@@ -29,11 +29,11 @@ include(${wxWidgets_USE_FILE})
 # Sources
 # --------------------------------------------------------------------------
 # Platform-agnostic firmware core, shared with the hardware target.
-set(FIRMWARE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../firmware")
+set(FIRMWARE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
 
 # Firmware logic shared with the real hardware target...
 file(GLOB_RECURSE ARDUINO_SOURCES CONFIGURE_DEPENDS
-    "${FIRMWARE_DIR}/src/*.cpp")
+    "${FIRMWARE_DIR}/*.cpp")
 
 # --------------------------------------------------------------------------
 # The two pages, as an array in a generated header - the same step both PlatformIO builds run
@@ -93,21 +93,18 @@ target_include_directories(WordclockBuildSettings INTERFACE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/sim"
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${FIRMWARE_DIR}/inc")
+    "${FIRMWARE_DIR}")
 
-# Every firmware inc/* module directory (Animation, Clock, Display, ...).
-file(GLOB ARDUINO_INC_DIRS LIST_DIRECTORIES true
-    "${FIRMWARE_DIR}/inc/*")
-foreach(dir ${ARDUINO_INC_DIRS})
+# Every module directory of the core (Animation, Clock, Display, ...) and the ones nested in
+# them (Communication/MessageParser/Base), recursively, as platform/avr-dx does it: a list of the
+# nested ones had to be extended by hand whenever a module grew a subfolder.
+file(GLOB_RECURSE FIRMWARE_ENTRIES LIST_DIRECTORIES true "${FIRMWARE_DIR}/*")
+foreach(dir ${FIRMWARE_ENTRIES})
     if(IS_DIRECTORY "${dir}")
         target_include_directories(WordclockBuildSettings INTERFACE "${dir}")
     endif()
 endforeach()
-# Nested Communication/* dirs are not caught by the glob above.
 target_include_directories(WordclockBuildSettings INTERFACE
-    "${FIRMWARE_DIR}/inc/Communication/MessageParser"
-    "${FIRMWARE_DIR}/inc/Communication/MessageParser/Base"
-    "${FIRMWARE_DIR}/inc/Communication/WebFrontend"
     # Where the rule above puts WebPage.h.
     "${CMAKE_CURRENT_BINARY_DIR}/generated")
 

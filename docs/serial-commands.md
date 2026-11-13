@@ -2,7 +2,7 @@
 
 The firmware exposes a line-based serial command interface. This document is
 generated from the parser sources under
-[firmware/inc/Communication/MessageParser/](../firmware/inc/Communication/MessageParser/).
+[src/Communication/MessageParser/](../src/Communication/MessageParser/).
 
 ## Wire format
 
@@ -11,14 +11,14 @@ generated from the parser sources under
 ```
 
 - The command is the **leading run of digits** of the message
-  ([`MsgCmdParser::ToCommand`](../firmware/inc/Communication/MessageParser/MsgCmdParser.h));
+  ([`MsgCmdParser::ToCommand`](../src/Communication/MessageParser/MsgCmdParser.h));
   a number past the last command is no command, rather than wrapping into one.
 - Options are introduced by `-`, then a **single-letter short name**, then the
   value directly (e.g. `-R255`)
-  ([`MsgParameterParser::Parse`](../firmware/inc/Communication/MessageParser/Base/MsgParameterParser.h)).
+  ([`MsgParameterParser::Parse`](../src/Communication/MessageParser/Base/MsgParameterParser.h)).
   The space between options is customary rather than needed: `9 -A3-M1` sets both.
 - Messages are terminated by newline `\n`
-  ([`Communication::kEndOfMessageChar`](../firmware/inc/Communication/Communication.h)).
+  ([`Communication::kEndOfMessageChar`](../src/Communication/Communication.h)).
 - Every command **echoes back** the command number plus current values as
   `X=value` pairs. Sending a command with no options acts as a **query**: values
   are read back without being changed.
@@ -27,7 +27,7 @@ generated from the parser sources under
 ## Top-level commands
 
 Command numbers below are for the default build (all overlays `STD_ON` in
-[`Overlays.h`](../firmware/inc/Overlay/Overlays.h)). The enum values shift if an
+[`Overlays.h`](../src/Overlay/Overlays.h)). The enum values shift if an
 overlay is disabled at compile time.
 
 | # | Command | Options | Notes |
@@ -53,7 +53,7 @@ overlay is disabled at compile time.
 ### Overlay options (shared)
 
 From
-[`MsgCmdBaseOverlayParser.h`](../firmware/inc/Communication/MessageParser/Base/MsgCmdBaseOverlayParser.h):
+[`MsgCmdBaseOverlayParser.h`](../src/Communication/MessageParser/Base/MsgCmdBaseOverlayParser.h):
 
 | Opt | Meaning |
 |-----|---------|
@@ -113,7 +113,7 @@ window stands in for it. It only has an effect while `-A1` is set.
 
 ### Clock modes (`command 8 -M<mode>`)
 
-From [`Clock.h`](../firmware/inc/Clock/Clock.h). The modes are the regional ways of
+From [`Clock.h`](../src/Clock/Clock.h). The modes are the regional ways of
 saying the time in German, and they differ in exactly two places: how the quarters
 are said, and whether 20 and 40 minutes past are counted from the hour or from the
 half hour. Everything else is identical between them.
@@ -131,7 +131,7 @@ The quarters of Ossi and Schwaben name the hour they are counting towards, so
 `-I<0|1>` decides whether **ES IST** stands in every time or only in the two it is
 said in — `-I0` lights it at the full and the half hour alone, `-I1` at every time.
 It used to be a compile-time switch; the default is still what
-[`CLOCK_SHOW_IT_IS_PERMANENTLY`](../firmware/inc/Clock/Clock.h) says, and a clock
+[`CLOCK_SHOW_IT_IS_PERMANENTLY`](../src/Clock/Clock.h) says, and a clock
 that was never told otherwise comes up with it.
 
 ```
@@ -141,7 +141,7 @@ that was never told otherwise comes up with it.
 
 ### Animation ids (`command 9 -A<id>`)
 
-From [`Animations.h`](../firmware/inc/Animation/Animations.h). Like the command
+From [`Animations.h`](../src/Animation/Animations.h). Like the command
 numbers, these shift if an animation is disabled through its
 `ANIMATIONS_SUPPORT_*` switch:
 
@@ -198,7 +198,7 @@ id 0 is rejected the same way, since `0` is not an animation.
 `-S<speed>` sets the speed of the animation selected with `-A`: **higher is faster**,
 `255` is the fastest and `0` stops the animation entirely. Speeds `1` through `255`
 map one-to-one to task cycles `255` through `1`; the scheduler counts those cycles in
-([`Scheduler::ConvertSpeedToTaskCycle`](../firmware/inc/Scheduler/Scheduler.h)), which
+([`Scheduler::ConvertSpeedToTaskCycle`](../src/Scheduler/Scheduler.h)), which
 is why the two run in opposite directions. The default task cycle of `10`
 (`ANIMATIONS_TASK_CYCLE_INIT_VALUE`) is reported as `S=246`. Every animation keeps its
 own speed, and modes 1 and 2 use the speed of whichever animation they picked.
@@ -217,8 +217,8 @@ carries no value, so the readings live in a command of their own.
 
 | field | Meaning |
 |-------|---------|
-| `V` | Firmware version, hand-kept in [`Version.h`](../firmware/inc/Version/Version.h) |
-| `U` | Full days since the last start, held at 65535 rather than wrapping ([`Uptime.h`](../firmware/inc/Uptime/Uptime.h)) |
+| `V` | Firmware version, hand-kept in [`Version.h`](../src/Version/Version.h) |
+| `U` | Full days since the last start, held at 65535 rather than wrapping ([`Uptime.h`](../src/Uptime/Uptime.h)) |
 | `H` | The hours beyond the full days, 0 to 23 |
 | `N` | The minutes beyond the full hours, 0 to 59 |
 | `I` | What the light sensor measures, in lux — the value the brightness automatic spreads between its two calibrated bounds |
@@ -235,7 +235,7 @@ a host's free heap says nothing about the firmware.
 The command takes no options. Its parameter table is empty, so `12 -V1` is answered with
 `Error=3:V` (`ErrorType::kParameterUnknown`) rather than silently accepted. The field names are
 still described in the
-[message catalog](../firmware/inc/Communication/MessageCatalog.h), marked read-only, which
+[message catalog](../src/Communication/MessageCatalog.h), marked read-only, which
 is how the simulator dialog and the web console put labels on an answer without offering
 the fields as inputs.
 
@@ -278,7 +278,7 @@ reach without a cable.
 ## RPC sub-commands (`command 1 -P<id>`)
 
 From
-[`MsgCmdRemoteProcedureCallParser.h`](../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h):
+[`MsgCmdRemoteProcedureCallParser.h`](../src/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h):
 
 | id | Action |
 |----|--------|
@@ -295,7 +295,7 @@ From
 | 14 / 15 | Brightness increment / decrement |
 | 16 / 17 | Auto-brightness on / off |
 | 18 / 19 | Gamma correction on / off |
-| 20 / 21 | Power on / off — switches the 5 V supply of the LED stripes, which is **not** ids 3 and 4: those darken a strip that stays powered and keeps drawing its quiescent current, about 110 mA for this display. Both are asks rather than acts, and take two ticks: switching off blanks the stripes over the data line, waits for that frame to be gone and only then drops the port, because data reaching DIN with the rail down pushes current into it through the LED's own protection diode. Switching on is that order backwards. **Answers `Error=9` on a clock whose switch was not built** — it is optional hardware, and only the simulator declares it fitted so far. Circuit in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply), sequence in [Power.h](../firmware/inc/Power/Power.h) |
+| 20 / 21 | Power on / off — switches the 5 V supply of the LED stripes, which is **not** ids 3 and 4: those darken a strip that stays powered and keeps drawing its quiescent current, about 110 mA for this display. Both are asks rather than acts, and take two ticks: switching off blanks the stripes over the data line, waits for that frame to be gone and only then drops the port, because data reaching DIN with the rail down pushes current into it through the LED's own protection diode. Switching on is that order backwards. **Answers `Error=9` on a clock whose switch was not built** — it is optional hardware, and only the simulator declares it fitted so far. Circuit in [the ESP32 backend's hardware notes](../platform/esp32/README.md#switching-the-strips-supply), sequence in [Power.h](../src/Power/Power.h) |
 | 22 | Clock refresh — draw the current time again, right now and without an animation |
 | 23 | Animation start — run the animation the mode provides on the current time |
 | 24 | Animation abort — end a running animation and put the time back |
@@ -344,7 +344,7 @@ setting can be in that makes the next one unreachable.
 ## Error codes
 
 Returned in the `Error=<code>` field
-([`ErrorMessage::ErrorType`](../firmware/inc/Communication/ErrorMessage.h)):
+([`ErrorMessage::ErrorType`](../src/Communication/ErrorMessage.h)):
 
 | code | Name | Meaning |
 |------|------|---------|
@@ -377,9 +377,9 @@ Returned in the `Error=<code>` field
 Three places have to move together:
 
 1. `RpcIdType` and the `switch` in
-   [MsgCmdRemoteProcedureCallParser.h](../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
+   [MsgCmdRemoteProcedureCallParser.h](../src/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
 2. `kRemoteProcedureValueNames` in
-   [MessageCatalog.cpp](../firmware/src/Communication/MessageCatalog.cpp) — written
+   [MessageCatalog.cpp](../src/Communication/MessageCatalog.cpp) — written
    beside the firmware rather than derived from it, and read positionally, so the order
    is the contract. A `static_assert` counts the names against `RpcIdType`, so a missing
    one does not compile; a *misordered* one still does.

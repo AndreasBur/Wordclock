@@ -11,7 +11,7 @@ replaces exactly one thing, `Serial`. See *A second front end reaches the same p
 below for why.
 
 The clock logic itself is not copied in here. `platformio.ini` compiles
-[`../../firmware/src`](../../firmware/src) directly and
+[`../../src`](../../src) directly and
 [`scripts/firmware_includes.py`](scripts/firmware_includes.py) puts its header
 directories on the include path, so there is one copy of the firmware, shared with the
 simulator.
@@ -120,7 +120,7 @@ the console and opens its access point, `Wordclock`, to be configured from. The 
 comes from the DS3231 where one is fitted, and stays unset where none is (see below).
 
 The LED data pin is **not** configured here. It comes from `DISPLAY_DATA_PIN` in
-[`../../firmware/inc/Display/Display.h`](../../firmware/inc/Display/Display.h), like
+[`../../src/Display/Display.h`](../../src/Display/Display.h), like
 every other display parameter, and the backend takes what `Display::Init()` hands it.
 
 Its default of GPIO 10 is chosen for the S3, where that pin is free. It is **not** free on
@@ -281,7 +281,7 @@ rather than at the strip. Fast edges see even 20 cm of wire as a transmission li
 330 Ω at the source absorbs the reflection instead of letting it ring at DIN; that one
 only costs wrong colours. The other can destroy something: data arriving while the strip
 has no 5 V pushes current through DIN's protection diode into the unpowered rail.
-[`../../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h`](../../firmware/inc/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
+[`../../src/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h`](../../src/Communication/MessageParser/MsgCmdRemoteProcedureCallParser.h)
 already orders `POWER_OFF` to blank the strips before cutting the supply, but a reset or
 a watchdog keeps no such order, and the resistor is what holds in that case.
 
@@ -346,7 +346,7 @@ The firmware side is built and `POWER_SWITCH_IS_FITTED` in
 beside it — `STD_OFF` and GPIO 11 until somebody confirms both against a board. Until then ids
 20 and 21 answer `Error=9` rather than pretending, and the port is never driven, which is the
 one thing a wrong pin here could do damage with. What the sequence behind those ids has to do,
-and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
+and why it takes two ticks, is in [`Power.h`](../../src/Power/Power.h).
 
 ### Supply
 
@@ -360,7 +360,7 @@ and why it takes two ticks, is in [`Power.h`](../../firmware/inc/Power/Power.h).
   6.6 A rather than for the display — 5 V / 10 A puts a supply at two thirds of its rating,
   which is where it belongs once it has aged and warmed up.
 - **What the firmware will not let it draw.**
-  [DisplayCurrentLimit](../../firmware/inc/Display/DisplayCurrentLimit.h) holds the display to
+  [DisplayCurrentLimit](../../src/Display/DisplayCurrentLimit.h) holds the display to
   `DISPLAY_CURRENT_LIMIT_BUDGET_MILLI_AMPS`, which defaults to the 2500 mA a 5 V / 3 A supply
   can be asked for. It estimates from the number of lit letters and the colour — 20 mA per
   channel at full and 1 mA idle per LED, the numbers the 6.6 A above is itself made of — and

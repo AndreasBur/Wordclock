@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Top-level entry point. Selects which platform backend to build; the firmware
-# core in firmware/ is shared and pulled in by the chosen platform.
+# core in src/ is shared and pulled in by the chosen platform.
 project(Wordclock NONE)
 
 # enable_testing() rather than include(CTest): the latter also pulls in the

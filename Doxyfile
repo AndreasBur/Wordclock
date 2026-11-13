@@ -1,4 +1,4 @@
-# The Doxygen blocks of firmware/ and of one backend under platform/, checked rather than
+# The Doxygen blocks of src/ and of one backend under platform/, checked rather than
 # published: Wordclock is a firmware with no reader of a reference outside its code, and docs/
 # is the project's site. Only what differs from Doxygen's defaults is set.
 #
@@ -10,7 +10,7 @@ PROJECT_NAME           = Wordclock
 PROJECT_BRIEF          = "A German word clock"
 OUTPUT_DIRECTORY       = build/doxygen/simulator
 
-INPUT                  = firmware platform/simulator
+INPUT                  = src platform/simulator
 RECURSIVE              = YES
 # The three headers of platform/avr-dx/include/stl are named as the standard's are, without an
 # extension.

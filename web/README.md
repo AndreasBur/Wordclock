@@ -10,10 +10,10 @@ its header.
 Three backends serve them: the [ESP32](../platform/esp32/README.md) and the
 [RP2350](../platform/rp2350/README.md) on a wall, and the
 [simulator](../platform/simulator/README.md) on a desk, at `http://localhost:8080/`. The
-AVR-Dx, having no radio, does not. This directory sits beside `firmware/` rather than inside
+AVR-Dx, having no radio, does not. This directory sits beside `src/` rather than inside
 any one of them because nothing a browser sees depends on which controller is behind it -
 which is the same reason all three answer out of one
-[`WebFrontend`](../firmware/inc/Communication/WebFrontend/WebFrontend.h).
+[`WebFrontend`](../src/Communication/WebFrontend/WebFrontend.h).
 
 Both speak the same commands as the wire, because their web socket is wired straight to the
 port `Communication` reads from. Nothing about the protocol is repeated in the browser.
@@ -72,7 +72,7 @@ into the input field rather than straight onto the wire, so it can still be corr
 exactly as the wx builder's Insert does.
 
 That JSON is written by
-[`WebFrontend`](../firmware/inc/Communication/WebFrontend/WebFrontend.h) in the firmware, once
+[`WebFrontend`](../src/Communication/WebFrontend/WebFrontend.h) in the firmware, once
 for every backend. It used to be written by each of them, in two functions that were identical
 down to their comments - and since a page parses what they produced, a divergence between them
 would have shown up in a browser rather than in either backend's tests, which check the bytes a

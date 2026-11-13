@@ -53,14 +53,14 @@ faces chosen by `#define`. Nothing here should move towards it.
 Worth writing down, because it is what the roadmap's items must not break.
 
 - Fifteen transition animations with three selection modes, a speed per animation and a
-  favourite flag ([Animations.h](../firmware/inc/Animation/Animations.h)).
+  favourite flag ([Animations.h](../src/Animation/Animations.h)).
 - Four German regional wordings switchable at runtime
-  ([Clock.h](../firmware/inc/Clock/Clock.h)).
+  ([Clock.h](../src/Clock/Clock.h)).
 - A platform abstraction with a full desktop simulator, so the firmware is developed and
   tested without hardware.
 - A BH1750 over I²C with min/max calibration and gamma correction, rather than an LDR on
   an ADC pin.
 - One command set for the serial line, the browser console and the simulator dialog,
   machine-readable in the
-  [MessageCatalog](../firmware/inc/Communication/MessageCatalog.h) — a command added
+  [MessageCatalog](../src/Communication/MessageCatalog.h) — a command added
   once appears in all three.

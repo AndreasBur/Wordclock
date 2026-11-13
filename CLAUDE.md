@@ -112,7 +112,7 @@ with the copyright, an SPDX line and a `\file` block. What a block holds, and ho
 
 ## Layout
 
-- `firmware/` — the platform-independent clock, shared by both targets.
+- `src/` — the platform-independent clock, a folder per module, shared by every target.
 - `platform/simulator/` — wxWidgets stand-ins for the hardware (pixel matrix,
   light sensor, Arduino `Serial`), mirroring the hardware classes' public API.
 - `.devcontainer/` — one `Dockerfile` plus a `devcontainer.json` per host

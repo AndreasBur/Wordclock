@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reads the Doxygen blocks of the firmware and of every backend, and fails on a warning.
 
-Doxygen runs once per backend, over firmware/ and platform/<backend>: the backends each have a
+Doxygen runs once per backend, over src/ and platform/<backend>: the backends each have a
 Pixels, a System and a Storage of their own, which one run over all of them would merge into one
 class. What the firmware's warnings say is the same in every run, so each is reported once.
 
@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKENDS = ('simulator', 'avr-dx', 'esp32', 'rp2350')
-# What a backend builds from beyond firmware/ and its own directory: the drivers the two Arduino
+# What a backend builds from beyond src/ and its own directory: the drivers the two Arduino
 # backends share.
 SHARED = {'esp32': ('platform/arduino',), 'rp2350': ('platform/arduino',)}
 
@@ -37,7 +37,7 @@ def run(backend):
     out.mkdir(parents=True, exist_ok=True)
     log = out / 'warnings.log'
     config = (ROOT / 'Doxyfile').read_text() + (
-        f'\nINPUT = firmware platform/{backend} {" ".join(SHARED.get(backend, ()))}\n'
+        f'\nINPUT = src platform/{backend} {" ".join(SHARED.get(backend, ()))}\n'
         f'OUTPUT_DIRECTORY = {out}\n'
         f'WARN_LOGFILE = {log}\n')
     subprocess.run(['doxygen', '-'], input=config, text=True, cwd=ROOT, check=True)

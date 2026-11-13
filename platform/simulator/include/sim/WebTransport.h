@@ -5,7 +5,7 @@
  * \file
  * \brief What WebFrontend needs from this backend's server.
  *
- * The simulator's half of the contract in firmware/inc/Communication/WebFrontend/WebFrontend.h -
+ * The simulator's half of the contract in src/Communication/WebFrontend/WebFrontend.h -
  * the third one, after the ESP32's and the RP2350's, and the one that needs no board.
  *
  * What sits behind it is WebHost, a socket, HTTP and a web socket written out here because a

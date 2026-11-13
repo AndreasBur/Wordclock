@@ -58,7 +58,7 @@ spricht deutsch.
 
 | Directory | Purpose |
 |-----------|---------|
-| [firmware/](firmware/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
+| [src/](src/) | **Single source of truth** for the clock logic — platform-agnostic (animations, clock, display, scheduler, overlays, communication). |
 | [docs/](docs/) | Reference documentation: the [serial command reference](docs/serial-commands.md), the [font tables](docs/fonts.md), the [roadmap](docs/roadmap.md) of what is still open, the [comparison](docs/comparison.md) with the other published word clocks, the [measured decisions](docs/decisions.md) and how the code is [documented](docs/documentation.md). |
 | [assets/](assets/) | The icon's SVG masters and the script that generates the `.ico`, the `.xpm` and `docs/images/logo.png` from them. |
 | [web/](web/) | The two pages a networked clock serves: the panel at `/` for what is changed often, the console at `/console` for every command. Compiled into the firmware by [platform/scripts/embed_web.py](platform/scripts/embed_web.py) — the clock has nowhere to fetch anything from. See its [README](web/README.md). |
@@ -67,7 +67,7 @@ spricht deutsch.
 | [platform/rp2350/](platform/rp2350/) | On-device backend for the Raspberry Pi Pico 2 W, derived from the ESP32 one. Built with PlatformIO — see its [README](platform/rp2350/README.md). |
 | [platform/arduino/](platform/arduino/) | What the two Arduino backends share: the real-time clock on the system clock, and the BH1750 and DS3231 drivers, written once against `Wire`. Each backend opens the bus its core's way in its own `I2cBus.cpp`. |
 | [platform/avr-dx/](platform/avr-dx/) | On-device backend for the AVR128DA48: WS2812 shaped by the CCL, time from a DS3231. Built with CMake and a cross toolchain file — see its [README](platform/avr-dx/README.md). |
-| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first, and [coverage.py](tools/coverage.py), which reports the lines of `firmware/` that no test runs. |
+| [tools/](tools/) | [documented-sizes.py](tools/documented-sizes.py), which compares every size this repository claims against a build and fails the pull request that made one stale; [self-contained-headers.py](tools/self-contained-headers.py), which compiles every header on its own so that none of them builds only on what its includers happened to include first, and [coverage.py](tools/coverage.py), which reports the lines of `src/` that no test runs. |
 
 The tool that generates the bitmap font tables lives in its own repository,
 [theAndreas/FontCreator](https://github.com/theAndreas/FontCreator) — see
@@ -140,7 +140,7 @@ cmake --build --preset simulator && ./build/bin/Wordclock     # http://localhost
 ```
 
 The panel is at `/` and the console at `/console`, answered out of the same
-[`WebFrontend`](firmware/inc/Communication/WebFrontend/WebFrontend.h) a clock answers them
+[`WebFrontend`](src/Communication/WebFrontend/WebFrontend.h) a clock answers them
 from — so what the browser sees is what a clock would send, with no board and no second
 process. The window and the browser then show the same clock, which is worth more than either
 alone: the window is colour-accurate, the pages are what somebody actually uses.
@@ -189,14 +189,14 @@ under the sanitizers, and a fuzzer for what no test thought of:
 | Job | `make` | What it does |
 |-----|--------|--------------|
 | clang-tidy | `tidy` | Over the firmware core and the simulator backend, seeing exactly what the compiler sees through `compile_commands.json`. Which checks and why the others are off is in [`.clang-tidy`](.clang-tidy). The names alone are also checked in every test: the simulator's, and the backends' host tests through the database their `run.sh compiledb` writes. Each of the four builds then compiles every header of the core and of its backend on its own, by its own compiler, through [`tools/self-contained-headers.py`](tools/self-contained-headers.py) |
-| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `firmware/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
+| coverage | `coverage` | Builds the core tests and both host suites with `--coverage`, runs them, and puts a table of which lines of `src/` none of them runs into the job's summary, through [`tools/coverage.py`](tools/coverage.py). A report rather than a check: there is no threshold, and the job fails only when a test does |
 | sanitizers | `sanitizers` | The same three suites built with AddressSanitizer and UndefinedBehaviorSanitizer, so that a test which passes only because the host did what undefined behaviour happened to do fails instead |
 | fuzz | `fuzz` | libFuzzer, under the same two sanitizers, over the two ways data from outside reaches the firmware: a command line as a browser's web socket frame brings it, and a stored settings blob. Three minutes each per pull request, from a corpus the runs before left in the cache. The fuzzers and how to run them are in [`platform/simulator/tests/fuzz/`](platform/simulator/tests/fuzz/run.sh) |
 | cppcheck | `cppcheck` | Parses the tree by itself, which is what reaches the template instantiations and container bounds the clang checks do not follow. Its two suppressions and their reasons are in [`.cppcheck-suppressions`](.cppcheck-suppressions) |
 | Scripts | `scripts` | shellcheck over every shell script, ruff over every Python one and actionlint over the workflows - what builds, tests and checks everything else. ruff runs pyflakes' checks only, for the reason [`pyproject.toml`](pyproject.toml) gives; actionlint learns the runner label from [`.github/actionlint.yaml`](.github/actionlint.yaml) |
 | Web page linters | `web-lint` | [html-validate](https://html-validate.org/) over both pages as whole documents and eslint over the scripts inline in them, at the versions [`package-lock.json`](package-lock.json) pins. What each checks and leaves out is in [`.htmlvalidate.mjs`](.htmlvalidate.mjs) and [`eslint.config.mjs`](eslint.config.mjs) |
 
-cppcheck reads `firmware/` only: without wxWidgets' own headers it stops at
+cppcheck reads `src/` only: without wxWidgets' own headers it stops at
 `DECLARE_EVENT_TABLE` in the simulator's window class, which is the half
 clang-tidy already covers through the compile database.
 

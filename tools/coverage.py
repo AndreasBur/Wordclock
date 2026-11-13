@@ -20,7 +20,7 @@ which leaves gcov's count of a line hard to read; at -O0 a line is the code writ
 It reports and does not judge: there is no threshold, and it fails only when it found no data at
 all, which means a suite was built without --coverage. A threshold would be a number to keep
 above rather than a picture of where the tests are thin; the files at the top of the table are
-the point. Only firmware/ is reported. The backends, the simulator and the stubs are what the
+the point. Only src/ is reported. The backends, the simulator and the stubs are what the
 tests run on, not what they are for.
 """
 
@@ -34,7 +34,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FIRMWARE = ROOT / 'firmware'
+FIRMWARE = ROOT / 'src'
 
 
 def data_files(directories):
@@ -98,11 +98,11 @@ def percent(run, total):
 def write_text(rows, total_run, total, out):
     for path, run, lines in rows:
         print(f'{percent(run, lines)} {run:5d}/{lines:<5d} {path}', file=out)
-    print(f'{percent(total_run, total)} {total_run:5d}/{total:<5d} firmware/ in all', file=out)
+    print(f'{percent(total_run, total)} {total_run:5d}/{total:<5d} src/ in all', file=out)
 
 
 def write_markdown(rows, total_run, total, suites, out):
-    print('## Line coverage of firmware/', file=out)
+    print('## Line coverage of src/', file=out)
     print('', file=out)
     print(f'**{percent(total_run, total).strip()}**, {total_run} of {total} lines, over '
           f'{", ".join(suites)}. A line counts as run if any of them ran it.', file=out)
@@ -137,7 +137,7 @@ def main():
 
     rows = rows_of(merged)
     if not rows:
-        sys.exit('coverage.py: the .gcda files name no source under firmware/')
+        sys.exit('coverage.py: the .gcda files name no source under src/')
     total_run = sum(row[1] for row in rows)
     total = sum(row[2] for row in rows)
 
