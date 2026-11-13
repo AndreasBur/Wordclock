@@ -22,12 +22,18 @@ runs:
       run: |
         systems=$(tools/setup.sh --systems | paste -sd ' ' -)
         echo "systems=$systems" >> "$GITHUB_OUTPUT"
-        version=$(sed -n 's/^ARG ARDUINO_CLI_VERSION=//p' .devcontainer/Dockerfile)
-        if [ -z "$version" ]; then
-          echo "::error::.devcontainer/Dockerfile names no ARG ARDUINO_CLI_VERSION"
-          exit 1
-        fi
-        echo "version=$version" >> "$GITHUB_OUTPUT"
+        # The version only where a target is built by arduino-cli: a project without one, as a
+        # firmware of CMake and PlatformIO, may have a Dockerfile that installs none.
+        case " $systems " in
+          *" arduino-cli "*)
+            version=$(sed -n 's/^ARG ARDUINO_CLI_VERSION=//p' .devcontainer/Dockerfile)
+            if [ -z "$version" ]; then
+              echo "::error::.devcontainer/Dockerfile names no ARG ARDUINO_CLI_VERSION"
+              exit 1
+            fi
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            ;;
+        esac
 
     - if: contains(steps.read.outputs.systems, 'arduino-cli')
       uses: arduino/setup-arduino-cli@v2
