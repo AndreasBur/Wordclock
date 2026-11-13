@@ -13,20 +13,39 @@ configuration prevents native Linux container startup from failing when
 
 ## Logins that survive a rebuild
 
-Two named volumes carry a login across a rebuild: `wordclock-codex` at `/home/vscode/.codex`
-and `wordclock-gh` at `/home/vscode/.config/gh`. Without them both have to be entered again
-by hand every time the container is built.
+Three named volumes carry a login across a rebuild: `wordclock-codex` at `/home/vscode/.codex`,
+`wordclock-claude` at `/home/vscode/.claude` and `wordclock-gh` at `/home/vscode/.config/gh`.
+Without them every login has to be entered again by hand each time the container is built.
 
-They are declared by the **shared feature**, so every variant gets them, because both tools
-belong to every variant: the Codex extension is in the shared extension list, and every push
-and pull request goes through `gh`. The `Dockerfile` creates both directories as the remote
-user at mode 0700 first — an empty named volume takes its ownership from the path it covers,
-so a path that does not exist in the image yields a volume owned by root that the tool cannot
-write. 0700 rather than the package cache's 0755, because a credential is not a cache, and
-`gh` refuses to read a config directory that others can enter.
+They are declared by the **shared feature**, so every variant gets them, because all three tools
+belong to every variant: the Codex and Claude Code extensions are in the shared extension list,
+and every push and pull request goes through `gh`. Claude Code keeps part of its state - the
+account and the finished onboarding among it - in `~/.claude.json`, beside the directory rather
+than in it, so `CLAUDE_CONFIG_DIR` points it at `/home/vscode/.claude`: without that a rebuild
+would keep the credentials and still start Claude Code as if for the first time.
 
-Both volumes hold credentials: do not share, export or remove one unless the saved login
+The `Dockerfile` creates these directories as the remote user at mode 0700 first — an empty
+named volume takes its ownership from the path it covers, so a path that does not exist in the
+image yields a volume owned by root that the tool cannot write. 0700 rather than the package
+cache's 0755, because a credential is not a cache, and `gh` refuses to read a config directory
+that others can enter.
+
+These volumes hold credentials: do not share, export or remove one unless the saved login
 should be discarded.
+
+The shared feature also persists uv's download cache in `wordclock-uv-cache` at
+`/home/vscode/.cache/uv`, so a `uv sync` after a rebuild does not download every package again.
+The volume and the environments it fills are on different file systems, where uv cannot
+hard-link and warns before falling back to a copy; `UV_LINK_MODE=copy` asks for the copy
+directly. The image's own tool environment under `/opt/wordclock-env` is built with
+`UV_NO_CACHE=1` and does not use the volume.
+
+`wordclock-history` at `/home/vscode/.commandhistory` keeps Bash history across rebuilds.
+`HISTFILE` points there and `PROMPT_COMMAND=history -a` saves each command at the next prompt,
+so closing a terminal during a rebuild does not lose the session's history. `containerEnv`
+replaces `PROMPT_COMMAND` rather than appending to it, which is harmless only as long as nothing
+in the image sets one of its own. The directory is created with mode 0700, since commands can
+contain private data.
 
 ## SSH agent on Linux
 
@@ -92,8 +111,7 @@ Code applies last:
 Which protocol to pick for Git operations depends on the network, and both fail
 in ways that do not name the cause — see below.
 
-The login lands in `~/.config/gh` and so does **not** survive a rebuild. It holds
-a credential, which puts persisting it in a local variant — see below.
+The login lands in `~/.config/gh`, persisted by the shared feature's `wordclock-gh` volume.
 
 ## Reaching GitHub: which transport works
 
@@ -240,7 +258,7 @@ is already listed there.
 What must stay local is a **secret or an internal address** — a registry-hosted feature, an
 internal base image, a token written into the file. A *mount* that persists a login is
 neither: the line names a volume, the volume lives on the machine that created it, and
-nothing about it reaches the repository. That is why the two login volumes above are in the
+nothing about it reaches the repository. That is why the login volumes above are in the
 committed shared feature, where every variant gets them, rather than in a variant somebody
 has to build for themselves.
 
