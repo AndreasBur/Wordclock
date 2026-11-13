@@ -37,7 +37,7 @@ name: static-analysis
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
 
 # Read the repository and nothing else: no job here writes to it, and a token that could would
 # be handed to every action each job runs. release.yml asks for what publishing needs itself.

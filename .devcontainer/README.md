@@ -111,14 +111,14 @@ Two commands tell them apart, and take a few seconds:
 
 ```sh
 ssh -T -p 443 git@ssh.github.com          # "Hi <user>!" means SSH works
-git ls-remote https://github.com/AndreasBur/Wordclock.git | head -1
+git ls-remote https://github.com/theAndreas/Wordclock.git | head -1
 ```
 
 Switch the remote to whichever answered:
 
 ```sh
-git remote set-url origin ssh://git@ssh.github.com:443/AndreasBur/Wordclock.git
-git remote set-url origin https://github.com/AndreasBur/Wordclock.git
+git remote set-url origin ssh://git@ssh.github.com:443/theAndreas/Wordclock.git
+git remote set-url origin https://github.com/theAndreas/Wordclock.git
 ```
 
 HTTPS needs no separate login: the shared feature's `postAttachCommand` runs

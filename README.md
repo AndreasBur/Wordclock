@@ -1,16 +1,16 @@
 # Wordclock — a German word clock (Wortuhr)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/ci.yml?branch=master&label=CI&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/ci.yml)
-[![static analysis](https://img.shields.io/github/actions/workflow/status/AndreasBur/Wordclock/static-analysis.yml?branch=master&label=static%20analysis&logo=github)](https://github.com/AndreasBur/Wordclock/actions/workflows/static-analysis.yml)
-[![Last commit](https://img.shields.io/github/last-commit/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/commits/master)
-[![Contributors](https://img.shields.io/github/contributors/AndreasBur/Wordclock?logo=github)](https://github.com/AndreasBur/Wordclock/graphs/contributors)
+[![CI](https://img.shields.io/github/actions/workflow/status/theAndreas/Wordclock/ci.yml?branch=main&label=CI&logo=github)](https://github.com/theAndreas/Wordclock/actions/workflows/ci.yml)
+[![static analysis](https://img.shields.io/github/actions/workflow/status/theAndreas/Wordclock/static-analysis.yml?branch=main&label=static%20analysis&logo=github)](https://github.com/theAndreas/Wordclock/actions/workflows/static-analysis.yml)
+[![Last commit](https://img.shields.io/github/last-commit/theAndreas/Wordclock?logo=github)](https://github.com/theAndreas/Wordclock/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/theAndreas/Wordclock?logo=github)](https://github.com/theAndreas/Wordclock/graphs/contributors)
 
 [![Platforms](https://img.shields.io/badge/platform-ESP32--S3%20%7C%20RP2350%20%7C%20AVR128DA48%20%7C%20Simulator-blue)](platform/)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)
 [![CMake](https://img.shields.io/badge/CMake-064F8C?logo=cmake&logoColor=white)](CMakeLists.txt)
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-FF7F00?logo=platformio&logoColor=white)](platform/esp32/platformio.ini)
-![Code size](https://img.shields.io/github/languages/code-size/AndreasBur/Wordclock)
-[![License](https://img.shields.io/github/license/AndreasBur/Wordclock)](LICENSE)
+![Code size](https://img.shields.io/github/languages/code-size/theAndreas/Wordclock)
+[![License](https://img.shields.io/github/license/theAndreas/Wordclock)](LICENSE)
 
 A word clock based on Arduino — a *Wortuhr*, which is what the German builds of
 this idea are called: an 11×10 grid of letters that spells out the time in German

@@ -46,7 +46,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
   # So release.yml can run this file rather than repeat it. A release is then by construction
   # something the whole of CI has passed, and the binaries it publishes are the ones those
   # jobs produced - not a second build of the same tag that could differ in a toolchain

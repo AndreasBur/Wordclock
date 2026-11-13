@@ -140,7 +140,7 @@ lint` takes seconds, `make check` is all of CI and takes minutes, most of them P
 ## Delivering a change
 
 Anything more than a trivial fix goes on a branch and arrives as a pull request, rather
-than as a commit on `master`. `gh` is in the dev container for that, so opening one costs
+than as a commit on `main`. `gh` is in the dev container for that, so opening one costs
 a command:
 
 ```bash
@@ -151,7 +151,7 @@ gh pr create --fill
 ```
 
 A stale line in a document, a typo, a comment that no longer matches its code — those may
-still go straight to `master`. Anything that changes behaviour does not.
+still go straight to `main`. Anything that changes behaviour does not.
 
 What the pull request body has to carry is what the commits already argue: what moved,
 why that way rather than the obvious alternative, and what was measured. A body that
