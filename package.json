@@ -7,6 +7,6 @@
     "eslint": "10.14.0",
     "eslint-plugin-html": "8.2.1",
     "globals": "17.14.0",
-    "html-validate": "11.18.0"
+    "html-validate": "11.19.0"
   }
 }
