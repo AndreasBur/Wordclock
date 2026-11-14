@@ -379,6 +379,9 @@ void OnSocketClosed(httpd_handle_t, int descriptor) {
  */
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 StdReturnType WebInterface::Begin() {
+  // The C cast is FreeRTOS's tskIDLE_PRIORITY, which the IDF's defaults expand to; those
+  // defaults are what the server is documented with, so they are taken whole.
+  // NOLINTNEXTLINE(clang-diagnostic-old-style-cast)
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   config.server_port = WEB_INTERFACE_PORT;
   // The sockets the server keeps have to cover the console clients plus the ones fetching
@@ -414,9 +417,11 @@ StdReturnType WebInterface::Begin() {
   for (byte index = 0u; index < WebFrontend::GetNumberOfAssets(); index++) {
     WebFrontend::AssetType const& asset = WebFrontend::GetAsset(index);
 
+    // httpd's user_ctx is a plain void*, and HandleAsset reads it back as the const it is.
     asset_uris[index] =
-        httpd_uri_t{asset.path, HTTP_GET, HandleAsset, const_cast<WebFrontend::AssetType*>(&asset),
-                    false,      false,    nullptr};
+        httpd_uri_t{asset.path, HTTP_GET, HandleAsset,
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+                    const_cast<WebFrontend::AssetType*>(&asset), false, false, nullptr};
     httpd_register_uri_handler(http_server, &asset_uris[index]);
   }
 
@@ -491,11 +496,14 @@ bool WebTransport::HasClients() const {
 void WebTransport::SendText(char const* text, size_t length) {
   // const_cast because httpd's frame struct is the same type used for receiving, where the
   // payload is written into. Nothing on the sending path writes through it.
-  SendToEveryClient(HTTPD_WS_TYPE_TEXT, reinterpret_cast<uint8_t*>(const_cast<char*>(text)),
-                    length);
+  SendToEveryClient(HTTPD_WS_TYPE_TEXT,
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+                    reinterpret_cast<uint8_t*>(const_cast<char*>(text)), length);
 }
 
 void WebTransport::SendBinary(byte const* bytes, size_t length) {
+  // The const_cast for the same reason as SendText's.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
   SendToEveryClient(HTTPD_WS_TYPE_BINARY, const_cast<uint8_t*>(bytes), length);
 }
 

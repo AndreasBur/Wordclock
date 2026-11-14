@@ -15,6 +15,7 @@ extern pio_hw pio0_hw;
 extern pio_hw pio1_hw;
 #define pio0 (&pio0_hw)
 #define pio1 (&pio1_hw)
+static inline PIO pio_get_instance(uint instance) { return (instance == 0u) ? pio0 : pio1; }
 typedef enum { PIO_FIFO_JOIN_NONE = 0, PIO_FIFO_JOIN_TX = 1 } pio_fifo_join;
 typedef struct {
   uint16_t const* instructions;

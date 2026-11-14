@@ -64,7 +64,8 @@ constexpr uint kWrapOffset{3u};
 
 constexpr uint kStateMachine{WS2812_PIO_STATE_MACHINE_INDEX};
 
-PIO Block() { return (WS2812_PIO_BLOCK_INDEX == 0u) ? pio0 : pio1; }
+// By its index rather than as pio0 or pio1, which the SDK defines as C casts of an address.
+PIO Block() { return pio_get_instance((WS2812_PIO_BLOCK_INDEX == 0u) ? 0u : 1u); }
 
 }  // namespace
 
