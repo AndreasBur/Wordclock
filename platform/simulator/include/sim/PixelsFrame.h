@@ -32,6 +32,9 @@
  * A lit letter is drawn in a grey between the unlit letter colour and black, by the brightness of
  * its pixel; the hue is not shown. Its menu opens Settings and MessageBuilder.
  */
+// wx deletes a window through wxWindow*, so the destructor is virtual, and it is not public, so
+// that nothing deletes the window but wx itself, after Destroy().
+// NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
 class PixelsFrame : public wxFrame {
  public:
   using PixelType = Pixels::PixelType; /*!< A pixel of the buffer the window draws. */
@@ -50,7 +53,7 @@ class PixelsFrame : public wxFrame {
     kIdMenuMessage
   };
 
-  wxStaticText* characters_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS];
+  wxStaticText* characters_[PIXELS_DISPLAY_NUMBER_OF_ROWS][PIXELS_DISPLAY_NUMBER_OF_COLUMNS]{};
 
   static constexpr byte kIntensityMaxValue{255u};
   static constexpr byte kUnlitLevel{192u}; /* wxLIGHT_GREY */
@@ -92,7 +95,7 @@ class PixelsFrame : public wxFrame {
   }
 
   PixelsFrame(wxWindow* parent, wxString const& title);
-  ~PixelsFrame();
+  ~PixelsFrame() override;
   void OnClose(wxCloseEvent& event);
   void OnClear(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
@@ -120,7 +123,7 @@ class PixelsFrame : public wxFrame {
    *       nothing creates it again; GetInstance() must not be called after that.
    */
   static PixelsFrame& GetInstance() {
-    static PixelsFrame* p_singleton_instance = new PixelsFrame(0L, _("Wordclock Pixels"));
+    static PixelsFrame* p_singleton_instance = new PixelsFrame(nullptr, _("Wordclock Pixels"));
     return *p_singleton_instance;
   }
 

@@ -43,7 +43,8 @@ void AnimationWipe::Reset() {
 }
 
 void AnimationWipe::ClearTimeTask() {
-  byte column, row;
+  byte column;
+  byte row;
 
   Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
@@ -70,7 +71,8 @@ void AnimationWipe::ClearTimeTask() {
 }
 
 void AnimationWipe::SetTimeTask() {
-  byte column, row;
+  byte column;
+  byte row;
 
   Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
@@ -87,7 +89,8 @@ void AnimationWipe::SetTimeTask() {
 
 StdReturnType AnimationWipe::SetNextIndex() {
   StdReturnType return_value = kEOk;
-  byte column, row;
+  byte column;
+  byte row;
 
   Display::GetInstance().IndexToColumnAndRow(index_, column, row);
 
@@ -106,7 +109,7 @@ void AnimationWipe::SetPixelDown(byte column, byte row) {
   Display::GetInstance().ClearPixel(column, row);
 
   for (byte row_next = row + 1u; row_next < DISPLAY_NUMBER_OF_ROWS; row_next++) {
-    if (Display::GetInstance().GetPixel(column, row_next) == false) {
+    if (!Display::GetInstance().GetPixel(column, row_next)) {
       Display::GetInstance().SetPixel(column, row_next);
       break;
     }
@@ -117,7 +120,7 @@ void AnimationWipe::SetPixelRight(byte column, byte row) {
   Display::GetInstance().ClearPixel(column, row);
 
   for (byte column_next = column + 1u; column_next < DISPLAY_NUMBER_OF_COLUMNS; column_next++) {
-    if (Display::GetInstance().GetPixel(column_next, row) == false) {
+    if (!Display::GetInstance().GetPixel(column_next, row)) {
       Display::GetInstance().SetPixel(column_next, row);
       break;
     }

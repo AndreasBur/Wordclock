@@ -156,8 +156,10 @@ void TestSnakeLifetime() {
   Expect(snake.GetState() == Animation::StateType::kIdle, "a fresh snake animation must be idle");
 }
 
+namespace {
+
 // Runs the current animation to its end, and says how many steps it took.
-static int RunAnimationToItsEnd() {
+int RunAnimationToItsEnd() {
   Animations& animations = Animations::GetInstance();
   int ticks = 0;
 
@@ -167,6 +169,8 @@ static int RunAnimationToItsEnd() {
   }
   return ticks;
 }
+
+}  // namespace
 
 /*
  * A second run in mode kFixed, with no SetAnimation() between the two, against the same

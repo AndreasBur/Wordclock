@@ -41,9 +41,9 @@ void TestReadingPastTheEndIsEmpty() {
          "the form that answers a code must still refuse it");
 
   Display& display = Display::GetInstance();
-  Expect(display.GetPixel(DISPLAY_NUMBER_OF_PIXELS) == false,
+  Expect(!display.GetPixel(DISPLAY_NUMBER_OF_PIXELS),
          "a display pixel past the last one must read as dark");
-  Expect(display.GetPixel(DISPLAY_NUMBER_OF_COLUMNS, 0u) == false,
+  Expect(!display.GetPixel(DISPLAY_NUMBER_OF_COLUMNS, 0u),
          "and so must a column past the last one");
 
   DisplayCharacters const characters;

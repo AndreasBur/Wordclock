@@ -77,7 +77,8 @@ class DisplayPixels {
    *                  Display::IndexToColumnAndRow() maps it.
    */
   void SetPixel(IndexType index) {
-    byte column, row;
+    byte column;
+    byte row;
     Display::IndexToColumnAndRow(index, column, row);
     SetPixel(column, row);
   }

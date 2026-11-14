@@ -266,7 +266,7 @@ class Animations {
   static constexpr uint16_t kAllFavourites{static_cast<uint16_t>(
       ((1uL << kNumberOfAnimations) - 1uL) & ~((1uL << kFirstAnimation) - 1uL))};
 
-  std::array<byte, kNumberOfAnimations> task_cycles_;
+  std::array<byte, kNumberOfAnimations> task_cycles_{};
   /* what the user selected, used as it is in ModeType::kFixed */
   AnimationIdType animation_id_{AnimationIdType::kNone};
   /* what is really running, equal to animation_id_ unless a mode selected something */

@@ -45,9 +45,6 @@ class ClockDateTime {
   /*! \brief Makes the date and time 1 January 2000, 0:00:00. */
   constexpr ClockDateTime() {}
 
-  /*! \brief Destroys the date and time. */
-  ~ClockDateTime() = default;
-
   /*! \brief Returns the time of day. */
   ClockTime GetTime() const { return time_; }
 

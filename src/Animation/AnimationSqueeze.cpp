@@ -66,26 +66,34 @@ void AnimationSqueeze::ClearRow(byte row) {
   // Takes one letter off every block of the row, on the side the direction says, so
   // all words of the row get shorter at the same time.
   if (direction_ == DirectionType::kFromLeft) {
-    for (byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
-      if (Display::GetInstance().GetPixel(column, row)) {
-        Display::GetInstance().ClearPixel(column, row);
+    ClearFirstLetterOfEveryBlock(row);
+  } else {
+    ClearLastLetterOfEveryBlock(row);
+  }
+}
 
-        /* skip the rest of this block, only its first letter goes this frame */
-        while ((column + 1u < DISPLAY_NUMBER_OF_COLUMNS) &&
-               Display::GetInstance().GetPixel(column + 1u, row)) {
-          column++;
-        }
+void AnimationSqueeze::ClearFirstLetterOfEveryBlock(byte row) {
+  for (byte column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
+    if (Display::GetInstance().GetPixel(column, row)) {
+      Display::GetInstance().ClearPixel(column, row);
+
+      /* skip the rest of this block, only its first letter goes this frame */
+      while ((column + 1u < DISPLAY_NUMBER_OF_COLUMNS) &&
+             Display::GetInstance().GetPixel(column + 1u, row)) {
+        column++;
       }
     }
-  } else {
-    for (int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1; column >= 0; column--) {
-      if (Display::GetInstance().GetPixel(static_cast<byte>(column), row)) {
-        Display::GetInstance().ClearPixel(static_cast<byte>(column), row);
+  }
+}
 
-        while ((column - 1 >= 0) &&
-               Display::GetInstance().GetPixel(static_cast<byte>(column - 1), row)) {
-          column--;
-        }
+void AnimationSqueeze::ClearLastLetterOfEveryBlock(byte row) {
+  for (int8_t column = DISPLAY_NUMBER_OF_COLUMNS - 1; column >= 0; column--) {
+    if (Display::GetInstance().GetPixel(static_cast<byte>(column), row)) {
+      Display::GetInstance().ClearPixel(static_cast<byte>(column), row);
+
+      while ((column - 1 >= 0) &&
+             Display::GetInstance().GetPixel(static_cast<byte>(column - 1), row)) {
+        column--;
       }
     }
   }
@@ -97,8 +105,8 @@ void AnimationSqueeze::SetTimeTask() {
 }
 
 void AnimationSqueeze::SetMaxWordLength() {
-  for (byte index = 0u; index < clock_words_table_.size(); index++) {
-    byte current_word_length = words_.GetDisplayWordLength(clock_words_table_[index]);
+  for (DisplayWords::WordIdType const word_id : clock_words_table_) {
+    byte current_word_length = words_.GetDisplayWordLength(word_id);
     if (current_word_length > max_word_length_) {
       max_word_length_ = current_word_length;
     }

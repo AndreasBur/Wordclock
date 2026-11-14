@@ -63,10 +63,10 @@ class MsgCmdDisplayBrightnessParser
       Display::GetInstance().SetBrightness(argument);
     }
     if (parameter_short_name == kUseAutomaticOptionShortName) {
-      Display::GetInstance().SetBrightnessUseAutomatic(argument);
+      Display::GetInstance().SetBrightnessUseAutomatic(argument != 0u);
     }
     if (parameter_short_name == kUseGammaCorrectionOptionShortName) {
-      Display::GetInstance().SetBrightnessUseGammaCorrection(argument);
+      Display::GetInstance().SetBrightnessUseGammaCorrection(argument != 0u);
     }
   }
 

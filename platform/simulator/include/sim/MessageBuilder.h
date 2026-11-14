@@ -38,6 +38,9 @@
  * A dialog rather than a frame, so the compositor centres it over the main window. Shown with
  * Show(), not ShowModal(), so the input field it writes to stays reachable. Closing it hides it.
  */
+// wx deletes a window through wxWindow*, so the destructor is virtual, and it is not public, so
+// that nothing deletes the window but wx itself, after Destroy().
+// NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
 class MessageBuilder : public wxDialog {
  private:
   // Own range, clear of the other windows'. The option rows get contiguous ranges of
@@ -71,9 +74,9 @@ class MessageBuilder : public wxDialog {
     wxOwnerDrawnComboBox* choice;
   };
 
-  wxOwnerDrawnComboBox* command_choice_;
-  std::array<OptionRowType, MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS> option_rows_;
-  wxTextCtrl* preview_;
+  wxOwnerDrawnComboBox* command_choice_{nullptr};
+  std::array<OptionRowType, MESSAGE_CATALOG_MAX_NUMBER_OF_OPTIONS> option_rows_{};
+  wxTextCtrl* preview_{nullptr};
 
   static constexpr int kValueWidth{80};
   // Wider than the plain value field: it has to hold names like "Illuminance
@@ -95,7 +98,7 @@ class MessageBuilder : public wxDialog {
   DECLARE_EVENT_TABLE()
 
   MessageBuilder(wxWindow* parent, wxString const& title);
-  ~MessageBuilder();
+  ~MessageBuilder() override;
 
   void OnClose(wxCloseEvent& event);
   void OnCommand(wxCommandEvent& event);
@@ -116,6 +119,9 @@ class MessageBuilder : public wxDialog {
     return MessageCatalog::GetCommand(static_cast<byte>(command_choice_->GetSelection()));
   }
 
+  // Labels a row with its option and fills the argument widget the option calls for, a dropdown
+  // of its names or a text field with its range as the hint.
+  static void FillOptionRow(OptionRowType const& row, MessageCatalog::OptionType const& option);
   void ShowOptionsOfSelectedCommand();
   wxString BuildMessage() const;
   void UpdatePreview() { preview_->SetValue(BuildMessage()); }

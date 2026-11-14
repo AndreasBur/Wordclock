@@ -15,7 +15,7 @@
 // wxWidgets' macros for the entry point and the event table, which Doxygen would take for
 // functions of this file.
 /*! \cond */
-IMPLEMENT_APP(WordclockApp);
+IMPLEMENT_APP(WordclockApp)
 
 wxBEGIN_EVENT_TABLE(WordclockApp, wxApp)
   EVT_TIMER(kTimerId, WordclockApp::OnTimer)

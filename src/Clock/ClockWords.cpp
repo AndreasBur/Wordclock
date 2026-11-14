@@ -9,20 +9,12 @@
 #include "ClockWords.h"
 
 bool ClockWords::operator==(ClockWords const& clock_words) const {
-  if (show_it_is_ == clock_words.GetShowItIs() && hour_words_ == clock_words.GetHourWords() &&
-      minute_words_ == clock_words.GetMinuteWords()) {
-    return true;
-  } else {
-    return false;
-  }
+  return show_it_is_ == clock_words.GetShowItIs() && hour_words_ == clock_words.GetHourWords() &&
+         minute_words_ == clock_words.GetMinuteWords();
 }
 
 bool ClockWords::operator!=(ClockWords const& clock_words) const {
-  if (operator==(clock_words)) {
-    return false;
-  } else {
-    return true;
-  }
+  return !operator==(clock_words);
 }
 
 ClockWords::WordsListType ClockWords::GetWordsList() const {

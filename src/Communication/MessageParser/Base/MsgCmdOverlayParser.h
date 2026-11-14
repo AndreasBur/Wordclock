@@ -53,6 +53,9 @@
  * \tparam Derived The overlay parser that derives from this class.
  */
 template <typename Derived>
+// MsgCmdBaseOverlayParser holds no state: only the option names and the one parameter table every
+// overlay command shares in flash, which a template would have repeated per overlay.
+// NOLINTNEXTLINE(misc-multiple-inheritance)
 class MsgCmdOverlayParser
     : public MsgParameterParser<MsgCmdOverlayParser<Derived>,
                                 MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>,
@@ -63,7 +66,9 @@ class MsgCmdOverlayParser
       MsgParameterParser<MsgCmdOverlayParser<Derived>,
                          MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
   /*! \brief A position in the options, MsgParameterParser::PositionType. */
-  using PositionType = typename MsgParameterParserType::PositionType;
+  // The typename C++17 asks for, which the ESP32's C++23 alone would do without.
+  using PositionType =
+      typename MsgParameterParserType::PositionType;  // NOLINT(readability-redundant-typename)
   /*! \brief The length of the text of `-T`, its terminator included, StringTools::LengthType. */
   using LengthType = StringTools::LengthType;
 
@@ -100,7 +105,7 @@ class MsgCmdOverlayParser
      * assertion catches instead, at the first point where Derived is a complete type.
      */
     static_assert(
-        std::is_base_of<MsgCmdOverlayParser, Derived>::value,
+        std::is_base_of_v<MsgCmdOverlayParser, Derived>,
         "MsgCmdOverlayParser is a CRTP base: Derived has to be the class that inherits it");
   }
 

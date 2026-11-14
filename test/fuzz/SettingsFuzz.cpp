@@ -81,7 +81,7 @@ struct LayoutType {
 LayoutType FindLayout() {
   StartFromANewClock();
   if (Persistence::Save() != kEOk) {
-    std::fputs("SettingsFuzz: the store took no blob\n", stderr);
+    (void)std::fputs("SettingsFuzz: the store took no blob\n", stderr);
     std::abort();
   }
   BlobType const fresh_blob = ReadStoredBlob();
@@ -95,7 +95,7 @@ LayoutType FindLayout() {
       return {fresh_blob, offset};
     }
   }
-  std::fputs("SettingsFuzz: the stored blob no longer has its checksum at its end\n", stderr);
+  (void)std::fputs("SettingsFuzz: the stored blob no longer has its checksum at its end\n", stderr);
   std::abort();
 }
 
@@ -147,7 +147,8 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) {
     return 0;
   }
   if (Persistence::Load() != kEOk) {
-    std::fputs("SettingsFuzz: a blob with the right header and checksum was refused\n", stderr);
+    (void)std::fputs("SettingsFuzz: a blob with the right header and checksum was refused\n",
+                     stderr);
     std::abort();
   }
   RunTicks(kTicksAfterTheLoad);

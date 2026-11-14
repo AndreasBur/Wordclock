@@ -131,7 +131,7 @@ StdReturnType Twi::Read(byte address, byte* data, byte length) {
     return kENotOk;
   }
 
-  TWI_PERIPHERAL.MADDR = static_cast<uint8_t>((address << 1u) | 1u);
+  TWI_PERIPHERAL.MADDR = static_cast<uint8_t>((static_cast<unsigned int>(address) << 1u) | 1u);
 
   for (byte index = 0u; index < length; index++) {
     if (WaitForRead() != kEOk) {

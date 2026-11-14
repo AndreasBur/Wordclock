@@ -177,7 +177,8 @@ class DisplayCharacters {
     return display_characters_table_element;
   }
   static DisplayCharactersTableElementType GetDisplayCharactersTableElement(byte index) {
-    byte column, row;
+    byte column;
+    byte row;
     IndexToColumnAndRow(index, column, row);
     return GetDisplayCharactersTableElement(column, row);
   }

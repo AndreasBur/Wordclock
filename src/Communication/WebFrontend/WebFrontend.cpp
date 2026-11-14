@@ -171,6 +171,46 @@ constexpr WebFrontend::AssetType kAssets[]{
 static_assert((sizeof(kAssets) / sizeof(kAssets[0])) <= WebFrontend::kMaxAssets,
               "WebFrontend::MaxAssets has to grow with the asset table");
 
+// The names of an option's values, as the array "values" of its object.
+void WriteValueNames(ChunkWriter& writer, MessageCatalog::OptionType const& option) {
+  writer.Put(",\"values\":[");
+  for (byte name_index = 0u; name_index < option.number_of_value_names; name_index++) {
+    if (name_index > 0u) {
+      writer.Put(',');
+    }
+    writer.PutString(option.value_names[name_index]);
+  }
+  writer.Put(']');
+}
+
+// One option of a command, as the object of the catalog's JSON that the pages build forms from.
+void WriteOption(ChunkWriter& writer, MessageCatalog::OptionType const& option) {
+  writer.Put("{\"short\":\"");
+  writer.Put(option.short_name);
+  writer.Put("\",\"label\":");
+  writer.PutString(option.label);
+  writer.Put(",\"type\":");
+  writer.PutNumber(static_cast<uint16_t>(option.argument));
+  writer.Put(",\"min\":");
+  writer.PutNumber(option.minimum);
+  writer.Put(",\"max\":");
+  writer.PutNumber(option.maximum);
+
+  /*
+   * Only where it is set, so the page's form stays as it was for every option
+   * that can be sent, and the read-only fields it must not offer are the ones
+   * that say so.
+   */
+  if (option.read_only) {
+    writer.Put(",\"readonly\":true");
+  }
+
+  if ((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
+    WriteValueNames(writer, option);
+  }
+  writer.Put('}');
+}
+
 }  // namespace
 
 byte WebFrontend::GetNumberOfAssets() {
@@ -196,42 +236,10 @@ void WebFrontend::WriteCommands(WebResponseBody& body) {
     writer.Put(",\"options\":[");
 
     for (byte option_index = 0u; option_index < command.number_of_options; option_index++) {
-      MessageCatalog::OptionType const& option = command.options[option_index];
-
       if (option_index > 0u) {
         writer.Put(',');
       }
-      writer.Put("{\"short\":\"");
-      writer.Put(option.short_name);
-      writer.Put("\",\"label\":");
-      writer.PutString(option.label);
-      writer.Put(",\"type\":");
-      writer.PutNumber(static_cast<uint16_t>(option.argument));
-      writer.Put(",\"min\":");
-      writer.PutNumber(option.minimum);
-      writer.Put(",\"max\":");
-      writer.PutNumber(option.maximum);
-
-      /*
-       * Only where it is set, so the page's form stays as it was for every option
-       * that can be sent, and the read-only fields it must not offer are the ones
-       * that say so.
-       */
-      if (option.read_only) {
-        writer.Put(",\"readonly\":true");
-      }
-
-      if ((option.value_names != nullptr) && (option.number_of_value_names > 0u)) {
-        writer.Put(",\"values\":[");
-        for (byte name_index = 0u; name_index < option.number_of_value_names; name_index++) {
-          if (name_index > 0u) {
-            writer.Put(',');
-          }
-          writer.PutString(option.value_names[name_index]);
-        }
-        writer.Put(']');
-      }
-      writer.Put('}');
+      WriteOption(writer, command.options[option_index]);
     }
     writer.Put("]}");
   }
@@ -318,12 +326,11 @@ void WebFrontend::BroadcastFrame() {
 
   bool const forced = force_frame_.exchange(false, std::memory_order_acq_rel);
 
-  if (!forced) {
-    if (frame_countdown_ > 0u) {
-      frame_countdown_--;
-      return;
-    }
+  if ((!forced) && (frame_countdown_ > 0u)) {
+    frame_countdown_--;
+    return;
   }
+
   frame_countdown_ = WEB_FRONTEND_FRAME_INTERVAL_TICKS - 1u;
 
   /* Nothing to send to, so nothing is even gathered. */

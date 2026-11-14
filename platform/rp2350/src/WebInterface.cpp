@@ -428,7 +428,8 @@ void OnSocketEvent(AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type, vo
 
   AwsFrameInfo const* frame = static_cast<AwsFrameInfo const*>(argument);
 
-  if ((frame == nullptr) || (!frame->final) || (frame->index != 0u) || (frame->len != length)) {
+  if ((frame == nullptr) || (frame->final == 0u) || (frame->index != 0u) ||
+      (frame->len != length)) {
     return;
   }
   if (frame->opcode != WS_TEXT) {

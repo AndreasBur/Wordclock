@@ -39,7 +39,7 @@
 #define TIMER_USE_TCA1 STD_OFF
 
 #if (TIMER_USE_TCA0 == STD_ON) && !defined(TIMER_TCA0_ROUTE_PORT)
-#if defined(PORTB)
+#ifdef PORTB
 /*!
  * \brief The letter of the port that carries TCA0's waveform outputs: B, unless the build defines
  *        another.
@@ -200,7 +200,7 @@ template <typename TimerTraits>
 class Timer {
  public:
   /*! \brief A function the overflow ISR calls: no arguments, no result. */
-  typedef void (*TimerIsrCallbackFVoid)(void);
+  using TimerIsrCallbackFVoid = void (*)();
 
   /*! \brief The state of the timer, which Init(), Start(), Stop(), Resume() and Read() check. */
   enum class StateType {
@@ -278,22 +278,18 @@ class Timer {
 
   StateType state_;
   TimerClockSelectType clock_select_bit_group_;
-  TimerIsrCallbackFVoid timer_overflow_callback_;
+  TimerIsrCallbackFVoid timer_overflow_callback_{nullptr};
   /*
    * What PER and the compare channels are meant to hold. Kept here rather than read back from the
    * registers, because a value on its way through a buffer register is not in them until BOTTOM,
    * and because a duty is a fraction of the period that has to be applied again when it changes.
    * Top starts at PER's reset value, which is what an Init() with a refused period leaves.
    */
-  uint16_t top_;
-  uint16_t pwm_duty_[TimerTraits::kNumberOfChannels];
+  uint16_t top_{0xFFFFu};
+  uint16_t pwm_duty_[TimerTraits::kNumberOfChannels]{};
 
   constexpr Timer()
-      : state_(StateType::kNone),
-        clock_select_bit_group_(TimerClockSelectType::kNoPrescaler),
-        timer_overflow_callback_(nullptr),
-        top_(0xFFFFu),
-        pwm_duty_{} {}
+      : state_(StateType::kNone), clock_select_bit_group_(TimerClockSelectType::kNoPrescaler) {}
 
   static typename TimerTraits::RegisterType& GetTimer() { return TimerTraits::GetTimer(); }
 

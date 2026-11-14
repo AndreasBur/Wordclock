@@ -89,7 +89,6 @@ class Clock {
   using HourTableElementType = HourType;
   using MinuteTableElementType = MinuteType;
 
- private:
   static constexpr bool kShowItIsPermanentlyInitValue{CLOCK_SHOW_IT_IS_PERMANENTLY == STD_ON};
 
   ModeType mode_{CLOCK_INITIAL_MODE};

@@ -38,7 +38,7 @@ void AnimationSnake::Task() {
     if ((snake_begin_index_ - snake_end_index_) == ANIMATION_SNAKE_LENGTH ||
         (snake_begin_index_ >= DISPLAY_NUMBER_OF_LEDS - 1u &&
          snake_end_index_ < DISPLAY_NUMBER_OF_LEDS)) {
-      if (IsPixelPartOfClockWords(clock_words_table_, snake_end_index_trans) == false)
+      if (!IsPixelPartOfClockWords(clock_words_table_, snake_end_index_trans))
         Display::GetInstance().ClearPixel(snake_end_index_trans);
       snake_end_index_++;
     }

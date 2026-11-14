@@ -95,7 +95,7 @@ class Animation {
 
  public:
   /*! \brief Makes an animation in the state StateType::kNone, before its `Init()`. */
-  constexpr Animation() : state_{StateType::kNone} {}
+  constexpr Animation() {}
 
   /*! \brief Destroys the animation. */
   ~Animation() = default;

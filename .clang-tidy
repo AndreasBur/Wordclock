@@ -57,6 +57,21 @@ Checks: >
   -performance-enum-size,
   -performance-unnecessary-value-param,
   -readability-enum-initial-value,
+  -bugprone-throwing-static-initialization,
+  -clang-diagnostic-enum-enum-conversion,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-use-enum-class,
+  -google-runtime-float,
+  -google-runtime-int,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-raw-string-literal,
+  -modernize-use-constraints,
+  -readability-redundant-casting,
+  -readability-suspicious-call-argument,
+  -readability-use-anyofallof,
+  -readability-use-std-min-max,
   -house-braced-var-init,
   -modernize-macro-to-enum,
   -modernize-use-nodiscard,
@@ -72,7 +87,6 @@ Checks: >
   -readability-magic-numbers,
   -readability-function-size,
   -readability-braces-around-statements,
-  -cppcoreguidelines-pro-type-reinterpret-cast,
   -modernize-use-equals-default,
   -modernize-use-auto,
   -bugprone-signed-bitwise,
@@ -80,62 +94,9 @@ Checks: >
   -google-readability-braces-around-statements,
   -cppcoreguidelines-init-variables,
   -cppcoreguidelines-owning-memory,
-  -cppcoreguidelines-pro-type-vararg,
   -readability-math-missing-parentheses,
-  -modernize-loop-convert,
-  -readability-isolate-declaration,
-  -google-runtime-int,
-  -readability-avoid-return-with-void-value,
   -readability-redundant-member-init,
-  -readability-simplify-boolean-expr,
-  -modernize-type-traits,
-  -modernize-use-default-member-init,
-  -clang-diagnostic-enum-enum-conversion,
-  -readability-implicit-bool-conversion,
-  -readability-redundant-nested-if,
-  -bugprone-throwing-static-initialization,
-  -misc-use-internal-linkage,
-  -readability-function-cognitive-complexity,
-  -cppcoreguidelines-pro-type-member-init,
-  -readability-redundant-casting,
-  -cppcoreguidelines-avoid-const-or-ref-data-members,
-  -cppcoreguidelines-avoid-do-while,
-  -cppcoreguidelines-prefer-member-initializer,
-  -cppcoreguidelines-use-enum-class,
-  -modernize-raw-string-literal,
-  -clang-diagnostic-deprecated-copy-with-dtor,
-  -google-runtime-float,
-  -misc-use-anonymous-namespace,
-  -readability-use-std-min-max,
-  -bugprone-derived-method-shadowing-base-method,
-  -cert-err33-c,
-  -cppcoreguidelines-virtual-class-destructor,
-  -misc-non-private-member-variables-in-classes,
-  -modernize-use-constraints,
-  -modernize-use-override,
-  -modernize-use-using,
-  -readability-redundant-access-specifiers,
-  -readability-redundant-parentheses,
-  -readability-redundant-typename,
-  -readability-use-anyofallof,
-  -readability-use-concise-preprocessor-directives,
-  -readability-suspicious-call-argument,
-  -bugprone-implicit-widening-of-multiplication-result,
-  -clang-diagnostic-c++98-compat-extra-semi,
-  -clang-diagnostic-comma,
-  -clang-diagnostic-sign-conversion,
-  -clang-diagnostic-undef,
-  -clang-diagnostic-zero-as-null-pointer-constant,
-  -cppcoreguidelines-avoid-non-const-global-variables,
-  -google-global-names-in-headers,
-  -misc-confusable-identifiers,
-  -misc-multiple-inheritance,
-  -misc-no-recursion,
-  -misc-redundant-expression,
-  -modernize-redundant-void-arg,
-  -modernize-use-nullptr,
-  -readability-avoid-nested-conditional-operator,
-  -readability-redundant-lambda-parameter-list
+  -cppcoreguidelines-avoid-const-or-ref-data-members
 # house-*: the checks of our own, in tools/lib/tidy_module/; tools/tidy.sh loads them. Without
 #   the module, as in clangd, the name matches nothing.
 # bugprone-dynamic-static-initializers: it reports the extern declaration of a constant whose
@@ -187,22 +148,48 @@ Checks: >
 # bugprone-too-small-loop-variable: a byte counting over a table of a hundred entries. The
 #   truncation it warns about needs a container larger than the loop variable can address, and
 #   every table here is fixed and small - the largest is 110 pixels.
-# cert-err58-cpp: it reports the singletons, a static object whose constructor could throw.
-#   Nothing here throws, and the whole design is static objects.
+# cert-err58-cpp, bugprone-throwing-static-initialization: one check under two names. It reports
+#   the singletons and the PROGMEM tables, a static object whose constructor could throw. Nothing
+#   here throws, and the whole design is static objects.
 # cert-int09-c, readability-enum-initial-value: one check under two names. It reports
 #   enumerations whose first values are given and the rest counted, which is how a hardware
 #   command set is written down: BH1750::ModeType carries the chip's opcodes.
+# clang-diagnostic-enum-enum-conversion: the same as bugprone-suspicious-enum-usage, from the
+#   compiler: wxWidgets' flags, and the AVR vendor header's group configurations, which are
+#   enumerations of their own that a register takes ORed together, USART_CMODE | USART_CHSIZE.
 # clang-analyzer-optin.performance.Padding: it reports the message catalog's two structs. Their
 #   field order is the order the tables are written in, and those tables sit in flash.
+# cppcoreguidelines-avoid-do-while: a do-while is the loop that runs at least once, as writing
+#   the digits of a number does for 0; the while it would become needs its first pass written
+#   out before it.
 # cppcoreguidelines-pro-type-union-access: the memory of the animations is a union, as only one
 #   runs at a time and the AVR has 16 KiB of RAM; the rest are the AVR's 16-bit registers, which
 #   its vendor header declares as unions of the word and its two bytes, TCB0.CCMP among them.
 #   std::variant is not in the std the AVR has, and would add a tag the animations keep already.
+# cppcoreguidelines-pro-type-reinterpret-cast: a register or a buffer read as bytes is what a
+#   firmware is made of - the settings blob to and from the store, a socket's address, F()'s
+#   strings, which the cores declare as a type of their own. Over fifty findings, none of them
+#   avoidable but by memcpy, which hides the same cast in a call.
+# cppcoreguidelines-pro-type-vararg: snprintf is the formatting every target has; the AVR has no
+#   <format> and no streams.
+# cppcoreguidelines-use-enum-class: StdReturnType is the one plain enum of the core, as CLAUDE.md
+#   says, and the simulator's window ids are the int-valued enums wxWidgets takes them as.
+# google-runtime-int, google-runtime-float: every finding is a name that is someone else's -
+#   Arduino's millis() and Print::print(unsigned long), and the list of integer and floating
+#   point types the AVR's stand-in for <type_traits> has to spell as the standard does.
 # misc-header-include-cycle: the ESP32's and the RP2350's Arduino.h stand in for the core's, to
 #   bind Serial to WordclockSerial, and include it by its path, WORDCLOCK_CORE_ARDUINO_H; the
 #   core's own headers include "Arduino.h" again and find this one, a cycle the include guards
 #   end. Every finding lies in the frameworks' headers, which the filter above does not keep out
 #   of this check.
+# misc-non-private-member-variables-in-classes: the state of an animation and of an overlay is
+#   kept in their base classes and driven by the derived ones, through the CRTP of Overlay. An
+#   accessor pair on it would be the member under another name.
+# modernize-raw-string-literal: it reports a JSON fragment once three quotes are escaped in it,
+#   and leaves the fragment beside it with two; half a writer in raw strings reads worse than
+#   all of it escaped.
+# modernize-use-constraints: requires is C++20, which the ESP32's framework alone compiles; the
+#   core is C++17 everywhere else.
 # misc-include-cleaner: a source leans on what its own header includes, as Google's rule allows
 #   and CLAUDE.md asks; the check wants every name's header included where it is used, which
 #   would put StdReturnType's and byte's header into nearly every file.
@@ -212,6 +199,12 @@ Checks: >
 # performance-unnecessary-value-param: it reports Pixel, ClockDate and ClockTime passed by value.
 #   On a controller with two-byte pointers a three-byte value is cheaper by value than by
 #   reference, the opposite of what the check assumes.
+# readability-redundant-casting: what it calls redundant is so where an int has 16 bits, as on
+#   the AVR, and needed where it has 32: int16_t arithmetic is int arithmetic on the AVR alone.
+# readability-suspicious-call-argument: it compares names, and Bit::WriteBit(value, bit,
+#   bit_value) called with pixel_row, column and pixel_value looks swapped to it by the prefix.
+# readability-use-anyofallof, readability-use-std-min-max: <algorithm> is not in the std the
+#   AVR has, and the core is shared by every target.
 #
 # Wordclock's own, for now: every check after readability-enum-initial-value found
 # something when Wordclock came onto the template, the number given below. Each is answered in a
@@ -238,7 +231,6 @@ Checks: >
 #      65 readability-magic-numbers
 #      59 readability-function-size
 #      55 readability-braces-around-statements
-#      54 cppcoreguidelines-pro-type-reinterpret-cast
 #      54 modernize-use-equals-default
 #      48 modernize-use-auto
 #      44 bugprone-signed-bitwise
@@ -246,62 +238,9 @@ Checks: >
 #      43 google-readability-braces-around-statements
 #      35 cppcoreguidelines-init-variables
 #      34 cppcoreguidelines-owning-memory
-#      19 cppcoreguidelines-pro-type-vararg
 #      19 readability-math-missing-parentheses
-#      17 modernize-loop-convert
-#      17 readability-isolate-declaration
-#      15 google-runtime-int
-#      15 readability-avoid-return-with-void-value
 #      14 readability-redundant-member-init
-#      14 readability-simplify-boolean-expr
-#      13 modernize-type-traits
-#      12 modernize-use-default-member-init
-#      11 clang-diagnostic-enum-enum-conversion
-#      11 readability-implicit-bool-conversion
-#       9 readability-redundant-nested-if
-#       8 bugprone-throwing-static-initialization
-#       8 misc-use-internal-linkage
-#       8 readability-function-cognitive-complexity
-#       7 cppcoreguidelines-pro-type-member-init
-#       7 readability-redundant-casting
 #       6 cppcoreguidelines-avoid-const-or-ref-data-members
-#       6 cppcoreguidelines-avoid-do-while
-#       6 cppcoreguidelines-prefer-member-initializer
-#       6 cppcoreguidelines-use-enum-class
-#       6 modernize-raw-string-literal
-#       5 clang-diagnostic-deprecated-copy-with-dtor
-#       5 google-runtime-float
-#       4 misc-use-anonymous-namespace
-#       4 readability-use-std-min-max
-#       3 bugprone-derived-method-shadowing-base-method
-#       3 cert-err33-c
-#       3 cppcoreguidelines-virtual-class-destructor
-#       3 misc-non-private-member-variables-in-classes
-#       3 modernize-use-constraints
-#       3 modernize-use-override
-#       3 modernize-use-using
-#       3 readability-redundant-access-specifiers
-#       3 readability-redundant-parentheses
-#       3 readability-redundant-typename
-#       3 readability-use-anyofallof
-#       3 readability-use-concise-preprocessor-directives
-#       2 readability-suspicious-call-argument
-#       1 bugprone-implicit-widening-of-multiplication-result
-#       1 clang-diagnostic-c++98-compat-extra-semi
-#       1 clang-diagnostic-comma
-#       1 clang-diagnostic-sign-conversion
-#       1 clang-diagnostic-undef
-#       1 clang-diagnostic-zero-as-null-pointer-constant
-#       1 cppcoreguidelines-avoid-non-const-global-variables
-#       1 google-global-names-in-headers
-#       1 misc-confusable-identifiers
-#       1 misc-multiple-inheritance
-#       1 misc-no-recursion
-#       1 misc-redundant-expression
-#       1 modernize-redundant-void-arg
-#       1 modernize-use-nullptr
-#       1 readability-avoid-nested-conditional-operator
-#       1 readability-redundant-lambda-parameter-list
 WarningsAsErrors: '*'
 # clang's warnings beyond -Wall -Wextra, which tools/tidy.sh passes: what an IDE such as CLion
 # finds with its own analysis of the code, reported here by clang-tidy as clang-diagnostic-*
@@ -374,8 +313,8 @@ CheckOptions:
   # A struct with only public members is what Google calls a struct, and an
   # array type has to be one to stay an aggregate.
   misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
-  # The do { ... } while (0) of a macro is how a macro becomes one statement.
-  cppcoreguidelines-avoid-do-while.IgnoreMacros: true
+  # An object in an anonymous namespace is the file's own, which is what a module's state is.
+  cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage: true
   # A class that deletes its copy has no move either, as the language has it;
   # the rule of five does not ask to say so twice.
   cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: true

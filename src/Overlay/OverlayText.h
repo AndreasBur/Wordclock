@@ -72,11 +72,6 @@ class OverlayText : public Overlay<OverlayText> {
    */
   void ResetOwnToDefaults() { text_[0u] = STD_NULL_CHARACTER; }
 
-  void ShowTask() {
-    if (Text::GetInstance().GetState() == Text::StateType::kIdle) {
-      SetText();
-    }
-  }
   void SetText() { Text::GetInstance().SetTextWithShift(text_, GetFont()); }
 
  public:
@@ -104,26 +99,6 @@ class OverlayText : public Overlay<OverlayText> {
    */
   void SetText(char const* text, LengthType length) {
     StringTools::StringCopy(text_, text, length);
-  }
-
-  /*!
-   * \brief Takes the overlay one second further, as Overlay::Task() does, and starts the text again
-   *        each time it has scrolled through.
-   *
-   * While the overlay shows, it first starts the text anew if the text output is idle, which it
-   * is once the previous run has come to its end; then it runs Overlay::Task().
-   *
-   * \param[in] show_timer_in_seconds The show timer, in seconds.
-   * \param[in] current_date The date now.
-   * \param[in] current_time The time now.
-   * \return The new show timer, in seconds, as Overlay::Task() returns it.
-   */
-  SecondType Task(SecondType show_timer_in_seconds, ClockDate current_date,
-                  ClockTime current_time) {
-    if (state_ == StateType::kShow) {
-      ShowTask();
-    }
-    return Overlay::Task(show_timer_in_seconds, current_date, current_time);
   }
 };
 

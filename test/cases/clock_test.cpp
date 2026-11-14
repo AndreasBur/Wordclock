@@ -12,6 +12,8 @@
 #include "test/cases.h"
 #include "test/check.h"
 
+namespace {
+
 // Whether a word is part of what the clock would light for a time, which is what the
 // regional wordings differ in.
 bool WordsContain(ClockWords const& words, DisplayWords::WordIdType word) {
@@ -22,6 +24,8 @@ bool WordsContain(ClockWords const& words, DisplayWords::WordIdType word) {
   }
   return false;
 }
+
+}  // namespace
 
 /*
  * The four regional wordings, at the four times where they part company. This is the table
@@ -189,7 +193,9 @@ void TestClockModeStepsThroughEveryWording() {
 void TestClockWordsComparison() {
   ClockWords const words = WordsAt(10u, 15u);
 
-  Expect(words == words, "clock words must equal themselves");
+  // Compared with itself on purpose: the operator is what is under test.
+  Expect(words == words,  // NOLINT(misc-redundant-expression)
+         "clock words must equal themselves");
 
   ClockWords different_it_is = words;
   different_it_is.SetShowItIs(!words.GetShowItIs());

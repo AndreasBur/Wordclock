@@ -92,7 +92,8 @@ class StringTools {
    *                    characters and the terminator.
    * \return A pointer to the terminator in `string`.
    */
-  static char* Itoa(int32_t number, char* string) {
+  // Named after itoa(), which it stands in for; that it reads like ltoa() is the C library's doing.
+  static char* Itoa(int32_t number, char* string) {  // NOLINT(misc-confusable-identifiers)
     // The magnitude in an unsigned type, where negating INT32_MIN is defined; in an int32_t
     // it overflows.
     uint32_t magnitude{static_cast<uint32_t>(number)};
@@ -151,8 +152,8 @@ class StringTools {
    *         ResultType::kNoValue if `string` does not start with a number; `value` is then left as
    *         it was.
    */
-  template <typename Unsigned, std::enable_if_t<std::is_unsigned<Unsigned>::value>* = nullptr,
-            std::enable_if_t<std::is_integral<Unsigned>::value>* = nullptr>
+  template <typename Unsigned, std::enable_if_t<std::is_unsigned_v<Unsigned>>* = nullptr,
+            std::enable_if_t<std::is_integral_v<Unsigned>>* = nullptr>
   static ResultType StringTo(char const* string, PositionType& position, Unsigned& value,
                              uint8_t base = 10u) {
     char* end = nullptr;
@@ -179,8 +180,8 @@ class StringTools {
   }
 
   /*! \copydoc StringTools::StringTo(const char*, PositionType&, Unsigned&, uint8_t) */
-  template <typename Signed, std::enable_if_t<std::is_signed<Signed>::value>* = nullptr,
-            std::enable_if_t<std::is_integral<Signed>::value>* = nullptr>
+  template <typename Signed, std::enable_if_t<std::is_signed_v<Signed>>* = nullptr,
+            std::enable_if_t<std::is_integral_v<Signed>>* = nullptr>
   static ResultType StringTo(char const* string, PositionType& position, Signed& value,
                              uint8_t base = 10u) {
     char* end = nullptr;
@@ -222,7 +223,7 @@ class StringTools {
    *         ResultType::kNoValue if `string` does not start with a number; `value` is then left as
    *         it was.
    */
-  template <typename Float, std::enable_if_t<std::is_floating_point<Float>::value>* = nullptr>
+  template <typename Float, std::enable_if_t<std::is_floating_point_v<Float>>* = nullptr>
   static ResultType StringTo(char const* string, PositionType& position, Float& value,
                              uint8_t = 10u) {
     char* end = nullptr;

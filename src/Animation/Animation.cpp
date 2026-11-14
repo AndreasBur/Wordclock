@@ -17,15 +17,14 @@ bool Animation::IsPixelPartOfClockWords(ClockWords::WordsListType const clock_wo
                                         byte column, byte row) {
   DisplayWords words;
 
-  for (uint8_t word_index = 0u; word_index < clock_words_table.size(); word_index++) {
-    if (clock_words_table[word_index] == DisplayWords::WordIdType::kNone) {
+  for (DisplayWords::WordIdType const word_id : clock_words_table) {
+    if (word_id == DisplayWords::WordIdType::kNone) {
       break;
     }
-    DisplayWord word = words.GetDisplayWord(clock_words_table[word_index]);
-    if (word.GetRow() == row) {
-      if ((column >= word.GetColumn()) && (column < word.GetColumn() + word.GetLength())) {
-        return true;
-      }
+    DisplayWord word = words.GetDisplayWord(word_id);
+    if ((word.GetRow() == row) && (column >= word.GetColumn()) &&
+        (column < word.GetColumn() + word.GetLength())) {
+      return true;
     }
   }
   return false;

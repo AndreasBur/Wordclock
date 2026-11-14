@@ -1,4 +1,5 @@
 /* XPM */
+/* An image file as GIMP writes it. NOLINTNEXTLINE(misc-use-anonymous-namespace) */
 static const char * WordclockIcon_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "48 48 170 2 ",

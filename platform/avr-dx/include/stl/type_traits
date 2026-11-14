@@ -66,6 +66,8 @@ template<class T> struct enable_if<true, T> { using type = T; /*!< `T`. */ };
  * \tparam B The condition.
  * \tparam T The type, void unless given.
  */
+// The alias modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
 template<bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
 
 /*!
@@ -85,6 +87,8 @@ template<class T> struct remove_cv<const volatile T> { using type = T; /*!< Bare
  *
  * \tparam T The type.
  */
+// The alias modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
 template<class T> using remove_cv_t = typename remove_cv<T>::type;
 
 /*!
@@ -96,6 +100,10 @@ template<class T> using remove_cv_t = typename remove_cv<T>::type;
 template<class T, class U> struct is_same : false_type { };
 /*! \brief The case of is_same where both types are the same, which is true. */
 template<class T> struct is_same<T, T> : true_type { };
+/*! \brief The member `value` of is_same, as the standard's std::is_same_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class T, class U> inline constexpr bool is_same_v = is_same<T, U>::value;
 
 /*!
  * \brief Whether `Base` is a base of `Derived`, or the same class, as the standard's
@@ -109,6 +117,10 @@ template<class T> struct is_same<T, T> : true_type { };
  * \tparam Derived The class that may derive from it.
  */
 template<class Base, class Derived> struct is_base_of : integral_constant<bool, __is_base_of(Base, Derived)> { };
+/*! \brief The member `value` of is_base_of, as the standard's std::is_base_of_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class Base, class Derived> inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
 /*!
  * \brief The test behind is_integral, for a type without const and volatile: true for bool, the
@@ -144,6 +156,10 @@ template<> struct is_integral_helper<unsigned long long> : true_type { };
  * \tparam T The type, const and volatile ones included.
  */
 template<class T> struct is_integral : is_integral_helper<remove_cv_t<T>> { };
+/*! \brief The member `value` of is_integral, as the standard's std::is_integral_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class T> inline constexpr bool is_integral_v = is_integral<T>::value;
 
 /*!
  * \brief The test behind is_floating_point, for a type without const and volatile: true for float,
@@ -161,6 +177,10 @@ template<> struct is_floating_point_helper<long double> : true_type { };
  * \tparam T The type, const and volatile ones included.
  */
 template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_t<T>> { };
+/*! \brief The member `value` of is_floating_point, as the standard's std::is_floating_point_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class T> inline constexpr bool is_floating_point_v = is_floating_point<T>::value;
 
 /*!
  * \brief Whether `T` is a signed integer type.
@@ -172,14 +192,22 @@ template<class T> struct is_floating_point : is_floating_point_helper<remove_cv_
  * \tparam T The type.
  * \note Unlike the standard's std::is_signed, it is false for the floating-point types.
  */
-template<class T> struct is_signed : integral_constant<bool, is_integral<T>::value && (T(-1) < T(0))> { };
+template<class T> struct is_signed : integral_constant<bool, is_integral_v<T> && (T(-1) < T(0))> { };
+/*! \brief The member `value` of is_signed, as the standard's std::is_signed_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class T> inline constexpr bool is_signed_v = is_signed<T>::value;
 /*!
  * \brief Whether `T` is an unsigned integer type, bool included, as the standard's
  *        std::is_unsigned.
  *
  * \tparam T The type.
  */
-template<class T> struct is_unsigned : integral_constant<bool, is_integral<T>::value && (T(0) < T(-1))> { };
+template<class T> struct is_unsigned : integral_constant<bool, is_integral_v<T> && (T(0) < T(-1))> { };
+/*! \brief The member `value` of is_unsigned, as the standard's std::is_unsigned_v. */
+// The variable template modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
+template<class T> inline constexpr bool is_unsigned_v = is_unsigned<T>::value;
 
 /*!
  * \brief The integer type an enum is stored as, as the standard's std::underlying_type.
@@ -195,6 +223,8 @@ template<class T> struct underlying_type { using type = __underlying_type(T); /*
  *
  * \tparam T The enum type.
  */
+// The alias modernize-type-traits asks for is the one this line defines.
+// NOLINTNEXTLINE(modernize-type-traits)
 template<class T> using underlying_type_t = typename underlying_type<T>::type;
 
 } // namespace std

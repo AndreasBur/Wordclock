@@ -38,20 +38,16 @@ class Communication {
   };
 
  private:
-  Communication()
-      : error_(),
-        incoming_message_(),
-        state_(StateType::kMessageIncomplete),
-        is_message_too_long_(false) {}
+  Communication() : error_(), incoming_message_() {}
   ~Communication() = default;
 
   static constexpr byte kTaskCycle{COMMUNICATION_TASK_CYCLE};
   static constexpr char kEndOfMessageChar{'\n'};
   ErrorMessage error_;
   Message incoming_message_;
-  StateType state_;
+  StateType state_{StateType::kMessageIncomplete};
   // A character of the line was dropped, so the line is not parsed when it ends.
-  bool is_message_too_long_;
+  bool is_message_too_long_{false};
 
   void AddMessagePart();
 
