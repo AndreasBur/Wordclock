@@ -36,7 +36,9 @@ namespace {
 WordclockMain wordclock;
 
 // The tick the whole firmware is timed against: every module's task cycle counts in this
-// unit, so it is read from the scheduler rather than repeated as a number here.
+// unit, so it is read from the scheduler rather than repeated as a number here. The C cast is
+// FreeRTOS's, inside pdMS_TO_TICKS: the conversion is the kernel's own, rounding included.
+// NOLINTNEXTLINE(clang-diagnostic-old-style-cast)
 TickType_t const kTaskInterval{pdMS_TO_TICKS(Scheduler::GetTaskIntervalMs())};
 TickType_t last_wake_time{0};
 

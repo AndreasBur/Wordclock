@@ -78,6 +78,12 @@ rmt_encoder_handle_t rmt_encoder{nullptr};
 void Pixels::Init(byte pin) {
   pin_ = pin;
 
+  /*
+   * Zeroed first, as the IDF's examples do, so that the fields of a later IDF that this code
+   * does not name start out at zero. The zero is not a clock source; the line after the next
+   * sets one.
+   */
+  // NOLINTNEXTLINE(bugprone-invalid-enum-default-initialization)
   rmt_tx_channel_config_t channel_config{};
   channel_config.gpio_num = static_cast<gpio_num_t>(pin_);
   channel_config.clk_src = RMT_CLK_SRC_DEFAULT;

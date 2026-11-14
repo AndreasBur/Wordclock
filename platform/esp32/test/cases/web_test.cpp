@@ -677,7 +677,7 @@ int main() {
     constexpr int kLines{200};
 
     port.SetLineSink([](char const* line) {
-      std::lock_guard<std::mutex> const lock(sunk_mutex);
+      std::scoped_lock const lock(sunk_mutex);
       sunk.emplace_back(line);
     });
     std::string const as(40u, 'a');
