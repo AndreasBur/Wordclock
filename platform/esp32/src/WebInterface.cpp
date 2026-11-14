@@ -48,7 +48,8 @@ constexpr int kNoClient{-1};
  * did.
  */
 struct ClientTableType {
-  std::atomic<int> slots[kMaxClients];
+  // Value-initialised, as C++20 does on its own and C++17 does only when asked.
+  std::atomic<int> slots[kMaxClients]{};
 
   ClientTableType() {
     for (std::atomic<int>& slot : slots) {

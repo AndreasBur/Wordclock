@@ -66,9 +66,7 @@ class MsgCmdOverlayParser
       MsgParameterParser<MsgCmdOverlayParser<Derived>,
                          MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
   /*! \brief A position in the options, MsgParameterParser::PositionType. */
-  // The typename C++17 asks for, which the ESP32's C++23 alone would do without.
-  using PositionType =
-      typename MsgParameterParserType::PositionType;  // NOLINT(readability-redundant-typename)
+  using PositionType = typename MsgParameterParserType::PositionType;
   /*! \brief The length of the text of `-T`, its terminator included, StringTools::LengthType. */
   using LengthType = StringTools::LengthType;
 

@@ -67,7 +67,6 @@ Checks: >
   -google-runtime-int,
   -misc-non-private-member-variables-in-classes,
   -modernize-raw-string-literal,
-  -modernize-use-constraints,
   -readability-redundant-casting,
   -readability-suspicious-call-argument,
   -readability-use-anyofallof,
@@ -188,8 +187,6 @@ Checks: >
 # modernize-raw-string-literal: it reports a JSON fragment once three quotes are escaped in it,
 #   and leaves the fragment beside it with two; half a writer in raw strings reads worse than
 #   all of it escaped.
-# modernize-use-constraints: requires is C++20, which the ESP32's framework alone compiles; the
-#   core is C++17 everywhere else.
 # misc-include-cleaner: a source leans on what its own header includes, as Google's rule allows
 #   and CLAUDE.md asks; the check wants every name's header included where it is used, which
 #   would put StdReturnType's and byte's header into nearly every file.
