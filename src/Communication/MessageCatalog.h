@@ -57,17 +57,17 @@ class MessageCatalog {
 
   /*! \brief An option of a command: its short name, label, argument type, range and names. */
   struct OptionType {
-    char short_name;       /*!< The letter behind the `-` that introduces the option. */
-    char const* label;     /*!< The name a front end shows for it. */
-    ArgumentType argument; /*!< The type of its argument. */
+    char short_name{};          /*!< The letter behind the `-` that introduces the option. */
+    char const* label{nullptr}; /*!< The name a front end shows for it. */
+    ArgumentType argument{};    /*!< The type of its argument. */
     /*!
      * \brief The smallest value of a number.
      *
      * Zero both for a text, where the bounds are ignored, and for a read-only option, which
      * nothing offers to be typed.
      */
-    uint16_t minimum;
-    uint16_t maximum; /*!< The largest value of a number; see `minimum`. */
+    uint16_t minimum{0u};
+    uint16_t maximum{0u}; /*!< The largest value of a number; see `minimum`. */
     /*!
      * \brief The names of the values, or nullptr.
      *
@@ -97,7 +97,6 @@ class MessageCatalog {
     byte number_of_options;    /*!< The number of its options, from the start of `options`. */
   };
 
- public:
   /*! \brief Returns the number of commands in the catalog. */
   static byte GetNumberOfCommands();
 

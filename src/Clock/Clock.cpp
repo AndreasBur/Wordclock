@@ -326,11 +326,7 @@ StdReturnType Clock::SetTime(byte hour, byte minute) const {
 bool Clock::CalculateItIs(byte minute) {
   byte minute_steps = minute / CLOCK_MINUTE_STEP_IN_MINUTES;
   // show "it is" only to full and half hour
-  if (minute_steps == 0u || minute_steps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u)) {
-    return true;
-  } else {
-    return false;
-  }
+  return minute_steps == 0u || minute_steps == (CLOCK_NUMBER_OF_MINUTE_STEPS / 2u);
 }
 
 StdReturnType Clock::SetMode(ModeType mode) {
@@ -343,8 +339,8 @@ StdReturnType Clock::SetMode(ModeType mode) {
 }
 
 void Clock::SetTime(ClockWords::WordsListType clock_words_table, byte max_length) {
-  for (byte index = 0u; index < clock_words_table.size(); index++) {
-    Display::GetInstance().SetWord(clock_words_table[index], max_length);
+  for (DisplayWords::WordIdType const word_id : clock_words_table) {
+    Display::GetInstance().SetWord(word_id, max_length);
   }
 }
 

@@ -124,6 +124,8 @@ class Text {
    * branch. There is one of each now, so the mistake has nowhere left to happen, and the
    * [[nodiscard]] that used to police it is gone with the twins.
    */
+  // The glyph at `font_index` of `font`, drawn with its top left corner at `column` and `row`.
+  StdReturnType SetFontIndex(byte column, byte row, byte font_index, FontType font);
   template <typename RowType, byte RowsSize>
   StdReturnType SetCharFontHorizontal(byte column, byte row,
                                       FontCharHorizontal<RowType, RowsSize> const& font_char,

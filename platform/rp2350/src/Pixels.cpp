@@ -112,9 +112,9 @@ StdReturnType Pixels::SetPixel(byte index, byte red, byte green, byte blue) {
 }
 
 void Pixels::SetPixels(PixelType pixel) {
-  for (unsigned int row = 0; row < PIXELS_DISPLAY_NUMBER_OF_ROWS; row++) {
-    for (unsigned int column = 0; column < PIXELS_DISPLAY_NUMBER_OF_COLUMNS; column++) {
-      pixel_buffer_[row][column] = pixel;
+  for (auto& row : pixel_buffer_) {
+    for (PixelType& slot : row) {
+      slot = pixel;
     }
   }
   dirty_ = true;

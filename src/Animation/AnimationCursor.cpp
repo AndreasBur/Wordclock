@@ -37,7 +37,7 @@ void AnimationCursor::Task() {
     if (current_pixel_index_ > 0u) {
       Display::IndexType const previous_index =
           static_cast<Display::IndexType>(current_pixel_index_ - 1u);
-      if (IsPixelPartOfClockWords(clock_words_table_, previous_index) == false) {
+      if (!IsPixelPartOfClockWords(clock_words_table_, previous_index)) {
         Display::GetInstance().ClearPixel(previous_index);
       }
     }

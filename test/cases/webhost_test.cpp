@@ -53,7 +53,7 @@ void TestWebHostOutlastsAnIdleConnection() {
          "the idle connection must reach the host");
 
   std::promise<void> task_done;
-  std::thread closer([idle, done = task_done.get_future()]() {
+  std::thread closer([idle, done = task_done.get_future()] {
     if (done.wait_for(std::chrono::seconds(3)) == std::future_status::timeout) {
       shutdown(idle, SHUT_RDWR);
     }

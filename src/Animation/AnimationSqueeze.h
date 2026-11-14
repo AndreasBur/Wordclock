@@ -57,6 +57,8 @@ class AnimationSqueeze : public Animation {
   void SetTimeTask();
 
   void ClearRow(byte row);
+  static void ClearFirstLetterOfEveryBlock(byte row);
+  static void ClearLastLetterOfEveryBlock(byte row);
   void SetMaxWordLength();
 
  public:

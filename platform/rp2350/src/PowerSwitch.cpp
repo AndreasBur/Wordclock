@@ -21,6 +21,8 @@ void PowerSwitch::Init() {
   }
 
   gpio_init(POWER_SWITCH_PIN);
+  // GPIO_OUT is the SDK's own spelling of the direction, though its parameter is a bool.
+  // NOLINTNEXTLINE(readability-implicit-bool-conversion)
   gpio_set_dir(POWER_SWITCH_PIN, GPIO_OUT);
   SwitchSupplyOn();
 }

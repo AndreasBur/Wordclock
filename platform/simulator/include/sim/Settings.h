@@ -32,6 +32,9 @@
  * dropped wherever the compositor pleases, see the constructor. Shown with Show(), not ShowModal(),
  * so it does not block the main window. Closing it hides it.
  */
+// wx deletes a window through wxWindow*, so the destructor is virtual, and it is not public, so
+// that nothing deletes the window but wx itself, after Destroy().
+// NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
 class Settings : public wxDialog {
  private:
   /* Own range, so the ids stay clear of the pixel matrix window's. */
@@ -43,9 +46,9 @@ class Settings : public wxDialog {
     kIdStaticBoxTemperature
   };
 
-  wxSlider* illuminance_slider_;
-  wxSlider* temperature_slider_;
-  wxCheckBox* temperature_connected_check_box_;
+  wxSlider* illuminance_slider_{nullptr};
+  wxSlider* temperature_slider_{nullptr};
+  wxCheckBox* temperature_connected_check_box_{nullptr};
 
   static constexpr int kIlluminancePercentMin{0};
   static constexpr int kIlluminancePercentMax{100};
@@ -62,7 +65,7 @@ class Settings : public wxDialog {
   DECLARE_EVENT_TABLE()
 
   Settings(wxWindow* parent, wxString const& title);
-  ~Settings();
+  ~Settings() override;
 
   void OnClose(wxCloseEvent& event);
   void OnIlluminance(wxCommandEvent& event);

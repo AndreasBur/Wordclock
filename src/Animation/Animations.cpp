@@ -79,77 +79,77 @@ void Animations::InitCurrentAnimation() {
   switch (current_animation_id_) {
 #if (ANIMATIONS_SUPPORT_CURSOR == STD_ON)
     case AnimationIdType::kCursor:
-      return animations_raw_.cursor.Init();
+      animations_raw_.cursor.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_TELETYPE == STD_ON)
     case AnimationIdType::kTeletype:
-      return animations_raw_.teletype.Init();
+      animations_raw_.teletype.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_DROP == STD_ON)
     case AnimationIdType::kDrop:
-      return animations_raw_.drop.Init();
+      animations_raw_.drop.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_SHIFT == STD_ON)
     case AnimationIdType::kShift:
-      return animations_raw_.shift.Init();
+      animations_raw_.shift.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_FADE == STD_ON)
     case AnimationIdType::kFade:
-      return animations_raw_.fade.Init();
+      animations_raw_.fade.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_SNAKE == STD_ON)
     case AnimationIdType::kSnake:
-      return animations_raw_.snake.Init();
+      animations_raw_.snake.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_WIPE == STD_ON)
     case AnimationIdType::kWipe:
-      return animations_raw_.wipe.Init();
+      animations_raw_.wipe.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_CUBE == STD_ON)
     case AnimationIdType::kCube:
-      return animations_raw_.cube.Init();
+      animations_raw_.cube.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_FLICKER == STD_ON)
     case AnimationIdType::kFlicker:
-      return animations_raw_.flicker.Init();
+      animations_raw_.flicker.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_SQUEEZE == STD_ON)
     case AnimationIdType::kSqueeze:
-      return animations_raw_.squeeze.Init();
+      animations_raw_.squeeze.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_EXPLODE_PIXELS == STD_ON)
     case AnimationIdType::kExplodePixels:
-      return animations_raw_.explode_pixels.Init();
+      animations_raw_.explode_pixels.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_EXPLODE_WORDS == STD_ON)
     case AnimationIdType::kExplodeWords:
-      return animations_raw_.explode_words.Init();
+      animations_raw_.explode_words.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_MATRIX == STD_ON)
     case AnimationIdType::kMatrix:
-      return animations_raw_.matrix.Init();
+      animations_raw_.matrix.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_ROLL == STD_ON)
     case AnimationIdType::kRoll:
-      return animations_raw_.roll.Init();
+      animations_raw_.roll.Init();
       break;
 #endif
 #if (ANIMATIONS_SUPPORT_COLLAPSE == STD_ON)
     case AnimationIdType::kCollapse:
-      return animations_raw_.collapse.Init();
+      animations_raw_.collapse.Init();
       break;
 #endif
     default:

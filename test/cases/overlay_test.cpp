@@ -182,10 +182,12 @@ void TestOverlayPeriodAndEndurance() {
          "an overlay that is switched off must stay away");
 }
 
+namespace {
+
 // Starts the date overlay by its period in `minute` of 10 o'clock, if it will, and says whether
 // it did; a show it started is ended again. Overlays acts once per second, so the second before
 // is passed through first.
-static bool DateOverlayStartsIn(byte minute) {
+bool DateOverlayStartsIn(byte minute) {
   Overlays& overlays = Overlays::GetInstance();
 
   SetTime(10u, minute, 29u);
@@ -197,7 +199,7 @@ static bool DateOverlayStartsIn(byte minute) {
   return started;
 }
 
-static void ConfigureDateOverlayEveryMinute() {
+void ConfigureDateOverlayEveryMinute() {
   Overlays& overlays = Overlays::GetInstance();
 
   overlays.SetDatePeriodInMinutes(1u);
@@ -207,6 +209,8 @@ static void ConfigureDateOverlayEveryMinute() {
   overlays.SetDateValidInDays(0u);
   overlays.SetDateIsActive(true);
 }
+
+}  // namespace
 
 /*
  * An overlay switched off, or reset, while it shows ends its show as Abort() would: its text

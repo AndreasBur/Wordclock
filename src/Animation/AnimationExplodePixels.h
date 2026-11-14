@@ -14,6 +14,7 @@
 #include "ClockWords.h"
 #include "Display.h"
 #include "DisplayPixels.h"
+#include "DisplayWords.h"
 #include "StandardTypes.h"
 
 /*!
@@ -94,10 +95,30 @@ class AnimationExplodePixels : public Animation {
                ? static_cast<byte>(row + number_of_shifts)
                : kRowCenter;
   }
+  // A column moved that many steps towards the centre column; the centre column stays.
+  static byte ShiftColumnTowardsCenter(byte column, byte number_of_shifts) {
+    if (column < kColumnCenter) {
+      return ShiftRight(column, number_of_shifts);
+    }
+    if (column > kColumnCenter) {
+      return ShiftLeft(column, number_of_shifts);
+    }
+    return column;
+  }
+  // A row moved that many steps towards the centre row; the centre row stays.
+  static byte ShiftRowTowardsCenter(byte row, byte number_of_shifts) {
+    if (row < kRowCenter) {
+      return ShiftDown(row, number_of_shifts);
+    }
+    if (row > kRowCenter) {
+      return ShiftUp(row, number_of_shifts);
+    }
+    return row;
+  }
 
   void SetTime(DisplayPixels& pixels) {
-    for (byte index = 0u; index < clock_words_table_.size(); index++) {
-      pixels.SetWord(clock_words_table_[index]);
+    for (DisplayWords::WordIdType const word_id : clock_words_table_) {
+      pixels.SetWord(word_id);
     }
   }
 

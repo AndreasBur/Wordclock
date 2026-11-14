@@ -13,6 +13,8 @@
 
 using ResultType = StringTools::ResultType;
 
+namespace {
+
 /*
  * Converts `text` into a fresh value and reports whether the result and the value are the ones
  * expected. The value starts at `start`, so that a conversion that leaves it alone shows.
@@ -23,6 +25,8 @@ bool Converts(char const* text, ResultType result, T expected, T start = T{42}) 
   StringTools::PositionType position{0u};
   return (StringTools::StringTo(text, position, value) == result) && (value == expected);
 }
+
+}  // namespace
 
 // The one number whose magnitude an int32_t cannot hold: it used to be negated as an int32_t.
 void TestItoaWritesEveryInt32() {

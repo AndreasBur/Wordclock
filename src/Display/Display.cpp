@@ -220,13 +220,15 @@ StdReturnType Display::ClearWords() {
 }
 
 StdReturnType Display::GetPixel(IndexType index, PixelValueType& value) const {
-  byte row, column;
+  byte row;
+  byte column;
   IndexToColumnAndRow(index, column, row);
   return GetPixel(column, row, value);
 }
 
 Display::PixelValueType Display::GetPixel(IndexType index) const {
-  byte row, column;
+  byte row;
+  byte column;
   IndexToColumnAndRow(index, column, row);
   return GetPixel(column, row);
 }
@@ -248,7 +250,7 @@ Display::PixelValueType Display::GetPixel(byte column, byte row) const {
   Pixel const pixel = pixel_stripe_.GetPixel(ToIndex(column, row));
 
   /* Pixel is only off when all colors are zero */
-  return !(pixel.GetRed() == 0u && pixel.GetGreen() == 0u && pixel.GetBlue() == 0u);
+  return pixel.GetRed() != 0u || pixel.GetGreen() != 0u || pixel.GetBlue() != 0u;
 }
 
 StdReturnType Display::SetPixel(byte column, byte row) {
@@ -277,7 +279,8 @@ StdReturnType Display::SetPixel(byte column, byte row, byte brightness) {
 }
 
 StdReturnType Display::SetPixel(IndexType index) {
-  byte row, column;
+  byte row;
+  byte column;
   IndexToColumnAndRow(index, column, row);
   return SetPixel(column, row);
 }
@@ -291,7 +294,8 @@ StdReturnType Display::ClearPixel(byte column, byte row) {
 }
 
 StdReturnType Display::ClearPixel(IndexType index) {
-  byte row, column;
+  byte row;
+  byte column;
   IndexToColumnAndRow(index, column, row);
   return ClearPixel(column, row);
 }
@@ -317,7 +321,8 @@ StdReturnType Display::TogglePixel(byte column, byte row) {
 }
 
 StdReturnType Display::TogglePixel(IndexType index) {
-  byte row, column;
+  byte row;
+  byte column;
   IndexToColumnAndRow(index, column, row);
   return TogglePixel(column, row);
 }
@@ -387,8 +392,7 @@ StdReturnType Display::SetPixelColumn(byte column, PixelRowType pixel_column) {
   return return_value;
 }
 
-Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()} {
-  state_ = StateType::kUninit;
+Display::Display(Pixel color) : state_(StateType::kUninit), pixel_stripe_{Pixels::GetInstance()} {
   color_.SetColor(color);
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
@@ -397,11 +401,10 @@ Display::Display(Pixel color) : pixel_stripe_{Pixels::GetInstance()} {
 }
 
 Display::Display(ColorType red, ColorType green, ColorType blue)
-    : pixel_stripe_{Pixels::GetInstance()} {
+    : state_(StateType::kUninit), pixel_stripe_{Pixels::GetInstance()} {
   color_.SetColorRed(red);
   color_.SetColorGreen(green);
   color_.SetColorBlue(blue);
-  state_ = StateType::kUninit;
 
 #if (DISPLAY_USE_PIXELS_DIMMING == STD_OFF)
   brightness_.SetBrightness(255u);

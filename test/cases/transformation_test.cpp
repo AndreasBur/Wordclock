@@ -120,31 +120,30 @@ constexpr byte kNumberOfRolls{static_cast<byte>(RollType::kNumberOfRolls)};
  * by that many rows or columns, and the edge it left filled with as much of the new time as
  * has come in, the part of it that ends up furthest from that edge first.
  */
+bool RolledPixel(GridType const& previous, GridType const& next, RollType roll, int steps, int row,
+                 int column) {
+  switch (roll) {
+    case RollType::kRight:
+      return (column < steps) ? At(next, row, kColumns - steps + column)
+                              : At(previous, row, column - steps);
+    case RollType::kLeft:
+      return (column >= kColumns - steps) ? At(next, row, column - (kColumns - steps))
+                                          : At(previous, row, column + steps);
+    case RollType::kDown:
+      return (row < steps) ? At(next, kRows - steps + row, column)
+                           : At(previous, row - steps, column);
+    default:
+      return (row >= kRows - steps) ? At(next, row - (kRows - steps), column)
+                                    : At(previous, row + steps, column);
+  }
+}
+
 GridType Rolled(GridType const& previous, GridType const& next, RollType roll, int steps) {
   GridType rolled{};
 
   for (int row = 0; row < kRows; row++) {
     for (int column = 0; column < kColumns; column++) {
-      bool& pixel = At(rolled, row, column);
-
-      switch (roll) {
-        case RollType::kRight:
-          pixel = (column < steps) ? At(next, row, kColumns - steps + column)
-                                   : At(previous, row, column - steps);
-          break;
-        case RollType::kLeft:
-          pixel = (column >= kColumns - steps) ? At(next, row, column - (kColumns - steps))
-                                               : At(previous, row, column + steps);
-          break;
-        case RollType::kDown:
-          pixel = (row < steps) ? At(next, kRows - steps + row, column)
-                                : At(previous, row - steps, column);
-          break;
-        default:
-          pixel = (row >= kRows - steps) ? At(next, row - (kRows - steps), column)
-                                         : At(previous, row + steps, column);
-          break;
-      }
+      At(rolled, row, column) = RolledPixel(previous, next, roll, steps, row, column);
     }
   }
   return rolled;
@@ -210,6 +209,41 @@ void TestShiftsMoveEveryPixelByOne() {
   Display::GetInstance().Clear();
 }
 
+#if (ANIMATIONS_SUPPORT_ROLL == STD_ON)
+namespace {
+
+// One frame per task, the last of them the one that finishes: a roll of n steps takes n + 1
+// tasks. The bound is a runaway's, not a measurement.
+using FramesType = std::array<GridType, kColumns + 2u>;
+
+// Runs the started animation to its end and returns how many frames it showed.
+std::size_t RecordFrames(Animations& animations, FramesType& frames) {
+  std::size_t number_of_frames = 0u;
+  while (animations.GetState() == Animations::StateType::kPending &&
+         number_of_frames < frames.size()) {
+    animations.Task(true);
+    frames[number_of_frames++] = ReadGrid();
+  }
+  return number_of_frames;
+}
+
+// Whether the frames are, step by step, those of a roll in `roll` from `previous` to `next`.
+bool ShowsRoll(FramesType const& frames, std::size_t number_of_frames, GridType const& previous,
+               GridType const& next, RollType roll) {
+  if (number_of_frames != static_cast<std::size_t>(NumberOfSteps(roll)) + 1u) {
+    return false;
+  }
+  for (int step = 1; step <= NumberOfSteps(roll); step++) {
+    if (frames[ToIndex(step - 1)] != Rolled(previous, next, roll, step)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace
+#endif
+
 /*
  * The roll animation is what reaches the vertical shifts in the firmware, and which of its four
  * directions a word change takes is decided by the time. A single time - all the case for every
@@ -237,24 +271,12 @@ void TestRollAnimationRollsEveryWay() {
       animations.SetAnimation(Animations::AnimationIdType::kRoll);
       Expect(animations.SetTime(hour, minute) == kEOk, "the roll must start on a word change");
 
-      // One frame per task, the last of them the one that finishes: a roll of n steps
-      // takes n + 1 tasks. The bound is a runaway's, not a measurement.
-      std::array<GridType, kColumns + 2u> frames{};
-      std::size_t number_of_frames = 0u;
-      while (animations.GetState() == Animations::StateType::kPending &&
-             number_of_frames < frames.size()) {
-        animations.Task(true);
-        frames[number_of_frames++] = ReadGrid();
-      }
+      FramesType frames{};
+      std::size_t const number_of_frames = RecordFrames(animations, frames);
 
       bool any = false;
       for (byte roll = 0u; roll < kNumberOfRolls; roll++) {
-        auto const type = static_cast<RollType>(roll);
-        bool possible = number_of_frames == static_cast<std::size_t>(NumberOfSteps(type)) + 1u;
-        for (int step = 1; possible && step <= NumberOfSteps(type); step++) {
-          possible = frames[ToIndex(step - 1)] == Rolled(previous, next, type, step);
-        }
-        if (possible) {
+        if (ShowsRoll(frames, number_of_frames, previous, next, static_cast<RollType>(roll))) {
           any = true;
           seen[roll] = true;
         }

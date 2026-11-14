@@ -22,11 +22,25 @@ Pixel FirstLitPixel() {
   for (byte index = 0u; index < PIXELS_NUMBER_OF_PIXELS; index++) {
     Pixel const candidate = Pixels::GetInstance().GetPixel(index);
 
-    if (candidate.GetRed() || candidate.GetGreen() || candidate.GetBlue()) {
+    if ((candidate.GetRed() != 0u) || (candidate.GetGreen() != 0u) || (candidate.GetBlue() != 0u)) {
       return candidate;
     }
   }
   return Pixel(0u, 0u, 0u);
+}
+
+// One channel at full is the outside edge of the wheel, one channel dark is what keeps it from
+// being a paler white - together they are "saturated".
+bool HasChannelAtFull(Pixel pixel) {
+  return (pixel.GetRed() == 255u) || (pixel.GetGreen() == 255u) || (pixel.GetBlue() == 255u);
+}
+bool HasChannelDark(Pixel pixel) {
+  return (pixel.GetRed() == 0u) || (pixel.GetGreen() == 0u) || (pixel.GetBlue() == 0u);
+}
+
+// Whether `channel` is the strongest of the three.
+bool Leads(byte channel, byte other, byte another) {
+  return (channel > other) && (channel > another);
 }
 
 bool ArePixelsSame(Pixel left, Pixel right) {
@@ -115,24 +129,11 @@ void TestColourCycleWalksTheWholeWheel() {
     byte const green = shown.GetGreen();
     byte const blue = shown.GetBlue();
 
-    // One channel at full is the outside edge of the wheel, one channel dark is what
-    // keeps it from being a paler white - together they are "saturated".
-    if ((red != 255u) && (green != 255u) && (blue != 255u)) {
-      every_one_saturated = false;
-    }
-    if ((red != 0u) && (green != 0u) && (blue != 0u)) {
-      none_washed_out = false;
-    }
-
-    if ((red > green) && (red > blue)) {
-      red_led = true;
-    }
-    if ((green > red) && (green > blue)) {
-      green_led = true;
-    }
-    if ((blue > red) && (blue > green)) {
-      blue_led = true;
-    }
+    every_one_saturated = every_one_saturated && HasChannelAtFull(shown);
+    none_washed_out = none_washed_out && HasChannelDark(shown);
+    red_led = red_led || Leads(red, green, blue);
+    green_led = green_led || Leads(green, red, blue);
+    blue_led = blue_led || Leads(blue, red, green);
 
     color_cycle.Task();
   }

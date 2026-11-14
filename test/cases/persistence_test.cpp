@@ -15,6 +15,8 @@
 #include "test/cases.h"
 #include "test/check.h"
 
+namespace {
+
 /*
  * Reaches around Storage on purpose, which nothing else may: damaging a stored blob is
  * the one thing the store's own interface will not do, and rejecting a damaged one is
@@ -52,6 +54,8 @@ bool DamageStoredChecksum() {
 
   return written == size && write_close_result == 0;
 }
+
+}  // namespace
 
 /*
  * The whole persistence path, on the store the simulator really writes to. Runs last

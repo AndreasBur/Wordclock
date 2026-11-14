@@ -17,6 +17,22 @@
 #include "test/cases.h"
 #include "test/check.h"
 
+#if (DISPLAY_COLOR_SUPPORT_DIMMING == STD_ON)
+namespace {
+
+// What dimming makes of a channel at a brightness: the scaled value, but never 0 for a channel
+// that is lit, so a dim word does not go dark.
+byte ExpectedDimmed(unsigned channel, unsigned brightness) {
+  if (channel == 0u) {
+    return 0u;
+  }
+  uint32_t const scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
+  return (scaled == 0u) ? 1u : static_cast<byte>(scaled);
+}
+
+}  // namespace
+#endif
+
 // Only where the colour does the dimming: where the strip does it, DisplayColor keeps no
 // dimmed copy, and what this would check is the strip's master.
 void TestColourDimmingAcrossByteRange() {
@@ -28,9 +44,7 @@ void TestColourDimmingAcrossByteRange() {
     color.SetColor(Pixel(level, level, level));
     for (unsigned brightness = 0u; brightness <= 255u; ++brightness) {
       color.DimmColors(static_cast<byte>(brightness));
-      uint32_t const scaled = (static_cast<uint32_t>(channel) * brightness) / 256u;
-      byte const expected =
-          (channel == 0u) ? 0u : ((scaled == 0u) ? 1u : static_cast<byte>(scaled));
+      byte const expected = ExpectedDimmed(channel, brightness);
       all_match = all_match && color.GetColorRedDimmed() == expected &&
                   color.GetColorGreenDimmed() == expected && color.GetColorBlueDimmed() == expected;
     }
@@ -80,6 +94,8 @@ void TestGammaCorrectionCurve() {
          "the last step must be the top of the stored doubling, unshifted");
 }
 
+namespace {
+
 // How much light the whole display is putting out, which is what a fade changes and a
 // redraw does not.
 uint32_t TotalIntensity(PixelBufferType const& pixels) {
@@ -92,6 +108,8 @@ uint32_t TotalIntensity(PixelBufferType const& pixels) {
   }
   return total;
 }
+
+}  // namespace
 
 /*
  * The latch itself: the display is redrawn when the word set changes and left alone
@@ -381,7 +399,8 @@ void TestDisplayCharacterLookup() {
   // and row - that is what the two broken entry points disagreed on.
   bool all_agree = true;
   for (byte index = 0u; index < DISPLAY_CHARACTERS_NUMBER_OF_CHARACTERS; index++) {
-    byte column, row;
+    byte column;
+    byte row;
     characters.IndexToColumnAndRow(index, column, row);
 
     if (characters.GetCharacter(index) != characters.GetCharacter(column, row)) {
@@ -401,6 +420,7 @@ void TestDisplayCharacterLookup() {
 }
 
 namespace {
+
 // Whether the pixel at `column` and `row` is a letter of some word, which is what ClearWords()
 // turns off and what it has to leave alone otherwise.
 bool IsPixelOfAWord(byte column, byte row) {
@@ -431,6 +451,7 @@ byte LitLettersOf(DisplayWords::WordIdType word_id) {
   }
   return lit;
 }
+
 }  // namespace
 
 /*

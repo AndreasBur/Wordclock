@@ -61,9 +61,6 @@ class ClockWords {
   constexpr ClockWords(bool show_it_is, HourWordsType hour_words, MinutesWordsType minute_words)
       : show_it_is_(show_it_is), hour_words_(hour_words), minute_words_(minute_words) {}
 
-  /*! \brief Destroys the words. */
-  ~ClockWords() = default;
-
   /*!
    * \brief Returns whether `clock_words` holds the same words.
    *

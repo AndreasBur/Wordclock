@@ -42,7 +42,8 @@ inline ClockWords WordsAt(byte hour, byte minute) {
   return words;
 }
 
-using PixelBufferType = std::array<Pixels::PixelType, PIXELS_NUMBER_OF_PIXELS>;
+using PixelBufferType =
+    std::array<Pixels::PixelType, static_cast<std::size_t>(PIXELS_NUMBER_OF_PIXELS)>;
 
 inline PixelBufferType ReadPixels() {
   PixelBufferType pixels;

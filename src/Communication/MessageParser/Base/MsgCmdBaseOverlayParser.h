@@ -39,9 +39,9 @@ class MsgCmdBaseOverlayParser {
   using MsgParameterBaseParserType =
       MsgParameterParser<MsgCmdBaseOverlayParser, MSG_CMD_BASE_OVERLAY_PARSER_PARAMETER_TABLE_SIZE>;
   /*! \brief The parameter table, MsgParameterParser::ParameterTableType. */
-  using ParameterTableType = typename MsgParameterBaseParserType::ParameterTableType;
+  using ParameterTableType = MsgParameterBaseParserType::ParameterTableType;
   /*! \brief An option of the parameter table, MsgParameterParser::ParameterTableElementType. */
-  using ParameterTableElementType = typename MsgParameterBaseParserType::ParameterTableElementType;
+  using ParameterTableElementType = MsgParameterBaseParserType::ParameterTableElementType;
 
  protected:
   static constexpr char kPeriodOptionShortName{'P'};    /*!< The short name of the period. */

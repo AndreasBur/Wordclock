@@ -380,11 +380,10 @@ StdReturnType Persistence::Load() {
   SettingsType settings{};
   StdReturnType return_value{kENotOk};
 
-  if (Storage::GetInstance().Read(reinterpret_cast<byte*>(&settings), sizeof(settings)) == kEOk) {
-    if (IsValid(settings)) {
-      Apply(settings);
-      return_value = kEOk;
-    }
+  if ((Storage::GetInstance().Read(reinterpret_cast<byte*>(&settings), sizeof(settings)) == kEOk) &&
+      IsValid(settings)) {
+    Apply(settings);
+    return_value = kEOk;
   }
 
   if (return_value == kENotOk) {

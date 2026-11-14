@@ -55,6 +55,8 @@
  * compile time. This brings the argument types back within reach without the class's name,
  * which keeps the tables readable.
  */
+namespace {
+
 using ArgumentType = MessageCatalog::ArgumentType;
 
 /*
@@ -465,6 +467,8 @@ constexpr bool AreNamedRangesConsistent() {
 static_assert(AreNamedRangesConsistent(),
               "an option with named values has a range that does not match the number of names");
 
+}  // namespace
+
 /*! \endcond */
 // The tables live in the source, where they can be constexpr and checked against the
 // firmware at compile time. Hence out of line rather than inline in the header.
@@ -475,9 +479,9 @@ MessageCatalog::CommandType const& MessageCatalog::GetCommand(byte index) {
 }
 
 MessageCatalog::CommandType const* MessageCatalog::FindCommandByNumber(byte number) {
-  for (byte index = 0u; index < kNumberOfCommands; index++) {
-    if (kCommands[index].number == number) {
-      return &kCommands[index];
+  for (CommandType const& command : kCommands) {
+    if (command.number == number) {
+      return &command;
     }
   }
 

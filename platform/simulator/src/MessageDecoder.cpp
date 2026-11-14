@@ -189,8 +189,10 @@ wxString MessageDecoder::DescribeError(wxString const& line) {
  * Reads one error of a line back into names, or returns an empty string if this is no error.
  * Three shapes come out of ErrorMessage: the error on its own, the error with the option it
  * belongs to appended, and the error behind the api call that failed. The api form carries an
- * error of its own after the delimiter, which is why this reaches back into itself for it.
+ * error of its own after the delimiter, which is why this reaches back into itself for it - once
+ * per api prefix in the line, and on the host.
  */
+// NOLINTNEXTLINE(misc-no-recursion)
 wxString MessageDecoder::DescribeErrorPart(wxString const& part, char const* indent) {
   wxString rest;
 

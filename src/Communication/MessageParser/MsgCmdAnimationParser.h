@@ -172,22 +172,13 @@ class MsgCmdAnimationParser
    */
   explicit MsgCmdAnimationParser(char const* parameter)
       : MsgParameterParser(kParameterTable, parameter),
-        animation_id_(),
-        mode_(),
-        speed_(0u),
-        favourite_(true),
-        animation_given_(false),
-        mode_given_(false),
-        speed_given_(false),
-        favourite_given_(false) {
-    // preloaded with the current settings, so a command may set single options
-    // without resetting the others
-    animation_id_ = Animations::GetInstance().GetAnimation();
-    mode_ = Animations::GetInstance().GetMode();
-    speed_ =
-        Scheduler::ConvertTaskCycleToSpeed(Animations::GetInstance().GetTaskCycle(animation_id_));
-    favourite_ = Animations::GetInstance().IsFavourite(animation_id_);
-  }
+        // preloaded with the current settings, so a command may set single options
+        // without resetting the others
+        animation_id_(Animations::GetInstance().GetAnimation()),
+        mode_(Animations::GetInstance().GetMode()),
+        speed_(Scheduler::ConvertTaskCycleToSpeed(
+            Animations::GetInstance().GetTaskCycle(animation_id_))),
+        favourite_(Animations::GetInstance().IsFavourite(animation_id_)) {}
 
   /*! \brief Destroys the parser. */
   ~MsgCmdAnimationParser() = default;

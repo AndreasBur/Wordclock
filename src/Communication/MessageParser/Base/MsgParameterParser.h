@@ -137,7 +137,7 @@ class MsgParameterParser {
      * assertion catches instead, at the first point where Derived is a complete type.
      */
     static_assert(
-        std::is_base_of<MsgParameterParser, Derived>::value,
+        std::is_base_of_v<MsgParameterParser, Derived>,
         "MsgParameterParser is a CRTP base: Derived has to be the class that inherits it");
   }
 

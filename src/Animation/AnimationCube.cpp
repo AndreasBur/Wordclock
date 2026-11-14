@@ -89,21 +89,21 @@ void AnimationCube::SetTimeTask() {
 
 void AnimationCube::ClearBorderPixelsWithoutClockPixels() {
   for (byte column = border_.column_start; column <= border_.column_end; column++) {
-    if (IsPixelPartOfClockWords(clock_words_table_, column, border_.row_start) == false) {
+    if (!IsPixelPartOfClockWords(clock_words_table_, column, border_.row_start)) {
       // clear border top
       Display::GetInstance().ClearPixel(column, border_.row_start);
     }
-    if (IsPixelPartOfClockWords(clock_words_table_, column, border_.row_end) == false) {
+    if (!IsPixelPartOfClockWords(clock_words_table_, column, border_.row_end)) {
       // clear border bottom
       Display::GetInstance().ClearPixel(column, border_.row_end);
     }
   }
   for (byte row = border_.row_start; row <= border_.row_end; row++) {
-    if (IsPixelPartOfClockWords(clock_words_table_, border_.column_start, row) == false) {
+    if (!IsPixelPartOfClockWords(clock_words_table_, border_.column_start, row)) {
       // clear border left
       Display::GetInstance().ClearPixel(border_.column_start, row);
     }
-    if (IsPixelPartOfClockWords(clock_words_table_, border_.column_end, row) == false) {
+    if (!IsPixelPartOfClockWords(clock_words_table_, border_.column_end, row)) {
       // clear border right
       Display::GetInstance().ClearPixel(border_.column_end, row);
     }

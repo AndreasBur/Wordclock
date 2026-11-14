@@ -32,7 +32,6 @@ class Pixel {
   static constexpr byte kNumberOfColors{3u};
   using PixelRawType = std::array<byte, kNumberOfColors>;
 
- private:
   PixelRawType pixel_raw_{0u, 0u, 0u};
 
   static constexpr byte kColorMaxValue{255u};
@@ -68,9 +67,6 @@ class Pixel {
      */
     SetPixel(color_red, color_green, color_blue);
   }
-
-  /*! \brief Destroys the pixel. */
-  ~Pixel() = default;
 
   /*! \brief Returns the number of colours of a pixel, three. */
   static constexpr byte GetNumberOfColors() { return kNumberOfColors; }

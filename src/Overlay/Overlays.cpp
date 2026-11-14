@@ -83,17 +83,17 @@ StdReturnType Overlays::Abort() {
 // a timer that is not 0 keeps the ones behind it from starting in the same second.
 void Overlays::TaskIdle(ClockDate date, ClockTime time) {
 #if (OVERLAYS_SUPPORT_DATE == STD_ON)
-  if ((date_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+  if (date_.GetIsActive() && (show_timer_in_seconds_ == 0u)) {
     show_timer_in_seconds_ = date_.Task(show_timer_in_seconds_, date, time);
   }
 #endif
 #if (OVERLAYS_SUPPORT_TEMPERATURE == STD_ON)
-  if ((temperature_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+  if (temperature_.GetIsActive() && (show_timer_in_seconds_ == 0u)) {
     show_timer_in_seconds_ = temperature_.Task(show_timer_in_seconds_, date, time);
   }
 #endif
 #if (OVERLAYS_SUPPORT_TEXT == STD_ON)
-  if ((text_.GetIsActive()) && (show_timer_in_seconds_ == 0u)) {
+  if (text_.GetIsActive() && (show_timer_in_seconds_ == 0u)) {
     show_timer_in_seconds_ = text_.Task(show_timer_in_seconds_, date, time);
   }
 #endif

@@ -43,6 +43,8 @@
 namespace arduino {
 class __FlashStringHelper;
 }
+// In the global namespace, where the core's own using-declaration puts the name.
+// NOLINTNEXTLINE(google-global-names-in-headers)
 using arduino::__FlashStringHelper;
 // NOLINTEND(bugprone-reserved-identifier)
 

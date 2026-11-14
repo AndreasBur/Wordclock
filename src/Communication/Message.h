@@ -29,7 +29,7 @@ class Message {
   static constexpr char kNullCharacter{STD_NULL_CHARACTER}; /*!< The terminator. */
 
  private:
-  char buffer_[kMessageLength];
+  char buffer_[kMessageLength]{};
 
  public:
   /*! \brief Makes an empty line. */
@@ -72,7 +72,7 @@ class Message {
    * \param[in] character The character to find.
    * \return True if it does. Always true for kNullCharacter, as the terminator is found.
    */
-  bool Contains(char character) const { return strchr(buffer_, character); }
+  bool Contains(char character) const { return strchr(buffer_, character) != nullptr; }
 
   /*!
    * \brief Returns where `character` first occurs in the line, searched from `position` on.

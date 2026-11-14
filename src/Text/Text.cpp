@@ -16,6 +16,10 @@ StdReturnType Text::SetChar(byte column, byte row, char character, FontType font
   byte font_index;
   if (ConvertCharToFontIndex(character, font_index) == kENotOk) return kENotOk;
 
+  return SetFontIndex(column, row, font_index, font);
+}
+
+StdReturnType Text::SetFontIndex(byte column, byte row, byte font_index, FontType font) {
 #if (TEXT_SUPPORT_FONT_5X8 == STD_ON)
   if (font == FontType::kFont5x8) {
     FontSprite5x8::FontCharType font_char;

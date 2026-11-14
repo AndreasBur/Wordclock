@@ -38,7 +38,7 @@ inline char* itoa(int value, char* buffer, int base) {
     unsigned int const digit = u % static_cast<unsigned int>(base);
     *p++ = (digit < 10) ? static_cast<char>('0' + digit) : static_cast<char>('a' + digit - 10);
     u /= static_cast<unsigned int>(base);
-  } while (u);
+  } while (u != 0u);
   if (negative) *p++ = '-';
   *p = '\0';
 

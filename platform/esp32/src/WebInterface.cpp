@@ -48,11 +48,12 @@ constexpr int kNoClient{-1};
  * did.
  */
 struct ClientTableType {
-  std::atomic<int> slots[kMaxClients];
+  // Value-initialised, as C++20 does on its own and C++17 does only when asked.
+  std::atomic<int> slots[kMaxClients]{};
 
   ClientTableType() {
-    for (size_t slot = 0u; slot < kMaxClients; slot++) {
-      slots[slot].store(kNoClient);
+    for (std::atomic<int>& slot : slots) {
+      slot.store(kNoClient);
     }
   }
 };
@@ -78,8 +79,8 @@ void SendToEveryClient(httpd_ws_type_t type, uint8_t* payload, size_t length) {
   frame.payload = payload;
   frame.len = length;
 
-  for (size_t slot = 0u; slot < kMaxClients; slot++) {
-    int const descriptor = ClientTable().slots[slot].load(std::memory_order_acquire);
+  for (std::atomic<int>& slot : ClientTable().slots) {
+    int const descriptor = slot.load(std::memory_order_acquire);
 
     if (descriptor != kNoClient) {
       httpd_ws_send_frame_async(http_server, descriptor, &frame);
@@ -118,10 +119,9 @@ bool IsRequestAuthorised(httpd_req_t* request) {
   static constexpr char kScheme[]{"Basic "};
 
   if (httpd_req_get_hdr_value_str(request, "Authorization", header, sizeof(header)) == ESP_OK) {
-    if (strncmp(header, kScheme, sizeof(kScheme) - 1u) == 0) {
-      if (System::GetInstance().IsConsoleCredentialValid(&header[sizeof(kScheme) - 1u])) {
-        return true;
-      }
+    if ((strncmp(header, kScheme, sizeof(kScheme) - 1u) == 0) &&
+        System::GetInstance().IsConsoleCredentialValid(&header[sizeof(kScheme) - 1u])) {
+      return true;
     }
   }
 
@@ -320,10 +320,8 @@ esp_err_t HandleSocket(httpd_req_t* request) {
    * the check belongs at the one moment the browser does send them - which is the GET the
    * server calls this handler with before the socket exists.
    */
-  if (request->method == HTTP_GET) {
-    if (!IsRequestAuthorised(request)) {
-      return ESP_OK;
-    }
+  if ((request->method == HTTP_GET) && (!IsRequestAuthorised(request))) {
+    return ESP_OK;
   }
 
   if (request->method == HTTP_GET) {
@@ -485,8 +483,8 @@ WebTransport& WebTransport::GetInstance() {
 bool WebTransport::IsListening() const { return http_server != nullptr; }
 
 bool WebTransport::HasClients() const {
-  for (size_t slot = 0u; slot < kMaxClients; slot++) {
-    if (ClientTable().slots[slot].load(std::memory_order_acquire) != kNoClient) {
+  for (std::atomic<int>& slot : ClientTable().slots) {
+    if (slot.load(std::memory_order_acquire) != kNoClient) {
       return true;
     }
   }
@@ -535,15 +533,15 @@ void WebInterface::OnClientOpened(int descriptor) {
    */
   WebFrontend::GetInstance().OnClientOpened();
 
-  for (size_t slot = 0u; slot < kMaxClients; slot++) {
-    if (ClientTable().slots[slot].load(std::memory_order_relaxed) == descriptor) {
+  for (std::atomic<int>& slot : ClientTable().slots) {
+    if (slot.load(std::memory_order_relaxed) == descriptor) {
       return;
     }
   }
 
-  for (size_t slot = 0u; slot < kMaxClients; slot++) {
-    if (ClientTable().slots[slot].load(std::memory_order_relaxed) == kNoClient) {
-      ClientTable().slots[slot].store(descriptor, std::memory_order_release);
+  for (std::atomic<int>& slot : ClientTable().slots) {
+    if (slot.load(std::memory_order_relaxed) == kNoClient) {
+      slot.store(descriptor, std::memory_order_release);
       return;
     }
   }
@@ -552,9 +550,9 @@ void WebInterface::OnClientOpened(int descriptor) {
 }
 
 void WebInterface::OnClientClosed(int descriptor) {
-  for (size_t slot = 0u; slot < kMaxClients; slot++) {
-    if (ClientTable().slots[slot].load(std::memory_order_relaxed) == descriptor) {
-      ClientTable().slots[slot].store(kNoClient, std::memory_order_release);
+  for (std::atomic<int>& slot : ClientTable().slots) {
+    if (slot.load(std::memory_order_relaxed) == descriptor) {
+      slot.store(kNoClient, std::memory_order_release);
       return;
     }
   }

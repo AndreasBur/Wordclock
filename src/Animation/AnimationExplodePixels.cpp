@@ -79,12 +79,8 @@ void AnimationExplodePixels::ShiftQuadrants(DisplayPixels& pixels, byte number_o
   for (uint8_t row = 0u; row < DISPLAY_NUMBER_OF_ROWS; row++) {
     for (uint8_t column = 0u; column < DISPLAY_NUMBER_OF_COLUMNS; column++) {
       if (pixels.GetPixel(column, row)) {
-        byte column_next = column, row_next = row;
-        if (column < kColumnCenter) column_next = ShiftRight(column, number_of_shifts);
-        if (column > kColumnCenter) column_next = ShiftLeft(column, number_of_shifts);
-        if (row < kRowCenter) row_next = ShiftDown(row, number_of_shifts);
-        if (row > kRowCenter) row_next = ShiftUp(row, number_of_shifts);
-        SetNewPixel(column, row, column_next, row_next);
+        SetNewPixel(column, row, ShiftColumnTowardsCenter(column, number_of_shifts),
+                    ShiftRowTowardsCenter(row, number_of_shifts));
       }
     }
   }
@@ -106,7 +102,8 @@ void AnimationExplodePixels::ShiftQuadrantUpperLeft() {
 }
 
 void AnimationExplodePixels::ShiftDownRight(byte column, byte row) {
-  byte column_next = column, row_next = row;
+  byte column_next = column;
+  byte row_next = row;
 
   if (column < kColumnCenter) column_next++;
   if (row < kRowCenter) row_next++;
@@ -122,7 +119,8 @@ void AnimationExplodePixels::ShiftQuadrantUpperRight() {
 }
 
 void AnimationExplodePixels::ShiftDownLeft(byte column, byte row) {
-  byte column_next = column, row_next = row;
+  byte column_next = column;
+  byte row_next = row;
 
   if (column > kColumnCenter) column_next--;
   if (row < kRowCenter) row_next++;
@@ -138,7 +136,8 @@ void AnimationExplodePixels::ShiftQuadrantLowerLeft() {
 }
 
 void AnimationExplodePixels::ShiftUpRight(byte column, byte row) {
-  byte column_next = column, row_next = row;
+  byte column_next = column;
+  byte row_next = row;
 
   if (column < kColumnCenter) column_next++;
   if (row > kRowCenter) row_next--;
@@ -154,7 +153,8 @@ void AnimationExplodePixels::ShiftQuadrantLowerRight() {
 }
 
 void AnimationExplodePixels::ShiftUpLeft(byte column, byte row) {
-  byte column_next = column, row_next = row;
+  byte column_next = column;
+  byte row_next = row;
 
   if (column > kColumnCenter) column_next--;
   if (row > kRowCenter) row_next--;

@@ -41,9 +41,10 @@
  * share. It is Overlays that lets only one overlay show at a time.
  *
  * Each overlay derives from this class with itself as `Derived`, makes this class its friend, and
- * answers four private hooks, which are not virtual: `SetStateToShow(ClockDate, ClockTime)` starts
- * its text, `SetStateToIdle(ClockDate, ClockTime)` stops it, `IsReady()` says whether it has
- * anything to show, and `ResetOwnToDefaults()` resets what it adds to the settings of this class.
+ * answers five private hooks, which are not virtual: `SetStateToShow(ClockDate, ClockTime)` starts
+ * its text, `SetText()` starts it again, `SetStateToIdle(ClockDate, ClockTime)` stops it,
+ * `IsReady()` says whether it has anything to show, and `ResetOwnToDefaults()` resets what it adds
+ * to the settings of this class.
  *
  * \tparam Derived The overlay that derives from this class.
  */
@@ -86,7 +87,7 @@ class Overlay {
      * prevent - somebody inheriting this template with another class's Derived - the
      * assertion catches instead, at the first point where Derived is a complete type.
      */
-    static_assert(std::is_base_of<Overlay, Derived>::value,
+    static_assert(std::is_base_of_v<Overlay, Derived>,
                   "Overlay is a CRTP base: Derived has to be the class that inherits it");
   }
 
@@ -132,7 +133,7 @@ class Overlay {
   bool IsDateMatchingMonthSet(MonthType current_month) const { return current_month == month_; }
   bool IsDateMatchingDaySet(DayType current_day) const { return current_day == day_; }
   bool IsMinuteMatching(MinuteType current_minute) const {
-    return !(current_minute % period_in_minutes_);
+    return (current_minute % period_in_minutes_) == 0;
   }
   static bool IsSecondMatching(SecondType current_second) {
     return current_second == kSecondToStartShow;
@@ -195,6 +196,16 @@ class Overlay {
   void SetStateToIdle(ClockDate current_date, ClockTime current_time) {
     state_ = StateType::kIdle;
     Underlying().SetStateToIdle(current_date, current_time);
+  }
+
+  /*
+   * Here rather than in each overlay's own Task(), which hid this one: a call through the base
+   * would have skipped the restart, and the three copies were the same.
+   */
+  void RestartTextOnceScrolledThrough() {
+    if (Text::GetInstance().GetState() == Text::StateType::kIdle) {
+      Underlying().SetText();
+    }
   }
 
   SecondType ShowTimerTask(SecondType show_timer_in_seconds) {
@@ -504,8 +515,9 @@ class Overlay {
    * Switched off, the overlay does nothing. Idle, it starts if CanShow() is true, the time is
    * second 30 of a minute that the period divides, and the date passes the month, the day and
    * the valid-in-days: as StartShow() does, it goes to StateType::kShow and the derived overlay
-   * starts its text. Showing, it ends once the timer is 0: as StopShow() does, it goes back to
-   * StateType::kIdle and the derived overlay stops its text.
+   * starts its text. Showing, it first starts the text again if the text output is idle, which it
+   * is once the previous run has scrolled through, and then ends once the timer is 0: as
+   * StopShow() does, it goes back to StateType::kIdle and the derived overlay stops its text.
    *
    * It draws nothing itself and does not show the display; Text::Task() does that, called by the
    * scheduler.
@@ -526,6 +538,7 @@ class Overlay {
       return IdleTask(show_timer_in_seconds, current_date, current_time);
     }
     if (state_ == StateType::kShow) {
+      RestartTextOnceScrolledThrough();
       return ShowTask(show_timer_in_seconds, current_date, current_time);
     }
     return 0u;

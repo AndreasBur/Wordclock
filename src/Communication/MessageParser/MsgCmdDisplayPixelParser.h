@@ -17,13 +17,10 @@
 /*! \brief The number of options in the parameter table of the display pixel command. */
 #define MSG_CMD_DISPLAY_PIXEL_PARSER_PARAMETER_TABLE_SIZE 2u
 
-#if (WS2812_NUMBER_OF_LEDS < 255u)
+#if (DISPLAY_NUMBER_OF_LEDS < 255u)
 /*!
- * \brief The argument type of `-I`: uint8 while WS2812_NUMBER_OF_LEDS lies below 255, uint16
+ * \brief The argument type of `-I`: uint8 while DISPLAY_NUMBER_OF_LEDS lies below 255, uint16
  *        otherwise.
- *
- * WS2812_NUMBER_OF_LEDS is defined nowhere, so the preprocessor takes it as 0, and the type is
- * uint8 whatever the number of LEDs.
  */
 #define MSG_CMD_DISPLAY_PIXEL_PARSER_INDEX_ARGUMENT_TYPE MsgParameter::ArgumentTypeType::kUint8
 #else
@@ -106,7 +103,7 @@ class MsgCmdDisplayPixelParser
   }
 
   void HandleParameterState(byte argument) {
-    bool pixel_value = argument;
+    bool pixel_value = argument != 0u;
     state_ = GetPixelState(pixel_value);
   }
 

@@ -96,7 +96,7 @@ class WebHost {
    * read it.
    */
   SocketType listener_{kInvalidSocket};
-  SocketType clients_[WEB_HOST_MAX_CLIENTS];
+  SocketType clients_[WEB_HOST_MAX_CLIENTS]{};
   std::string pending_[WEB_HOST_MAX_CLIENTS];
 
   WebHost();

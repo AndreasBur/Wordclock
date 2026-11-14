@@ -105,9 +105,6 @@ class ClockDate {
     SetDay(day);
   }
 
-  /*! \brief Destroys the date. */
-  ~ClockDate() = default;
-
   /*! \brief Returns the year, 2000 to 2099. */
   YearType GetYear() const { return year_; }
 
@@ -220,7 +217,8 @@ class ClockDate {
    */
   static constexpr RataDieDayType GetRataDieDay(YearType year, MonthType month, DayType day) {
     if (month < 3u) {
-      year--, month += 12u;
+      year--;
+      month += 12u;
     }
     return static_cast<RataDieDayType>(365u) * year + year / 4u - year / 100u + year / 400u +
            (153u * month - 457u) / 5u + day - 306u;

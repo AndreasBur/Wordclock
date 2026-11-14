@@ -44,8 +44,8 @@ using SendLengthType = size_t;
 /*! \endcond */
 
 WebHost::WebHost() {
-  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-    clients_[slot] = kInvalidSocket;
+  for (int& client : clients_) {
+    client = kInvalidSocket;
   }
 }
 
@@ -101,8 +101,8 @@ void WebHost::End() {
 bool WebHost::IsListening() const { return listener_ != kInvalidSocket; }
 
 bool WebHost::HasClients() const {
-  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-    if (clients_[slot] != kInvalidSocket) {
+  for (int client : clients_) {
+    if (client != kInvalidSocket) {
       return true;
     }
   }
@@ -112,9 +112,9 @@ bool WebHost::HasClients() const {
 void WebHost::SendToEveryClient(bool is_binary, char const* payload, size_t length) {
   std::string const frame = WebSocket::EncodeFrame(is_binary, payload, length);
 
-  for (size_t slot = 0u; slot < WEB_HOST_MAX_CLIENTS; slot++) {
-    if (clients_[slot] != kInvalidSocket) {
-      SendAll(clients_[slot], frame.data(), frame.size());
+  for (int client : clients_) {
+    if (client != kInvalidSocket) {
+      SendAll(client, frame.data(), frame.size());
     }
   }
 }

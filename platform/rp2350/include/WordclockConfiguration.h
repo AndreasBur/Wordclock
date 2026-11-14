@@ -17,7 +17,7 @@
 #ifndef WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKCONFIGURATION_H_
 #define WORDCLOCK_PLATFORM_RP2350_INCLUDE_WORDCLOCKCONFIGURATION_H_
 
-#if defined(__has_include)
+#ifdef __has_include
 #if __has_include("WordclockSecrets.h")
 #include "WordclockSecrets.h"
 #endif

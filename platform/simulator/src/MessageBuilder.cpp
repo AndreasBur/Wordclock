@@ -93,6 +93,28 @@ wxBoxSizer* MessageBuilder::CreateSizerAll(wxWindow* parent) {
   return sizer_all;
 }
 
+void MessageBuilder::FillOptionRow(OptionRowType const& row,
+                                   MessageCatalog::OptionType const& option) {
+  row.use->SetLabel(wxString::Format(wxT("-%c  %s"), option.short_name, option.label));
+
+  if (option.value_names != nullptr) {
+    row.choice->Clear();
+    for (byte name = 0u; name < option.number_of_value_names; name++) {
+      row.choice->Append(
+          wxString::Format(wxT("%u  %s"), option.minimum + name, option.value_names[name]));
+    }
+    row.choice->SetSelection(0);
+    return;
+  }
+
+  row.value->ChangeValue(_T(""));
+  if (option.argument == MessageCatalog::ArgumentType::kString) {
+    row.value->SetHint(_T("text"));
+  } else {
+    row.value->SetHint(wxString::Format(wxT("%u..%u"), option.minimum, option.maximum));
+  }
+}
+
 /*
  * Brings the option rows in line with the selected command. Rows beyond the command's option
  * list are hidden. The ones in use are reset rather than left as they were, so an argument
@@ -110,8 +132,7 @@ void MessageBuilder::ShowOptionsOfSelectedCommand() {
      * when the answer comes back.
      */
     bool const used = exists && !command.options[index].read_only;
-
-    bool named = false;
+    bool const named = used && (command.options[index].value_names != nullptr);
 
     /*
      * Cleared for every option this command has, not only for the ones that get a row:
@@ -123,28 +144,7 @@ void MessageBuilder::ShowOptionsOfSelectedCommand() {
     }
 
     if (used) {
-      MessageCatalog::OptionType const& option = command.options[index];
-      named = option.value_names != nullptr;
-
-      option_rows_[index].use->SetLabel(
-          wxString::Format(wxT("-%c  %s"), option.short_name, option.label));
-
-      if (named) {
-        option_rows_[index].choice->Clear();
-        for (byte name = 0u; name < option.number_of_value_names; name++) {
-          option_rows_[index].choice->Append(
-              wxString::Format(wxT("%u  %s"), option.minimum + name, option.value_names[name]));
-        }
-        option_rows_[index].choice->SetSelection(0);
-      } else {
-        option_rows_[index].value->ChangeValue(_T(""));
-        if (option.argument == MessageCatalog::ArgumentType::kString) {
-          option_rows_[index].value->SetHint(_T("text"));
-        } else {
-          option_rows_[index].value->SetHint(
-              wxString::Format(wxT("%u..%u"), option.minimum, option.maximum));
-        }
-      }
+      FillOptionRow(option_rows_[index], command.options[index]);
     }
 
     option_rows_[index].use->Show(used);

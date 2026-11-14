@@ -185,7 +185,11 @@ std::string WebSocket::PadSha1Message(std::string const& message) {
 // 80 rounds over it.
 void WebSocket::ProcessSha1Block(uint8_t const* block, uint32_t* state) {
   uint32_t word[kSha1Rounds];
-  uint32_t a{state[0]}, b{state[1]}, c{state[2]}, d{state[3]}, e{state[4]};
+  uint32_t a{state[0]};
+  uint32_t b{state[1]};
+  uint32_t c{state[2]};
+  uint32_t d{state[3]};
+  uint32_t e{state[4]};
 
   for (size_t index = 0u; index < kSha1WordsPerBlock; index++) {
     uint8_t const* chunk = &block[index * 4u];
